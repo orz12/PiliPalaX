@@ -125,23 +125,6 @@ jobs:
       - android
       - iOS
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-
-      - name: Set up Git
-        run: |
-          cd $GITHUB_WORKSPACE
-          git config user.email "${{ secrets.GIT_EMAIL }}"
-          git config user.name "${{ secrets.GIT_USERNAME }}"
-
-      - name: Create release tag
-        run: |
-          git tag -a v${{ github.run_number }} -m "Release v${{ github.run_number }}"
-          git push --follow-tags
-          
-      - name: Get version
-        id: version
-        run: echo "version=${GITHUB_REF#refs/tags/v}" >>$GITHUB_OUTPUT
 
       - uses: actions/download-artifact@v3
         with:
@@ -151,9 +134,10 @@ jobs:
       - name: Upload Pre-release
         uses: ncipollo/release-action@v1
         with:
-          name: v${{ steps.version.outputs.version }}
+          name: v${{ github.run_number }}
           token: ${{ secrets.GIT_TOKEN }}
-          
+          commit: main
+          tag: v${{ github.run_number }}
           prerelease: true
           allowUpdates: true
           artifacts: Pilipala-CI/*
