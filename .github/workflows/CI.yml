@@ -130,6 +130,16 @@ jobs:
           name: Pilipala-CI
           path: ./Pilipala-CI
 
+      - name: Set up Git
+        run: |
+          git config user.email "${{ secrets.GIT_EMAIL }}"
+          git config user.name "${{ secrets.GIT_USERNAME }}"
+
+      - name: Create release tag
+        run: |
+          git tag -a v${{ github.run_number }} -m "Release v${{ github.run_number }}"
+          git push --follow-tags
+
       - name: Upload Pre-release
         uses: ncipollo/release-action@v1
         with:
