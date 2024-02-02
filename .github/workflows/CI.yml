@@ -139,6 +139,10 @@ jobs:
           git tag -a v${{ github.run_number }} -m "Release v${{ github.run_number }}"
           git push --follow-tags
           
+      - name: Get version
+        id: version
+        run: echo "version=${GITHUB_REF#refs/tags/v}" >>$GITHUB_OUTPUT
+
       - uses: actions/download-artifact@v3
         with:
           name: Pilipala-CI
