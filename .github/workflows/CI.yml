@@ -125,13 +125,12 @@ jobs:
       - android
       - iOS
     steps:
-      - uses: actions/download-artifact@v3
-        with:
-          name: Pilipala-CI
-          path: ./Pilipala-CI
+      - name: Checkout code
+        uses: actions/checkout@v2
 
       - name: Set up Git
         run: |
+          cd $GITHUB_WORKSPACE
           git config user.email "${{ secrets.GIT_EMAIL }}"
           git config user.name "${{ secrets.GIT_USERNAME }}"
 
@@ -139,7 +138,12 @@ jobs:
         run: |
           git tag -a v${{ github.run_number }} -m "Release v${{ github.run_number }}"
           git push --follow-tags
-
+          
+      - uses: actions/download-artifact@v3
+        with:
+          name: Pilipala-CI
+          path: ./Pilipala-CI
+          
       - name: Upload Pre-release
         uses: ncipollo/release-action@v1
         with:
