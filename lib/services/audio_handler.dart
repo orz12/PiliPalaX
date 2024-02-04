@@ -37,6 +37,11 @@ class VideoPlayerServiceHandler extends BaseAudioHandler with SeekHandler {
   }
 
   @override
+  Future<void> onAudioFocusGained() async {
+    // Do nothing
+  }
+
+  @override
   Future<void> play() async {
     PlPlayerController.getInstance().play();
   }
