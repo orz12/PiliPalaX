@@ -3,7 +3,7 @@ import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_displaymode/flutter_displaymode.dart';
 import 'package:hive/hive.dart';
-import 'package:pilipala/utils/storage.dart';
+import 'package:PiliPalaX/utils/storage.dart';
 
 class SetDiaplayMode extends StatefulWidget {
   const SetDiaplayMode({super.key});

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:pilipala/common/constants.dart';
-import 'package:pilipala/utils/feed_back.dart';
+import 'package:PiliPalaX/common/constants.dart';
+import 'package:PiliPalaX/utils/feed_back.dart';
 
 class ActionItem extends StatelessWidget {
   final Icon? icon;

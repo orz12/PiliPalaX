@@ -8,7 +8,7 @@ import 'package:dio/io.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 // import 'package:dio_http2_adapter/dio_http2_adapter.dart';
 import 'package:hive/hive.dart';
-import 'package:pilipala/utils/id_utils.dart';
+import 'package:PiliPalaX/utils/id_utils.dart';
 import '../utils/storage.dart';
 import '../utils/utils.dart';
 import 'constants.dart';

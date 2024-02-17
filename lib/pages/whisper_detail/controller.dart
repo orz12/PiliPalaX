@@ -1,7 +1,7 @@
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
-import 'package:pilipala/http/msg.dart';
-import 'package:pilipala/models/msg/session.dart';
+import 'package:PiliPalaX/http/msg.dart';
+import 'package:PiliPalaX/models/msg/session.dart';
 
 class WhisperDetailController extends GetxController {
   late int talkerId;

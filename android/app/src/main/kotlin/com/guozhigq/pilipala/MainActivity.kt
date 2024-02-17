@@ -1,4 +1,4 @@
-package com.guozhigq.pilipala
+package com.orz12.PiliPalaX
 
 import io.flutter.embedding.android.FlutterActivity
 

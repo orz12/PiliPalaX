@@ -6,6 +6,7 @@ on:
     # push tag时触发
     tags:
       - "v*.*.*"
+      - "!v*.*.*\+*"
 
 # 可以有多个jobs
 jobs:

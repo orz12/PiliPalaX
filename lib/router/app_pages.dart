@@ -3,11 +3,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
-import 'package:pilipala/pages/msg_feed_top/at_me/view.dart';
-import 'package:pilipala/pages/msg_feed_top/reply_me/view.dart';
-import 'package:pilipala/pages/msg_feed_top/like_me/view.dart';
-import 'package:pilipala/pages/follow_search/view.dart';
-import 'package:pilipala/pages/setting/pages/logs.dart';
+import 'package:PiliPalaX/pages/msg_feed_top/at_me/view.dart';
+import 'package:PiliPalaX/pages/msg_feed_top/reply_me/view.dart';
+import 'package:PiliPalaX/pages/msg_feed_top/like_me/view.dart';
+import 'package:PiliPalaX/pages/follow_search/view.dart';
+import 'package:PiliPalaX/pages/setting/pages/logs.dart';
 
 import '../pages/about/index.dart';
 import '../pages/blacklist/index.dart';

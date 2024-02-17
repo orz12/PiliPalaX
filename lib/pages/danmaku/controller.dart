@@ -1,5 +1,5 @@
-import 'package:pilipala/http/danmaku.dart';
-import 'package:pilipala/models/danmaku/dm.pb.dart';
+import 'package:PiliPalaX/http/danmaku.dart';
+import 'package:PiliPalaX/models/danmaku/dm.pb.dart';
 
 class PlDanmakuController {
   PlDanmakuController(this.cid);

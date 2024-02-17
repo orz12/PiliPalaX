@@ -3,9 +3,9 @@ import 'dart:io';
 
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:pilipala/models/model_owner.dart';
-import 'package:pilipala/models/search/hot.dart';
-import 'package:pilipala/models/user/info.dart';
+import 'package:PiliPalaX/models/model_owner.dart';
+import 'package:PiliPalaX/models/search/hot.dart';
+import 'package:PiliPalaX/models/user/info.dart';
 
 class GStrorage {
   static late final Box<dynamic> userInfo;

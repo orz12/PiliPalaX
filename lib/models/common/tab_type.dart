@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:pilipala/pages/bangumi/index.dart';
-import 'package:pilipala/pages/hot/index.dart';
-import 'package:pilipala/pages/live/index.dart';
-import 'package:pilipala/pages/rcmd/index.dart';
+import 'package:PiliPalaX/pages/bangumi/index.dart';
+import 'package:PiliPalaX/pages/hot/index.dart';
+import 'package:PiliPalaX/pages/live/index.dart';
+import 'package:PiliPalaX/pages/rcmd/index.dart';
 
 enum TabType { live, rcmd, hot, bangumi }
 

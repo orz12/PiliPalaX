@@ -1,20 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
-import 'package:pilipala/common/constants.dart';
-import 'package:pilipala/common/widgets/badge.dart';
-import 'package:pilipala/common/widgets/network_img_layer.dart';
-import 'package:pilipala/http/search.dart';
-import 'package:pilipala/http/user.dart';
-import 'package:pilipala/http/video.dart';
-import 'package:pilipala/models/bangumi/info.dart';
-import 'package:pilipala/models/common/business_type.dart';
-import 'package:pilipala/models/common/search_type.dart';
-import 'package:pilipala/models/live/item.dart';
-import 'package:pilipala/pages/history_search/index.dart';
-import 'package:pilipala/utils/feed_back.dart';
-import 'package:pilipala/utils/id_utils.dart';
-import 'package:pilipala/utils/utils.dart';
+import 'package:PiliPalaX/common/constants.dart';
+import 'package:PiliPalaX/common/widgets/badge.dart';
+import 'package:PiliPalaX/common/widgets/network_img_layer.dart';
+import 'package:PiliPalaX/http/search.dart';
+import 'package:PiliPalaX/http/user.dart';
+import 'package:PiliPalaX/http/video.dart';
+import 'package:PiliPalaX/models/bangumi/info.dart';
+import 'package:PiliPalaX/models/common/business_type.dart';
+import 'package:PiliPalaX/models/common/search_type.dart';
+import 'package:PiliPalaX/models/live/item.dart';
+import 'package:PiliPalaX/pages/history_search/index.dart';
+import 'package:PiliPalaX/utils/feed_back.dart';
+import 'package:PiliPalaX/utils/id_utils.dart';
+import 'package:PiliPalaX/utils/utils.dart';
 
 class HistoryItem extends StatelessWidget {
   final dynamic videoItem;

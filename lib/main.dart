@@ -8,20 +8,20 @@ import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:dynamic_color/dynamic_color.dart';
 import 'package:hive/hive.dart';
-import 'package:pilipala/common/widgets/custom_toast.dart';
-import 'package:pilipala/http/init.dart';
-import 'package:pilipala/models/common/color_type.dart';
-import 'package:pilipala/models/common/theme_type.dart';
-import 'package:pilipala/pages/search/index.dart';
-import 'package:pilipala/pages/video/detail/index.dart';
-import 'package:pilipala/router/app_pages.dart';
-import 'package:pilipala/pages/main/view.dart';
-import 'package:pilipala/services/service_locator.dart';
-import 'package:pilipala/utils/app_scheme.dart';
-import 'package:pilipala/utils/data.dart';
-import 'package:pilipala/utils/storage.dart';
+import 'package:PiliPalaX/common/widgets/custom_toast.dart';
+import 'package:PiliPalaX/http/init.dart';
+import 'package:PiliPalaX/models/common/color_type.dart';
+import 'package:PiliPalaX/models/common/theme_type.dart';
+import 'package:PiliPalaX/pages/search/index.dart';
+import 'package:PiliPalaX/pages/video/detail/index.dart';
+import 'package:PiliPalaX/router/app_pages.dart';
+import 'package:PiliPalaX/pages/main/view.dart';
+import 'package:PiliPalaX/services/service_locator.dart';
+import 'package:PiliPalaX/utils/app_scheme.dart';
+import 'package:PiliPalaX/utils/data.dart';
+import 'package:PiliPalaX/utils/storage.dart';
 import 'package:media_kit/media_kit.dart'; // Provides [Player], [Media], [Playlist] etc.
-import 'package:pilipala/utils/recommend_filter.dart';
+import 'package:PiliPalaX/utils/recommend_filter.dart';
 import 'package:catcher_2/catcher_2.dart';
 import './services/loggeer.dart';
 
@@ -148,7 +148,7 @@ class MyApp extends StatelessWidget {
         // 图片缓存
         // PaintingBinding.instance.imageCache.maximumSizeBytes = 1000 << 20;
         return GetMaterialApp(
-          title: 'PiLiPaLa',
+          title: 'PiliPalaX',
           theme: ThemeData(
             // fontFamily: 'HarmonyOS',
             colorScheme: currentThemeValue == ThemeType.dark

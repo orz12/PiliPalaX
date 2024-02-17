@@ -1,10 +1,10 @@
 // 视频or合集
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:pilipala/common/constants.dart';
-import 'package:pilipala/common/widgets/badge.dart';
-import 'package:pilipala/common/widgets/network_img_layer.dart';
-import 'package:pilipala/utils/utils.dart';
+import 'package:PiliPalaX/common/constants.dart';
+import 'package:PiliPalaX/common/widgets/badge.dart';
+import 'package:PiliPalaX/common/widgets/network_img_layer.dart';
+import 'package:PiliPalaX/utils/utils.dart';
 
 import 'rich_node_panel.dart';
 

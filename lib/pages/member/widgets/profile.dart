@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
-import 'package:pilipala/common/widgets/network_img_layer.dart';
-import 'package:pilipala/models/live/item.dart';
-import 'package:pilipala/models/member/info.dart';
-import 'package:pilipala/utils/utils.dart';
+import 'package:PiliPalaX/common/widgets/network_img_layer.dart';
+import 'package:PiliPalaX/models/live/item.dart';
+import 'package:PiliPalaX/models/member/info.dart';
+import 'package:PiliPalaX/utils/utils.dart';
 
 class ProfilePanel extends StatelessWidget {
   final dynamic ctr;

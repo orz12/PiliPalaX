@@ -1,4 +1,4 @@
-import 'package:pilipala/models/video/play/url.dart';
+import 'package:PiliPalaX/models/video/play/url.dart';
 
 class VideoUtils {
   static String getCdnUrl(dynamic item) {

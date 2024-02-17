@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:hive/hive.dart';
-import 'package:pilipala/models/common/tab_type.dart';
-import 'package:pilipala/utils/storage.dart';
+import 'package:PiliPalaX/models/common/tab_type.dart';
+import 'package:PiliPalaX/utils/storage.dart';
 
 class TabbarSetPage extends StatefulWidget {
   const TabbarSetPage({super.key});

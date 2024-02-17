@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:pilipala/common/skeleton/video_card_h.dart';
-import 'package:pilipala/common/widgets/animated_dialog.dart';
-import 'package:pilipala/common/widgets/http_error.dart';
-import 'package:pilipala/common/widgets/overlay_pop.dart';
-import 'package:pilipala/common/widgets/video_card_h.dart';
+import 'package:PiliPalaX/common/skeleton/video_card_h.dart';
+import 'package:PiliPalaX/common/widgets/animated_dialog.dart';
+import 'package:PiliPalaX/common/widgets/http_error.dart';
+import 'package:PiliPalaX/common/widgets/overlay_pop.dart';
+import 'package:PiliPalaX/common/widgets/video_card_h.dart';
 import './controller.dart';
 
 class RelatedVideoPanel extends StatefulWidget {

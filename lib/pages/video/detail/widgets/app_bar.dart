@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:pilipala/plugin/pl_player/index.dart';
+import 'package:PiliPalaX/plugin/pl_player/index.dart';
 
 class ScrollAppBar extends StatelessWidget {
   final double scrollVal;

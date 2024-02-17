@@ -5,11 +5,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
-import 'package:pilipala/models/video/play/quality.dart';
-import 'package:pilipala/pages/setting/widgets/select_dialog.dart';
-import 'package:pilipala/plugin/pl_player/index.dart';
-import 'package:pilipala/services/service_locator.dart';
-import 'package:pilipala/utils/storage.dart';
+import 'package:PiliPalaX/models/video/play/quality.dart';
+import 'package:PiliPalaX/pages/setting/widgets/select_dialog.dart';
+import 'package:PiliPalaX/plugin/pl_player/index.dart';
+import 'package:PiliPalaX/services/service_locator.dart';
+import 'package:PiliPalaX/utils/storage.dart';
 
 import 'widgets/switch_item.dart';
 

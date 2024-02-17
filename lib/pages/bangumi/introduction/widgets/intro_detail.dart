@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-import 'package:pilipala/common/widgets/stat/danmu.dart';
-import 'package:pilipala/common/widgets/stat/view.dart';
+import 'package:PiliPalaX/common/widgets/stat/danmu.dart';
+import 'package:PiliPalaX/common/widgets/stat/view.dart';
 
 import '../../../../utils/utils.dart';
 

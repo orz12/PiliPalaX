@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
-import 'package:pilipala/utils/storage.dart';
+import 'package:PiliPalaX/utils/storage.dart';
 
 class FontSizeSelectPage extends StatefulWidget {
   const FontSizeSelectPage({super.key});

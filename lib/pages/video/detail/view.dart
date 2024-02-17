@@ -4,26 +4,25 @@ import 'dart:math';
 import 'dart:ui';
 
 import 'package:auto_orientation/auto_orientation.dart';
-import 'package:extended_nested_scroll_view/extended_nested_scroll_view.dart';
 import 'package:floating/floating.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:nil/nil.dart';
-import 'package:pilipala/common/widgets/network_img_layer.dart';
-import 'package:pilipala/http/user.dart';
-import 'package:pilipala/models/common/search_type.dart';
-import 'package:pilipala/pages/bangumi/introduction/index.dart';
-import 'package:pilipala/pages/danmaku/view.dart';
-import 'package:pilipala/pages/video/detail/reply/index.dart';
-import 'package:pilipala/pages/video/detail/controller.dart';
-import 'package:pilipala/pages/video/detail/introduction/index.dart';
-import 'package:pilipala/pages/video/detail/related/index.dart';
-import 'package:pilipala/plugin/pl_player/index.dart';
-import 'package:pilipala/plugin/pl_player/models/play_repeat.dart';
-import 'package:pilipala/services/service_locator.dart';
-import 'package:pilipala/utils/storage.dart';
+import 'package:PiliPalaX/common/widgets/network_img_layer.dart';
+import 'package:PiliPalaX/http/user.dart';
+import 'package:PiliPalaX/models/common/search_type.dart';
+import 'package:PiliPalaX/pages/bangumi/introduction/index.dart';
+import 'package:PiliPalaX/pages/danmaku/view.dart';
+import 'package:PiliPalaX/pages/video/detail/reply/index.dart';
+import 'package:PiliPalaX/pages/video/detail/controller.dart';
+import 'package:PiliPalaX/pages/video/detail/introduction/index.dart';
+import 'package:PiliPalaX/pages/video/detail/related/index.dart';
+import 'package:PiliPalaX/plugin/pl_player/index.dart';
+import 'package:PiliPalaX/plugin/pl_player/models/play_repeat.dart';
+import 'package:PiliPalaX/services/service_locator.dart';
+import 'package:PiliPalaX/utils/storage.dart';
 
 import '../../../services/shutdown_timer_service.dart';
 import 'widgets/header_control.dart';
@@ -41,7 +40,6 @@ class _VideoDetailPageState extends State<VideoDetailPage>
     with TickerProviderStateMixin, RouteAware {
   late VideoDetailController videoDetailController;
   PlPlayerController? plPlayerController;
-  final ScrollController _extendNestCtr = ScrollController();
   late StreamController<double> appbarStream;
   late VideoIntroController videoIntroController;
   late BangumiIntroController bangumiIntroController;
@@ -112,12 +110,6 @@ class _VideoDetailPageState extends State<VideoDetailPage>
   // 流
   appbarStreamListen() {
     appbarStream = StreamController<double>();
-    _extendNestCtr.addListener(
-      () {
-        final double offset = _extendNestCtr.position.pixels;
-        appbarStream.add(offset);
-      },
-    );
   }
 
   // 播放器状态监听
@@ -159,8 +151,6 @@ class _VideoDetailPageState extends State<VideoDetailPage>
 
   // 继续播放或重新播放
   void continuePlay() async {
-    await _extendNestCtr.animateTo(0,
-        duration: const Duration(milliseconds: 500), curve: Curves.easeInOut);
     plPlayerController!.play();
   }
 
@@ -248,7 +238,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
     videoDetailController.autoPlay.value =
         !videoDetailController.isShowCover.value;
     videoIntroController.isPaused = false;
-    if (_extendNestCtr.position.pixels == 0 && autoplay) {
+    if (autoplay) {
       await Future.delayed(const Duration(milliseconds: 300));
       plPlayerController?.seekTo(videoDetailController.defaultST);
       plPlayerController?.play();

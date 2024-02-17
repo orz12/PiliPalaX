@@ -3,10 +3,10 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:pilipala/common/constants.dart';
-import 'package:pilipala/common/widgets/network_img_layer.dart';
-import 'package:pilipala/models/common/theme_type.dart';
-import 'package:pilipala/models/user/info.dart';
+import 'package:PiliPalaX/common/constants.dart';
+import 'package:PiliPalaX/common/widgets/network_img_layer.dart';
+import 'package:PiliPalaX/models/common/theme_type.dart';
+import 'package:PiliPalaX/models/user/info.dart';
 import 'controller.dart';
 
 class MinePage extends StatefulWidget {
@@ -53,7 +53,7 @@ class _MinePageState extends State<MinePage> {
             ),
             const SizedBox(width: 5),
             Text(
-              'PiliPala',
+              'PiliPalaX',
               style: Theme.of(context).textTheme.titleMedium,
             ),
           ],

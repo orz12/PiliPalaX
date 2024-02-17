@@ -1,4 +1,4 @@
-import 'package:pilipala/models/video/play/quality.dart';
+import 'package:PiliPalaX/models/video/play/quality.dart';
 
 class PlayUrlModel {
   PlayUrlModel({

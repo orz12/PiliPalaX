@@ -9,12 +9,12 @@ import 'package:hive/hive.dart';
 import 'package:media_kit/media_kit.dart';
 import 'package:media_kit_video/media_kit_video.dart';
 import 'package:nil/nil.dart';
-import 'package:pilipala/plugin/pl_player/controller.dart';
-import 'package:pilipala/plugin/pl_player/models/duration.dart';
-import 'package:pilipala/plugin/pl_player/models/fullscreen_mode.dart';
-import 'package:pilipala/plugin/pl_player/utils.dart';
-import 'package:pilipala/utils/feed_back.dart';
-import 'package:pilipala/utils/storage.dart';
+import 'package:PiliPalaX/plugin/pl_player/controller.dart';
+import 'package:PiliPalaX/plugin/pl_player/models/duration.dart';
+import 'package:PiliPalaX/plugin/pl_player/models/fullscreen_mode.dart';
+import 'package:PiliPalaX/plugin/pl_player/utils.dart';
+import 'package:PiliPalaX/utils/feed_back.dart';
+import 'package:PiliPalaX/utils/storage.dart';
 import 'package:screen_brightness/screen_brightness.dart';
 
 import 'models/bottom_progress_behavior.dart';

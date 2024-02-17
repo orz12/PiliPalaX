@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
-import 'package:pilipala/http/html.dart';
-import 'package:pilipala/http/reply.dart';
-import 'package:pilipala/models/common/reply_sort_type.dart';
-import 'package:pilipala/models/video/reply/item.dart';
-import 'package:pilipala/utils/feed_back.dart';
-import 'package:pilipala/utils/storage.dart';
+import 'package:PiliPalaX/http/html.dart';
+import 'package:PiliPalaX/http/reply.dart';
+import 'package:PiliPalaX/models/common/reply_sort_type.dart';
+import 'package:PiliPalaX/models/video/reply/item.dart';
+import 'package:PiliPalaX/utils/feed_back.dart';
+import 'package:PiliPalaX/utils/storage.dart';
 
 class HtmlRenderController extends GetxController {
   late String id;

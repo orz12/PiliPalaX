@@ -1,8 +1,8 @@
 import 'package:get/get.dart';
-import 'package:pilipala/http/constants.dart';
-import 'package:pilipala/http/live.dart';
-import 'package:pilipala/models/live/room_info.dart';
-import 'package:pilipala/plugin/pl_player/index.dart';
+import 'package:PiliPalaX/http/constants.dart';
+import 'package:PiliPalaX/http/live.dart';
+import 'package:PiliPalaX/models/live/room_info.dart';
+import 'package:PiliPalaX/plugin/pl_player/index.dart';
 import '../../models/live/room_info_h5.dart';
 
 class LiveRoomController extends GetxController {
