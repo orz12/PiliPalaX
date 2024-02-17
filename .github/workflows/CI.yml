@@ -13,13 +13,44 @@ on:
       - '!.github/workflows/**'
 
 jobs:
+  update_version:
+    name: Read and update version
+    runs-on: ubuntu-latest
+
+    outputs:
+      # 定义输出变量 version，以便在其他job中引用
+      new_version: ${{ steps.version.outputs.new_version }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: 更新版本号
+        id: version
+        run: |
+          # 读取版本号
+          VERSION=$(yq e .version pubspec.yaml)
+    
+          # 获取GitHub Actions的run_number
+          RUN_NUMBER=${{ github.run_number }}
+    
+          # 构建新版本号
+          NEW_VERSION=$(echo $VERSION | awk -F+ -v run_number="$RUN_NUMBER" '{print $1"+"run_number}')
+    
+          # 输出新版本号
+          echo "New version: $NEW_VERSION"
+    
+          # 设置新版本号为输出变量
+          echo "new_version=$NEW_VERSION" >>$GITHUB_OUTPUT
+
   android:
     name: Build CI (Android)
+    needs: update_version
     runs-on: ubuntu-latest
 
     steps:
-      - name: 代码迁出
-        uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v2
 
       - name: 构建Java环境
         uses: actions/setup-java@v3
@@ -50,6 +81,12 @@ jobs:
         env:
             KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
 
+      - name: 更新版本号
+        id: version
+        run: |
+          # 更新pubspec.yaml文件中的版本号
+          sed -i "s/version: .*/version: ${{ needs.update_version.outputs.new_version }}/g" pubspec.yaml
+
       - name: flutter build apk
         run: flutter build apk --release --split-per-abi
         env:
@@ -57,15 +94,11 @@ jobs:
             KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
             KEY_PASSWORD: ${{ secrets.KEY_PASSWORD}}
 
-      - name: 获取版本号
-        id: version
-        run: echo "version=${GITHUB_SHA::7}" >>$GITHUB_OUTPUT
-
       - name: 重命名应用
         run: |
           for file in build/app/outputs/flutter-apk/app-*.apk; do
             if [[ $file =~ app-(.?*)release.apk ]]; then
-              new_file_name="build/app/outputs/flutter-apk/Pili-${BASH_REMATCH[1]}${{ steps.version.outputs.version }}.apk"
+              new_file_name="build/app/outputs/flutter-apk/Pili-${BASH_REMATCH[1]}${{ needs.update_version.outputs.new_version }}.apk"
               mv "$file" "$new_file_name"
             fi
           done
@@ -79,11 +112,12 @@ jobs:
 
   iOS:
     name: Build CI (iOS)
+    needs: update_version
     runs-on: macos-latest
 
     steps:
-      - name: 代码迁出
-        uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v2
 
       - name: 安装Flutter
         if: steps.cache-flutter.outputs.cache-hit != 'true'
@@ -92,21 +126,23 @@ jobs:
           cache: true
           flutter-version: 3.16.5
 
+      - name: 更新版本号
+        id: version
+        run: |
+          # 更新pubspec.yaml文件中的版本号
+          sed -i "" "s/version: .*/version: ${{ needs.update_version.outputs.new_version }}/g" pubspec.yaml
+
       - name: flutter build ipa
         run: |
           flutter build ios --release --no-codesign 
           ln -sf ./build/ios/iphoneos Payload
           zip -r9 app.ipa Payload/runner.app
 
-      - name: 获取版本号
-        id: version
-        run:  echo "version=${GITHUB_SHA::7}" >>$GITHUB_OUTPUT
-
       - name: 重命名应用
         run: |
           DATE=${{ steps.date.outputs.date }}
           for file in app.ipa; do
-            new_file_name="build/Pili-${{ steps.version.outputs.version }}.ipa"
+            new_file_name="build/Pili-${{ needs.update_version.outputs.new_version }}.ipa"
             mv "$file" "$new_file_name"
           done
 
@@ -122,6 +158,7 @@ jobs:
     runs-on: ubuntu-latest
 
     needs:
+      - update_version
       - android
       - iOS
     steps:
@@ -134,10 +171,10 @@ jobs:
       - name: Upload Pre-release
         uses: ncipollo/release-action@v1
         with:
-          name: v${{ github.run_number }}
+          name: v${{ needs.update_version.outputs.new_version }}
           token: ${{ secrets.GIT_TOKEN }}
           commit: main
-          tag: v${{ github.run_number }}
+          tag: v${{ needs.update_version.outputs.new_version }}
           prerelease: true
           allowUpdates: true
           artifacts: Pilipala-CI/*

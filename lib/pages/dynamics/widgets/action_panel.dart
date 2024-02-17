@@ -3,10 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
-import 'package:pilipala/http/dynamics.dart';
-import 'package:pilipala/models/dynamics/result.dart';
-import 'package:pilipala/pages/dynamics/index.dart';
-import 'package:pilipala/utils/feed_back.dart';
+import 'package:PiliPalaX/http/dynamics.dart';
+import 'package:PiliPalaX/models/dynamics/result.dart';
+import 'package:PiliPalaX/pages/dynamics/index.dart';
+import 'package:PiliPalaX/utils/feed_back.dart';
 
 class ActionPanel extends StatefulWidget {
   const ActionPanel({

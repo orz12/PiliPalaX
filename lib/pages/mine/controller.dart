@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
-import 'package:pilipala/http/user.dart';
-import 'package:pilipala/models/common/theme_type.dart';
-import 'package:pilipala/models/user/info.dart';
-import 'package:pilipala/models/user/stat.dart';
-import 'package:pilipala/utils/storage.dart';
+import 'package:PiliPalaX/http/user.dart';
+import 'package:PiliPalaX/models/common/theme_type.dart';
+import 'package:PiliPalaX/models/user/info.dart';
+import 'package:PiliPalaX/models/user/stat.dart';
+import 'package:PiliPalaX/utils/storage.dart';
 
 class MineController extends GetxController {
   // 用户信息 头像、昵称、lv

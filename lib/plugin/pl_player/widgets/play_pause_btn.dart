@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:media_kit/media_kit.dart';
-import 'package:pilipala/plugin/pl_player/index.dart';
+import 'package:PiliPalaX/plugin/pl_player/index.dart';
 
 class PlayOrPauseButton extends StatefulWidget {
   final double? iconSize;

@@ -3,9 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:nil/nil.dart';
-import 'package:pilipala/plugin/pl_player/index.dart';
-import 'package:pilipala/plugin/pl_player/widgets/play_pause_btn.dart';
-import 'package:pilipala/utils/feed_back.dart';
+import 'package:PiliPalaX/plugin/pl_player/index.dart';
+import 'package:PiliPalaX/plugin/pl_player/widgets/play_pause_btn.dart';
+import 'package:PiliPalaX/utils/feed_back.dart';
 
 class BottomControl extends StatelessWidget implements PreferredSizeWidget {
   final PlPlayerController? controller;

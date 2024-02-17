@@ -8,7 +8,7 @@ import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:extended_image/extended_image.dart';
-import 'package:pilipala/utils/download.dart';
+import 'package:PiliPalaX/utils/download.dart';
 import 'controller.dart';
 import 'package:status_bar_control/status_bar_control.dart';
 

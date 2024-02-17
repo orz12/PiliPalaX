@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:pilipala/common/widgets/http_error.dart';
-import 'package:pilipala/utils/feed_back.dart';
+import 'package:PiliPalaX/common/widgets/http_error.dart';
+import 'package:PiliPalaX/utils/feed_back.dart';
 
 import '../../../../../utils/utils.dart';
 

@@ -5,15 +5,15 @@ import 'package:flutter/services.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
-import 'package:pilipala/http/init.dart';
-import 'package:pilipala/http/user.dart';
-import 'package:pilipala/pages/home/index.dart';
-import 'package:pilipala/pages/media/index.dart';
-import 'package:pilipala/utils/cookie.dart';
-import 'package:pilipala/utils/event_bus.dart';
-import 'package:pilipala/utils/id_utils.dart';
-import 'package:pilipala/utils/login.dart';
-import 'package:pilipala/utils/storage.dart';
+import 'package:PiliPalaX/http/init.dart';
+import 'package:PiliPalaX/http/user.dart';
+import 'package:PiliPalaX/pages/home/index.dart';
+import 'package:PiliPalaX/pages/media/index.dart';
+import 'package:PiliPalaX/utils/cookie.dart';
+import 'package:PiliPalaX/utils/event_bus.dart';
+import 'package:PiliPalaX/utils/id_utils.dart';
+import 'package:PiliPalaX/utils/login.dart';
+import 'package:PiliPalaX/utils/storage.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 class WebviewController extends GetxController {

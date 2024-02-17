@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:pilipala/utils/feed_back.dart';
+import 'package:PiliPalaX/utils/feed_back.dart';
 
 class ActionRowItem extends StatelessWidget {
   final Icon? icon;

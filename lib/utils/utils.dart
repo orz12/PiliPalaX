@@ -216,27 +216,16 @@ class Utils {
 
   // 版本对比
   static bool needUpdate(localVersion, remoteVersion) {
-    List<String> localVersionList = localVersion.split('.');
-    List<String> remoteVersionList = remoteVersion.split('v')[1].split('.');
-    for (int i = 0; i < localVersionList.length; i++) {
-      int localVersion = int.parse(localVersionList[i]);
-      int remoteVersion = int.parse(remoteVersionList[i]);
-      if (remoteVersion > localVersion) {
-        return true;
-      } else if (remoteVersion < localVersion) {
-        return false;
-      }
-    }
-    return false;
+    return localVersion != remoteVersion;
   }
 
   // 检查更新
-  static Future<bool> checkUpdata() async {
+  static Future<bool> checkUpdate() async {
     SmartDialog.dismiss();
     var currentInfo = await PackageInfo.fromPlatform();
     var result = await Request().get(Api.latestApp, extra: {'ua': 'mob'});
-    LatestDataModel data = LatestDataModel.fromJson(result.data);
-    bool isUpdate = Utils.needUpdate(currentInfo.version, data.tagName!);
+    LatestDataModel data = LatestDataModel.fromJson(result.data[0]);
+    bool isUpdate = Utils.needUpdate("v${currentInfo.version}+${currentInfo.buildNumber}", data.tagName!);
     if (isUpdate) {
       SmartDialog.show(
         animationType: SmartAnimationType.centerFade_otherSlide,
@@ -269,16 +258,6 @@ class Utils {
                   style:
                       TextStyle(color: Theme.of(context).colorScheme.outline),
                 ),
-              ),
-              TextButton(
-                onPressed: () async {
-                  await SmartDialog.dismiss();
-                  launchUrl(
-                    Uri.parse('https://www.123pan.com/s/9sVqVv-flu0A.html'),
-                    mode: LaunchMode.externalApplication,
-                  );
-                },
-                child: const Text('网盘'),
               ),
               TextButton(
                 onPressed: () => matchVersion(data),

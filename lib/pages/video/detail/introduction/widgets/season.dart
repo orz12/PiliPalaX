@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:pilipala/models/video_detail_res.dart';
-import 'package:pilipala/pages/video/detail/index.dart';
-import 'package:pilipala/utils/id_utils.dart';
+import 'package:PiliPalaX/models/video_detail_res.dart';
+import 'package:PiliPalaX/pages/video/detail/index.dart';
+import 'package:PiliPalaX/utils/id_utils.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
 import '../../../../../utils/utils.dart';

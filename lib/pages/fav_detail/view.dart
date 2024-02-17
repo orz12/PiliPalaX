@@ -3,11 +3,11 @@ import 'dart:async';
 import 'package:easy_debounce/easy_throttle.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:pilipala/common/skeleton/video_card_h.dart';
-import 'package:pilipala/common/widgets/http_error.dart';
-import 'package:pilipala/common/widgets/network_img_layer.dart';
-import 'package:pilipala/common/widgets/no_data.dart';
-import 'package:pilipala/pages/fav_detail/index.dart';
+import 'package:PiliPalaX/common/skeleton/video_card_h.dart';
+import 'package:PiliPalaX/common/widgets/http_error.dart';
+import 'package:PiliPalaX/common/widgets/network_img_layer.dart';
+import 'package:PiliPalaX/common/widgets/no_data.dart';
+import 'package:PiliPalaX/pages/fav_detail/index.dart';
 
 import 'widget/fav_video_card.dart';
 

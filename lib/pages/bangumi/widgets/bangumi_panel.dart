@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
-import 'package:pilipala/models/bangumi/info.dart';
-import 'package:pilipala/pages/video/detail/index.dart';
-import 'package:pilipala/utils/storage.dart';
+import 'package:PiliPalaX/models/bangumi/info.dart';
+import 'package:PiliPalaX/pages/video/detail/index.dart';
+import 'package:PiliPalaX/utils/storage.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
 import '../../../utils/utils.dart';

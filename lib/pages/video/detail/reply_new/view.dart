@@ -2,10 +2,10 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
-import 'package:pilipala/http/video.dart';
-import 'package:pilipala/models/common/reply_type.dart';
-import 'package:pilipala/models/video/reply/item.dart';
-import 'package:pilipala/utils/feed_back.dart';
+import 'package:PiliPalaX/http/video.dart';
+import 'package:PiliPalaX/models/common/reply_type.dart';
+import 'package:PiliPalaX/models/video/reply/item.dart';
+import 'package:PiliPalaX/utils/feed_back.dart';
 
 class VideoReplyNewDialog extends StatefulWidget {
   final int? oid;

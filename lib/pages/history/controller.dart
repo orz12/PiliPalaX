@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
-import 'package:pilipala/http/user.dart';
-import 'package:pilipala/models/user/history.dart';
-import 'package:pilipala/utils/storage.dart';
+import 'package:PiliPalaX/http/user.dart';
+import 'package:PiliPalaX/models/user/history.dart';
+import 'package:PiliPalaX/utils/storage.dart';
 
 class HistoryController extends GetxController {
   final ScrollController scrollController = ScrollController();

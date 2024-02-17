@@ -1,7 +1,7 @@
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
-import 'package:pilipala/http/msg.dart';
-import 'package:pilipala/models/msg/msgfeed_at_me.dart';
+import 'package:PiliPalaX/http/msg.dart';
+import 'package:PiliPalaX/models/msg/msgfeed_at_me.dart';
 
 class AtMeController extends GetxController {
   RxList<AtMeItems> msgFeedAtMeList = <AtMeItems>[].obs;

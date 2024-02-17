@@ -1,10 +1,10 @@
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
-import 'package:pilipala/http/video.dart';
-import 'package:pilipala/models/home/rcmd/result.dart';
-import 'package:pilipala/models/model_rec_video_item.dart';
-import 'package:pilipala/utils/storage.dart';
+import 'package:PiliPalaX/http/video.dart';
+import 'package:PiliPalaX/models/home/rcmd/result.dart';
+import 'package:PiliPalaX/models/model_rec_video_item.dart';
+import 'package:PiliPalaX/utils/storage.dart';
 
 class RcmdController extends GetxController {
   final ScrollController scrollController = ScrollController();

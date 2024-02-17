@@ -5,12 +5,12 @@ import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
-import 'package:pilipala/http/common.dart';
-import 'package:pilipala/pages/dynamics/index.dart';
-import 'package:pilipala/pages/home/view.dart';
-import 'package:pilipala/pages/media/index.dart';
-import 'package:pilipala/utils/storage.dart';
-import 'package:pilipala/utils/utils.dart';
+import 'package:PiliPalaX/http/common.dart';
+import 'package:PiliPalaX/pages/dynamics/index.dart';
+import 'package:PiliPalaX/pages/home/view.dart';
+import 'package:PiliPalaX/pages/media/index.dart';
+import 'package:PiliPalaX/utils/storage.dart';
+import 'package:PiliPalaX/utils/utils.dart';
 import '../../models/common/dynamic_badge_mode.dart';
 
 class MainController extends GetxController {
@@ -72,7 +72,7 @@ class MainController extends GetxController {
   void onInit() {
     super.onInit();
     if (setting.get(SettingBoxKey.autoUpdate, defaultValue: false)) {
-      Utils.checkUpdata();
+      Utils.checkUpdate();
     }
     hideTabBar = setting.get(SettingBoxKey.hideTabBar, defaultValue: true);
     var userInfo = userInfoCache.get('userInfoCache');
@@ -94,7 +94,7 @@ class MainController extends GetxController {
       if (selectedIndex != 0) {
         pageController.jumpTo(0);
       }
-      SmartDialog.showToast("再按一次退出Pili");
+      SmartDialog.showToast("再按一次退出PiliPalaX");
       return; // 不退出应用
     }
     SystemNavigator.pop(); // 退出应用

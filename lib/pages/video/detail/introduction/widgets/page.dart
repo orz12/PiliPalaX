@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:pilipala/models/video_detail_res.dart';
-import 'package:pilipala/pages/video/detail/index.dart';
+import 'package:PiliPalaX/models/video_detail_res.dart';
+import 'package:PiliPalaX/pages/video/detail/index.dart';
 
 import '../../../../../utils/utils.dart';
 

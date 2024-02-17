@@ -3,8 +3,8 @@ import 'dart:io';
 import 'package:floating/floating.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:pilipala/common/widgets/network_img_layer.dart';
-import 'package:pilipala/plugin/pl_player/index.dart';
+import 'package:PiliPalaX/common/widgets/network_img_layer.dart';
+import 'package:PiliPalaX/plugin/pl_player/index.dart';
 
 import 'controller.dart';
 import 'widgets/bottom_control.dart';

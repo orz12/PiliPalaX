@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:hive/hive.dart';
-import 'package:pilipala/utils/storage.dart';
 
 class HiddenSetting extends StatefulWidget {
   const HiddenSetting({super.key});

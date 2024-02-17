@@ -9,16 +9,16 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:ns_danmaku/ns_danmaku.dart';
-import 'package:pilipala/http/user.dart';
-import 'package:pilipala/models/video/play/quality.dart';
-import 'package:pilipala/models/video/play/url.dart';
-import 'package:pilipala/pages/video/detail/index.dart';
-import 'package:pilipala/pages/video/detail/introduction/widgets/menu_row.dart';
-import 'package:pilipala/plugin/pl_player/index.dart';
-import 'package:pilipala/plugin/pl_player/models/play_repeat.dart';
-import 'package:pilipala/utils/storage.dart';
-import 'package:pilipala/http/danmaku.dart';
-import 'package:pilipala/services/shutdown_timer_service.dart';
+import 'package:PiliPalaX/http/user.dart';
+import 'package:PiliPalaX/models/video/play/quality.dart';
+import 'package:PiliPalaX/models/video/play/url.dart';
+import 'package:PiliPalaX/pages/video/detail/index.dart';
+import 'package:PiliPalaX/pages/video/detail/introduction/widgets/menu_row.dart';
+import 'package:PiliPalaX/plugin/pl_player/index.dart';
+import 'package:PiliPalaX/plugin/pl_player/models/play_repeat.dart';
+import 'package:PiliPalaX/utils/storage.dart';
+import 'package:PiliPalaX/http/danmaku.dart';
+import 'package:PiliPalaX/services/shutdown_timer_service.dart';
 
 class HeaderControl extends StatefulWidget implements PreferredSizeWidget {
   const HeaderControl({

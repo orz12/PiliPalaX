@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:pilipala/common/constants.dart';
-import 'package:pilipala/models/live/item.dart';
-import 'package:pilipala/utils/utils.dart';
-import 'package:pilipala/common/widgets/network_img_layer.dart';
+import 'package:PiliPalaX/common/constants.dart';
+import 'package:PiliPalaX/models/live/item.dart';
+import 'package:PiliPalaX/utils/utils.dart';
+import 'package:PiliPalaX/common/widgets/network_img_layer.dart';
 
 // 视频卡片 - 垂直布局
 class LiveCardV extends StatelessWidget {

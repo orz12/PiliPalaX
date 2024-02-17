@@ -1,33 +1,31 @@
 <div align="center">
-    <img width="200" height="200" src="https://github.com/guozhigq/pilipala/blob/main/assets/images/logo/logo_android.png">
+    <img width="200" height="200" src="https://github.com/orz12/pilipala/blob/main/assets/images/logo/logo_android.png">
 </div>
 
 
 
 <div align="center">
-    <h1>PiliPala</h1>
+    <h1>PiliPalaX</h1>
 <div align="center">
     
-![GitHub repo size](https://img.shields.io/github/repo-size/guozhigq/pilipala) 
-![GitHub Repo stars](https://img.shields.io/github/stars/guozhigq/pilipala) 
-![GitHub all releases](https://img.shields.io/github/downloads/guozhigq/pilipala/total) 
+![GitHub repo size](https://img.shields.io/github/repo-size/orz12/pilipala) 
+![GitHub Repo stars](https://img.shields.io/github/stars/orz12/pilipala) 
+![GitHub all releases](https://img.shields.io/github/downloads/orz12/pilipala/total) 
 </div>
     <p>使用Flutter开发的BiliBili第三方客户端</p>
     
-<img src="https://github.com/guozhigq/pilipala/blob/main/assets/screenshots/510shots_so.png" width="32%" alt="home" />
-<img src="https://github.com/guozhigq/pilipala/blob/main/assets/screenshots/174shots_so.png" width="32%" alt="home" />
-<img src="https://github.com/guozhigq/pilipala/blob/main/assets/screenshots/850shots_so.png" width="32%" alt="home" />
+<img src="https://github.com/orz12/pilipala/blob/main/assets/screenshots/510shots_so.png" width="32%" alt="home" />
+<img src="https://github.com/orz12/pilipala/blob/main/assets/screenshots/174shots_so.png" width="32%" alt="home" />
+<img src="https://github.com/orz12/pilipala/blob/main/assets/screenshots/850shots_so.png" width="32%" alt="home" />
 <br/>
-<img src="https://github.com/guozhigq/pilipala/blob/main/assets/screenshots/main_screen.png" width="96%" alt="home" />
+<img src="https://github.com/orz12/pilipala/blob/main/assets/screenshots/main_screen.png" width="96%" alt="home" />
 <br/>
 </div>
 
 ## 开发环境
-Xcode 13.4 不支持**auto_orientation**，请注释相关代码
 
 ```bash
-[✓] Flutter (Channel stable, 3.16.4, on macOS 14.1.2 23B92 darwin-arm64, locale
-    zh-Hans-CN)
+[✓] Flutter (Channel stable, 3.16.5, on Microsoft Windows [版本 10.0.19045.4046], locale zh-CN)
 [✓] Android toolchain - develop for Android devices (Android SDK version 34.0.0)
 [✓] Xcode - develop for iOS and macOS (Xcode 15.1)
 [✓] Chrome - develop for the web
@@ -51,11 +49,9 @@ QQ频道: https://pd.qq.com/s/365esodk3
 
 ## 功能
 
-目前着重移动端(Android、iOS)，暂时没有适配桌面端、Pad端、手表端等
+目前着重移动端(Android、iOS)和Pad端，暂时没有适配桌面端、手表端等
 
 <br/>
-
-现有功能及[开发计划](https://github.com/users/guozhigq/projects/5)
 
 
 - [x] 推荐视频列表(app端)
@@ -91,6 +87,7 @@ QQ频道: https://pd.qq.com/s/365esodk3
   - [x] 音质选择（视视频而定）
   - [x] 解码格式选择（视视频而定）
   - [x] 弹幕
+  - [ ] 直播弹幕
   - [ ] 字幕
   - [x] 记忆播放
   - [x] 视频比例：高度/宽度适应、填充、包含等
@@ -119,6 +116,7 @@ QQ频道: https://pd.qq.com/s/365esodk3
   - [x] 震动反馈(可选)
   - [x] 高帧率
   - [x] 自动全屏
+  - [x] 横屏适配
 - [ ] 等等
 
 <br/>
@@ -131,8 +129,10 @@ QQ频道: https://pd.qq.com/s/365esodk3
 
 ## 声明
 
-此项目（PiliPala）是个人为了兴趣而开发, 仅用于学习和测试。
+此项目（PiliPalaX）是个人为了兴趣而开发, 仅用于学习和测试，请于下载后24小时内删除。
 所用API皆从官方网站收集, 不提供任何破解内容。
+在此致敬原作者：[guozhigq/pilipala](https://github.com/guozhigq/pilipala)
+本仓库做了更激进的修改，感谢原作者的开源精神。
 
 感谢使用
 

@@ -4,15 +4,15 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
-import 'package:pilipala/common/skeleton/video_reply.dart';
-import 'package:pilipala/common/widgets/html_render.dart';
-import 'package:pilipala/common/widgets/http_error.dart';
-import 'package:pilipala/common/widgets/network_img_layer.dart';
-import 'package:pilipala/models/common/reply_type.dart';
-import 'package:pilipala/pages/video/detail/reply/widgets/reply_item.dart';
-import 'package:pilipala/pages/video/detail/reply_new/index.dart';
-import 'package:pilipala/pages/video/detail/reply_reply/index.dart';
-import 'package:pilipala/utils/feed_back.dart';
+import 'package:PiliPalaX/common/skeleton/video_reply.dart';
+import 'package:PiliPalaX/common/widgets/html_render.dart';
+import 'package:PiliPalaX/common/widgets/http_error.dart';
+import 'package:PiliPalaX/common/widgets/network_img_layer.dart';
+import 'package:PiliPalaX/models/common/reply_type.dart';
+import 'package:PiliPalaX/pages/video/detail/reply/widgets/reply_item.dart';
+import 'package:PiliPalaX/pages/video/detail/reply_new/index.dart';
+import 'package:PiliPalaX/pages/video/detail/reply_reply/index.dart';
+import 'package:PiliPalaX/utils/feed_back.dart';
 
 import 'controller.dart';
 

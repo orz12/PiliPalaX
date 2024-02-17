@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:pilipala/http/video.dart';
+import 'package:PiliPalaX/http/video.dart';
 import '../../../../models/model_hot_video_item.dart';
 
 class ReleatedController extends GetxController {

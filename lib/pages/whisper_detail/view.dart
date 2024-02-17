@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:pilipala/common/widgets/network_img_layer.dart';
-import 'package:pilipala/pages/whisper_detail/controller.dart';
-import 'package:pilipala/utils/feed_back.dart';
+import 'package:PiliPalaX/common/widgets/network_img_layer.dart';
+import 'package:PiliPalaX/pages/whisper_detail/controller.dart';
+import 'package:PiliPalaX/utils/feed_back.dart';
 
 import 'widget/chat_item.dart';
 

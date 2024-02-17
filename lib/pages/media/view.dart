@@ -3,11 +3,11 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:get/get.dart';
-import 'package:pilipala/common/widgets/network_img_layer.dart';
-import 'package:pilipala/models/user/fav_folder.dart';
-import 'package:pilipala/pages/main/index.dart';
-import 'package:pilipala/pages/media/index.dart';
-import 'package:pilipala/utils/utils.dart';
+import 'package:PiliPalaX/common/widgets/network_img_layer.dart';
+import 'package:PiliPalaX/models/user/fav_folder.dart';
+import 'package:PiliPalaX/pages/main/index.dart';
+import 'package:PiliPalaX/pages/media/index.dart';
+import 'package:PiliPalaX/utils/utils.dart';
 
 class MediaPage extends StatefulWidget {
   const MediaPage({super.key});

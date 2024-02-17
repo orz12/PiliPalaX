@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
-import 'package:pilipala/common/widgets/video_card_h.dart';
-import 'package:pilipala/models/common/search_type.dart';
-import 'package:pilipala/pages/search_panel/index.dart';
+import 'package:PiliPalaX/common/widgets/video_card_h.dart';
+import 'package:PiliPalaX/models/common/search_type.dart';
+import 'package:PiliPalaX/pages/search_panel/index.dart';
 
 class SearchVideoPanel extends StatelessWidget {
   SearchVideoPanel({

@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:pilipala/common/widgets/http_error.dart';
+import 'package:PiliPalaX/common/widgets/http_error.dart';
 import 'controller.dart';
 import 'widgets/hot_keyword.dart';
 import 'widgets/search_text.dart';

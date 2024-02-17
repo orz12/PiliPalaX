@@ -3,9 +3,9 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
-import 'package:pilipala/common/widgets/network_img_layer.dart';
-import 'package:pilipala/pages/mine/index.dart';
-import 'package:pilipala/utils/feed_back.dart';
+import 'package:PiliPalaX/common/widgets/network_img_layer.dart';
+import 'package:PiliPalaX/pages/mine/index.dart';
+import 'package:PiliPalaX/utils/feed_back.dart';
 import './controller.dart';
 
 class HomePage extends StatefulWidget {

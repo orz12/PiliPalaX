@@ -4,11 +4,11 @@ import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:package_info_plus/package_info_plus.dart';
-import 'package:pilipala/http/index.dart';
-import 'package:pilipala/models/github/latest.dart';
-import 'package:pilipala/pages/setting/controller.dart';
-import 'package:pilipala/utils/storage.dart';
-import 'package:pilipala/utils/utils.dart';
+import 'package:PiliPalaX/http/index.dart';
+import 'package:PiliPalaX/models/github/latest.dart';
+import 'package:PiliPalaX/pages/setting/controller.dart';
+import 'package:PiliPalaX/utils/storage.dart';
+import 'package:PiliPalaX/utils/utils.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../utils/cache_manage.dart';
 
@@ -53,7 +53,7 @@ class _AboutPageState extends State<AboutPage> {
             ),
           ),
           ListTile(
-            title: Text('PiliPala',
+            title: Text('PiliPalaX',
                 textAlign: TextAlign.center,
                 style: Theme.of(context)
                     .textTheme
@@ -104,27 +104,8 @@ class _AboutPageState extends State<AboutPage> {
             onTap: () => _aboutController.githubUrl(),
             title: const Text('Github'),
             trailing: Text(
-              'github.com/guozhigq/pilipala',
+              'github.com/orz12/pilipala',
               style: subTitleStyle,
-            ),
-          ),
-          ListTile(
-            onTap: () => _aboutController.webSiteUrl(),
-            title: const Text('访问官网'),
-            trailing: Text(
-              'https://pilipalanet.mysxl.cn',
-              style: subTitleStyle,
-            ),
-          ),
-          ListTile(
-            onTap: () => _aboutController.panDownload(),
-            title: const Text('网盘下载'),
-            trailing: Text(
-              '提取码：pili',
-              style: TextStyle(
-                fontSize: 13,
-                color: Theme.of(context).colorScheme.outline,
-              ),
             ),
           ),
           ListTile(
@@ -212,14 +193,14 @@ class AboutController extends GetxController {
 
   // 获取当前版本
   Future getCurrentApp() async {
-    var result = await PackageInfo.fromPlatform();
-    currentVersion.value = result.version;
+    var currentInfo = await PackageInfo.fromPlatform();
+    currentVersion.value = "v${currentInfo.version}+${currentInfo.buildNumber}";
   }
 
   // 获取远程版本
   Future getRemoteApp() async {
     var result = await Request().get(Api.latestApp, extra: {'ua': 'pc'});
-    data = LatestDataModel.fromJson(result.data);
+    data = LatestDataModel.fromJson(result.data[0]);
     remoteAppInfo = data;
     remoteVersion.value = data.tagName!;
     isUpdate.value =
@@ -235,15 +216,7 @@ class AboutController extends GetxController {
   // 跳转github
   githubUrl() {
     launchUrl(
-      Uri.parse('https://github.com/guozhigq/pilipala'),
-      mode: LaunchMode.externalApplication,
-    );
-  }
-
-  // 从网盘下载
-  panDownload() {
-    launchUrl(
-      Uri.parse('https://www.123pan.com/s/9sVqVv-flu0A.html'),
+      Uri.parse('https://github.com/orz12/pilipala'),
       mode: LaunchMode.externalApplication,
     );
   }
@@ -251,7 +224,7 @@ class AboutController extends GetxController {
   // 问题反馈
   feedback() {
     launchUrl(
-      Uri.parse('https://github.com/guozhigq/pilipala/issues'),
+      Uri.parse('https://github.com/orz12/pilipala/issues'),
       // 系统自带浏览器打开
       mode: LaunchMode.externalApplication,
     );
@@ -285,20 +258,12 @@ class AboutController extends GetxController {
     try {
       launchUrl(
         Uri.parse(
-            'alipayqr://platformapi/startapp?saId=10000007&qrcode=https://qr.alipay.com/fkx14623ddwl1ping3ddd73'),
+            'alipayqr://platformapi/startapp?saId=10000007&qrcode=https://qr.alipay.com/fkx12886sndepheaukiabc8'),
         mode: LaunchMode.externalApplication,
       );
     } catch (e) {
       print(e);
     }
-  }
-
-  // 官网
-  webSiteUrl() {
-    launchUrl(
-      Uri.parse('https://pilipalanet.mysxl.cn'),
-      mode: LaunchMode.externalApplication,
-    );
   }
 
   // 日志

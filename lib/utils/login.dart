@@ -4,10 +4,10 @@ import 'dart:math';
 import 'package:crypto/crypto.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
-import 'package:pilipala/pages/dynamics/index.dart';
-import 'package:pilipala/pages/home/index.dart';
-import 'package:pilipala/pages/media/index.dart';
-import 'package:pilipala/pages/mine/index.dart';
+import 'package:PiliPalaX/pages/dynamics/index.dart';
+import 'package:PiliPalaX/pages/home/index.dart';
+import 'package:PiliPalaX/pages/media/index.dart';
+import 'package:PiliPalaX/pages/mine/index.dart';
 import 'package:uuid/uuid.dart';
 
 class LoginUtils {
