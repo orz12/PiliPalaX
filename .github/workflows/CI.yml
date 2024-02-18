@@ -25,17 +25,31 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
+      - name: 获取first parent commit次数
+        id: get-first-parent-commit-count
+        run: |
+          version=$(yq e .version pubspec.yaml)
+          git fetch origin "refs/tags/*:refs/tags/*"
+          recent_release_tag=$(git tag -l | grep $version | egrep -v "[-|+]" || true)
+          if (echo x$recent_release_tag == x); then
+            echo "当前版本tag不存在，请手动生成tag."
+            exit 1
+          fi
+          first_parent_commit_count=$(git rev-list --first-parent --count $recent_release_tag..HEAD)
+          echo "count=$first_parent_commit_count" >> $GITHUB_OUTPUT
+
       - name: 更新版本号
         id: version
         run: |
           # 读取版本号
           VERSION=$(yq e .version pubspec.yaml)
     
-          # 获取GitHub Actions的run_number
-          RUN_NUMBER=${{ github.run_number }}
+          # # 获取GitHub Actions的run_number
+          # RUN_NUMBER=${{ github.run_number }}
+          SUBVERSION=beta.${{ steps.get-first-parent-commit-count.outputs.count }}
     
           # 构建新版本号
-          NEW_VERSION=$(echo $VERSION | awk -F+ -v run_number="$RUN_NUMBER" '{print $1"+"run_number}')
+          NEW_VERSION=$(echo $VERSION | awk -F+ -v subversion="$SUBVERSION" '{print $1"-"subversion}')
     
           # 输出新版本号
           echo "New version: $NEW_VERSION"
