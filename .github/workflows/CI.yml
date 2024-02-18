@@ -29,6 +29,7 @@ jobs:
         id: get-first-parent-commit-count
         run: |
           version=$(yq e .version pubspec.yaml)
+          echo $version
           git fetch origin "refs/tags/*:refs/tags/*"
           recent_release_tag=$(git tag -l | grep $version | egrep -v "[-|+]" || true)
           if (echo x$recent_release_tag == x); then
