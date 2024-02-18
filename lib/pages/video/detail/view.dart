@@ -822,6 +822,16 @@ class _VideoDetailPageState extends State<VideoDetailPage>
         }
       },
     );
+    if (!horizontalScreen) {
+      if (Platform.isAndroid) {
+        return PiPSwitcher(
+          childWhenDisabled: childWhenDisabled,
+          childWhenEnabled: childWhenEnabled,
+          floating: floating,
+        );
+      }
+      return childWhenDisabled;
+    }
     return OrientationBuilder(
         builder: (BuildContext context, Orientation orientation) {
       if (orientation == Orientation.landscape) {
@@ -831,7 +841,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
         return PiPSwitcher(
           childWhenDisabled: Container(
             key: UniqueKey(),
-            child: !horizontalScreen || orientation == Orientation.portrait
+            child: orientation == Orientation.portrait
                 ? childWhenDisabled
                 : childWhenDisabledLandscape,
           ),
@@ -841,7 +851,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
       }
       return Container(
         key: UniqueKey(),
-        child: !horizontalScreen || orientation == Orientation.portrait
+        child: orientation == Orientation.portrait
             ? childWhenDisabled
             : childWhenDisabledLandscape,
       );
