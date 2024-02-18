@@ -28,8 +28,7 @@ jobs:
       - name: 获取first parent commit次数
         id: get-first-parent-commit-count
         run: |
-          version=$(yq e .version pubspec.yaml)
-          echo $version
+          version=$(yq e .version pubspec.yaml | cut -d "+" -f 1)
           git fetch origin "refs/tags/*:refs/tags/*"
           recent_release_tag=$(git tag -l | grep $version | egrep -v "[-|+]" || true)
           if (echo x$recent_release_tag == x); then
