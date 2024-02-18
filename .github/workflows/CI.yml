@@ -31,7 +31,7 @@ jobs:
           version=$(yq e .version pubspec.yaml | cut -d "+" -f 1)
           git fetch origin "refs/tags/*:refs/tags/*"
           recent_release_tag=$(git tag -l | grep $version | egrep -v "[-|+]" || true)
-          if (echo x$recent_release_tag == x); then
+          if [[ "x$recent_release_tag" == "x" ]]; then
             echo "当前版本tag不存在，请手动生成tag."
             exit 1
           fi
