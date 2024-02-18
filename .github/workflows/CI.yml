@@ -35,6 +35,7 @@ jobs:
             echo "当前版本tag不存在，请手动生成tag."
             exit 1
           fi
+          git log --oneline HEAD~1..HEAD
           first_parent_commit_count=$(git rev-list --first-parent --count $recent_release_tag..HEAD)
           echo "count=$first_parent_commit_count" >> $GITHUB_OUTPUT
 
