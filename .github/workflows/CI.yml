@@ -23,13 +23,14 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: 获取first parent commit次数
         id: get-first-parent-commit-count
         run: |
           version=$(yq e .version pubspec.yaml | cut -d "+" -f 1)
-          git fetch origin "refs/tags/*:refs/tags/*"
           recent_release_tag=$(git tag -l | grep $version | egrep -v "[-|+]" || true)
           if [[ "x$recent_release_tag" == "x" ]]; then
             echo "当前版本tag不存在，请手动生成tag."
