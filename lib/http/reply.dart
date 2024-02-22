@@ -100,4 +100,24 @@ class ReplyHttp {
       };
     }
   }
+
+  static Future getMyEmote({
+    required String business,
+  }) async {
+    var res = await Request().get(Api.myEmote, data: {
+      'business': business,
+    });
+    if (res.data['code'] == 0) {
+      return {
+        'status': true,
+        'data': res.data['data'],
+      };
+    } else {
+      return {
+        'status': false,
+        'date': [],
+        'msg': res.data['message'],
+      };
+    }
+  }
 }

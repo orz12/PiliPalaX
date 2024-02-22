@@ -7,6 +7,9 @@ import 'package:PiliPalaX/models/common/reply_type.dart';
 import 'package:PiliPalaX/models/video/reply/item.dart';
 import 'package:PiliPalaX/utils/feed_back.dart';
 
+import '../../../../common/constants.dart';
+import '../reply/reply_emote/view.dart';
+
 class VideoReplyNewDialog extends StatefulWidget {
   final int? oid;
   final int? root;
@@ -32,6 +35,7 @@ class _VideoReplyNewDialogState extends State<VideoReplyNewDialog>
   final TextEditingController _replyContentController = TextEditingController();
   final FocusNode replyContentFocusNode = FocusNode();
   final GlobalKey _formKey = GlobalKey<FormState>();
+  bool isShowEmote = false;
 
   @override
   void initState() {
@@ -141,9 +145,13 @@ class _VideoReplyNewDialogState extends State<VideoReplyNewDialog>
                   width: 36,
                   height: 36,
                   child: IconButton(
-                    onPressed: () {
+                    onPressed: () async {
                       FocusScope.of(context)
                           .requestFocus(replyContentFocusNode);
+                      await Future.delayed(const Duration(milliseconds: 200));
+                      setState(() {
+                        isShowEmote = false;
+                      });
                     },
                     icon: Icon(Icons.keyboard,
                         size: 22,
@@ -154,7 +162,44 @@ class _VideoReplyNewDialogState extends State<VideoReplyNewDialog>
                       padding: MaterialStateProperty.all(EdgeInsets.zero),
                       backgroundColor:
                           MaterialStateProperty.resolveWith((states) {
-                        return Theme.of(context).highlightColor;
+                        if (states.contains(MaterialState.pressed) || !isShowEmote) {
+                          return Theme.of(context).highlightColor;
+                        }
+                        // 默认状态下，返回透明颜色
+                        return Colors.transparent;
+                      }),
+                    ),
+                  ),
+                ),
+                const SizedBox(
+                  width: 10,
+                ),
+                SizedBox(
+                  width: 36,
+                  height: 36,
+                  child: IconButton(
+                    onPressed: () {
+                      //收起输入法
+                      FocusScope.of(context).unfocus();
+                      // 弹出表情选择
+                      setState(() {
+                        isShowEmote = true;
+                      });
+                    },
+                    icon: Icon(Icons.emoji_emotions,
+                        size: 22,
+                        color: Theme.of(context).colorScheme.onBackground),
+                    highlightColor:
+                        Theme.of(context).colorScheme.onInverseSurface,
+                    style: ButtonStyle(
+                      padding: MaterialStateProperty.all(EdgeInsets.zero),
+                      backgroundColor:
+                          MaterialStateProperty.resolveWith((states) {
+                        if (states.contains(MaterialState.pressed) || isShowEmote) {
+                          return Theme.of(context).highlightColor;
+                        }
+                        // 默认状态下，返回透明颜色
+                        return Colors.transparent;
                       }),
                     ),
                   ),
@@ -165,16 +210,42 @@ class _VideoReplyNewDialogState extends State<VideoReplyNewDialog>
               ],
             ),
           ),
-          AnimatedSize(
-            curve: Curves.easeInOut,
-            duration: const Duration(milliseconds: 300),
-            child: SizedBox(
+          if (!isShowEmote)
+            SizedBox(
               width: double.infinity,
               height: keyboardHeight,
             ),
-          ),
+          if (isShowEmote)
+            SizedBox(
+              width: double.infinity,
+              height: 310,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                    horizontal: StyleString.safeSpace),
+                child: EmoteTab(
+                  onEmoteTap: onEmoteTap,
+                ),
+              ),
+            )
         ],
       ),
+    );
+  }
+
+  void onEmoteTap(String emoteString) {
+    // 在光标处插入表情
+    final String currentText = _replyContentController.text;
+    final TextSelection selection = _replyContentController.selection;
+    final String newText = currentText.replaceRange(
+      selection.start,
+      selection.end,
+      emoteString,
+    );
+    _replyContentController.text = newText;
+    final int newCursorIndex = selection.start + emoteString.length;
+    _replyContentController.selection = selection.copyWith(
+      baseOffset: newCursorIndex,
+      extentOffset: newCursorIndex,
     );
   }
 }

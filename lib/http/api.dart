@@ -120,6 +120,11 @@ class Api {
   // https://api.bilibili.com/x/relation/stat?vmid=697166795
   static const String userStat = '/x/relation/stat';
 
+  // 获取我的表情列表
+  // business:reply（回复）dynamic（动态）
+  //https://api.bilibili.com/x/emote/user/panel/web?business=reply
+  static const String myEmote = '/x/emote/user/panel/web';
+
   // 获取用户信息
   static const String userInfo = '/x/web-interface/nav';
 
