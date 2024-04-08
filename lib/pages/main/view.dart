@@ -30,6 +30,7 @@ class _MainAppState extends State<MainApp> with SingleTickerProviderStateMixin {
   int? _lastSelectTime; //上次点击时间
   Box setting = GStrorage.setting;
   late bool enableMYBar;
+  late bool horizontalScreen;
 
   @override
   void initState() {
@@ -38,6 +39,7 @@ class _MainAppState extends State<MainApp> with SingleTickerProviderStateMixin {
     _mainController.pageController =
         PageController(initialPage: _mainController.selectedIndex);
     enableMYBar = setting.get(SettingBoxKey.enableMYBar, defaultValue: true);
+    horizontalScreen = setting.get(SettingBoxKey.horizontalScreen, defaultValue: false);
   }
 
   void setIndex(int value) async {
@@ -109,7 +111,43 @@ class _MainAppState extends State<MainApp> with SingleTickerProviderStateMixin {
       onPopInvoked: (bool didPop) async {
         _mainController.onBackPressed(context);
       },
-      child: Scaffold(
+      child: horizontalScreen
+      ? AdaptiveScaffold(
+        body: (_) => PageView(
+          physics: const NeverScrollableScrollPhysics(),
+          controller: _mainController.pageController,
+          onPageChanged: (index) {
+            _mainController.selectedIndex = index;
+            setState(() {});
+          },
+          children: _mainController.pages,
+        ),
+        destinations: _mainController.navigationBars.map((e) => NavigationDestination(
+          icon: Badge(
+            label: _mainController.dynamicBadgeType ==
+                    DynamicBadgeMode.number
+                ? Text(e['count'].toString())
+                : null,
+            padding: const EdgeInsets.fromLTRB(6, 0, 6, 0),
+            isLabelVisible:
+                _mainController.dynamicBadgeType !=
+                        DynamicBadgeMode.hidden &&
+                    e['count'] > 0,
+            child: e['icon'],
+            backgroundColor:
+                Theme.of(context).colorScheme.primary,
+            textColor: Theme.of(context)
+                .colorScheme
+                .onInverseSurface,
+          ),
+          selectedIcon: e['selectIcon'],
+          label: e['label'],
+        )).toList(),
+        onSelectedIndexChange: (value) => setIndex(value),
+        selectedIndex: _mainController.selectedIndex,
+        useDrawer: false
+      )
+      : Scaffold(
         extendBody: true,
         body: PageView(
           physics: const NeverScrollableScrollPhysics(),

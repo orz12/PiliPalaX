@@ -37,6 +37,8 @@ dependencies:
   cupertino_icons: ^1.0.5
   # 动态取色
   dynamic_color: ^1.6.8
+  # Adaptive scaffold
+  flutter_adaptive_scaffold: ^0.1.10+1
 
   get: ^4.6.5
 
