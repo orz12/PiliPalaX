@@ -120,6 +120,10 @@ class Api {
   // https://github.com/SocialSisterYi/bilibili-API-collect/blob/master/docs/comment/action.md
   static const String replyAdd = '/x/v2/reply/add';
 
+  // 删除评论
+  // https://github.com/SocialSisterYi/bilibili-API-collect/blob/master/docs/comment/action.md
+  static const String replyDel = '/x/v2/reply/del';
+
   // 用户(被)关注数、投稿数
   // https://api.bilibili.com/x/relation/stat?vmid=697166795
   static const String userStat = '/x/relation/stat';

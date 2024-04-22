@@ -34,7 +34,9 @@ class _AboutPageState extends State<AboutPage> {
 
   Future<void> getCacheSize() async {
     final res = await CacheManage().loadApplicationCache();
-    setState(() => cacheSize = res);
+    cacheSize = res;
+    if (!mounted) return;
+    setState(() => {});
   }
 
   @override
@@ -379,8 +381,7 @@ class AboutController extends GetxController {
   aPay() {
     try {
       launchUrl(
-        Uri.parse(
-            'https://pilipalanet.mysxl.cn/pilipalaxadmire'),
+        Uri.parse('https://pilipalanet.mysxl.cn/pilipalaxadmire'),
         mode: LaunchMode.externalApplication,
       );
     } catch (e) {

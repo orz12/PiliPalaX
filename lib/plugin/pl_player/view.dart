@@ -496,10 +496,10 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
       children: <Widget>[
         Obx(
           () => Video(
-            key: ValueKey('${_.videoFit.value}${_.backgroundPlay.value}'),
+            key: ValueKey('${_.videoFit.value}${_.continuePlayInBackground.value}'),
             controller: videoController,
             controls: NoVideoControls,
-            pauseUponEnteringBackgroundMode: !_.backgroundPlay.value,
+            pauseUponEnteringBackgroundMode: !_.continuePlayInBackground.value,
             resumeUponEnteringForegroundMode: true,
             subtitleViewConfiguration: const SubtitleViewConfiguration(
               style: subTitleStyle,
@@ -735,11 +735,11 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
                     _playerKey.currentContext!.findRenderObject() as RenderBox;
                 final double totalWidth = renderBox.size.width;
                 final double tapPosition = details.localPosition.dx;
-                final double sectionWidth = totalWidth / 3;
+                final double sectionWidth = totalWidth / 4;
                 String type = 'left';
                 if (tapPosition < sectionWidth) {
                   type = 'left';
-                } else if (tapPosition < sectionWidth * 2) {
+                } else if (tapPosition < sectionWidth * 3) {
                   type = 'center';
                 } else {
                   type = 'right';
@@ -793,7 +793,7 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
                 }
                 final double totalWidth = renderBox.size.width;
                 final double tapPosition = details.localPosition.dx;
-                final double sectionWidth = totalWidth / 3;
+                final double sectionWidth = totalWidth / 4;
                 final double delta = details.delta.dy;
                 if (lastFullScreenToggleTime != null &&
                     DateTime.now().difference(lastFullScreenToggleTime!) <
@@ -807,7 +807,7 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
                       _brightnessValue.value - delta / level;
                   final double result = brightness.clamp(0.0, 1.0);
                   setBrightness(result);
-                } else if (tapPosition < sectionWidth * 2) {
+                } else if (tapPosition < sectionWidth * 3) {
                   // 全屏
                   final double dy = details.delta.dy;
                   const double threshold = 7.0; // 滑动阈值

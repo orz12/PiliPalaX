@@ -132,22 +132,28 @@ class _PlaySettingState extends State<PlaySetting> {
             defaultVal: true,
           ),
           const SetSwitchItem(
+            title: '全向旋转',
+            subTitle: '非全屏时可受重力转为临时全屏，若系统锁定旋转仍异常触发请关闭，无异常可保持开启',
+            setKey: SettingBoxKey.allowRotateScreen,
+            defaultVal: true,
+          ),
+          const SetSwitchItem(
             title: '后台播放',
             subTitle: '进入后台时继续播放',
-            setKey: SettingBoxKey.enableBackgroundPlay,
-            defaultVal: false,
+            setKey: SettingBoxKey.continuePlayInBackground,
+            defaultVal: true,
           ),
           if (Platform.isAndroid)
             SetSwitchItem(
                 title: '后台画中画',
-                subTitle: '进入后台时以小窗形式（PiP）播放，建议同时开启【后台播放】，避免没有暂停按钮',
+                subTitle: '进入后台时以小窗形式（PiP）播放',
                 setKey: SettingBoxKey.autoPiP,
                 defaultVal: false,
                 callFn: (val) {
                   if (val &&
                       !setting.get(SettingBoxKey.enableBackgroundPlay,
-                          defaultValue: false)) {
-                    SmartDialog.showToast('建议开启后台播放');
+                          defaultValue: true)) {
+                    SmartDialog.showToast('建议开启后台音频服务');
                   }
                 }),
           if (Platform.isAndroid)
@@ -220,6 +226,12 @@ class _PlaySettingState extends State<PlaySetting> {
                 setState(() {});
               }
             },
+          ),
+          const SetSwitchItem(
+            title: '后台音频服务',
+            subTitle: '避免画中画没有播放暂停功能',
+            setKey: SettingBoxKey.enableBackgroundPlay,
+            defaultVal: true,
           ),
         ],
       ),

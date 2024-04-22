@@ -183,7 +183,7 @@ class _MinePageState extends State<MinePage> {
                   style:
                       TextStyle(color: Theme.of(context).colorScheme.outline)),
               TextSpan(
-                  text: (_mineController.userInfo.value.money ?? 'pilipala')
+                  text: (_mineController.userInfo.value.money ?? '-')
                       .toString(),
                   style:
                       TextStyle(color: Theme.of(context).colorScheme.primary)),

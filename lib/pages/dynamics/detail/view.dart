@@ -383,6 +383,7 @@ class _DynamicDetailPageState extends State<DynamicDetailPage>
                     showModalBottomSheet(
                       context: context,
                       isScrollControlled: true,
+                      isDismissible: false,
                       builder: (BuildContext context) {
                         return VideoReplyNewDialog(
                           oid: _dynamicDetailController.oid ??

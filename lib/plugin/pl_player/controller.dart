@@ -87,7 +87,7 @@ class PlPlayerController {
   late StreamSubscription<DataStatus> _dataListenerForEnterFullscreen;
 
   /// 后台播放
-  final Rx<bool> _backgroundPlay = false.obs;
+  final Rx<bool> _continuePlayInBackground = false.obs;
 
   ///
   // ignore: prefer_final_fields
@@ -209,7 +209,7 @@ class PlPlayerController {
   Rx<String> get videoFitDEsc => _videoFitDesc;
 
   /// 后台播放
-  Rx<bool> get backgroundPlay => _backgroundPlay;
+  Rx<bool> get continuePlayInBackground => _continuePlayInBackground;
 
   /// 是否长按倍速
   Rx<bool> get doubleSpeedStatus => _doubleSpeedStatus;
@@ -311,8 +311,8 @@ class PlPlayerController {
     enableAutoLongPressSpeed = setting
         .get(SettingBoxKey.enableAutoLongPressSpeed, defaultValue: false);
     // 后台播放
-    _backgroundPlay.value =
-        setting.get(SettingBoxKey.enableBackgroundPlay, defaultValue: false);
+    _continuePlayInBackground.value =
+        setting.get(SettingBoxKey.continuePlayInBackground, defaultValue: true);
     if (!enableAutoLongPressSpeed) {
       _longPressSpeed.value = videoStorage
           .get(VideoBoxKey.longPressSpeedDefault, defaultValue: 3.0);
@@ -980,8 +980,8 @@ class PlPlayerController {
 
   /// 设置后台播放
   Future<void> setBackgroundPlay(bool val) async {
-    _backgroundPlay.value = val;
-    setting.put(SettingBoxKey.enableBackgroundPlay, val);
+    _continuePlayInBackground.value = val;
+    setting.put(SettingBoxKey.continuePlayInBackground, val);
     videoPlayerServiceHandler.revalidateSetting();
   }
 

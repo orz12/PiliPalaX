@@ -94,6 +94,7 @@ class SettingBoxKey {
       enableAutoBrightness = 'enableAutoBrightness',
       enableAutoEnter = 'enableAutoEnter',
       enableAutoExit = 'enableAutoExit',
+      allowRotateScreen = 'allowRotateScreen',
       horizontalScreen = 'horizontalScreen',
       p1080 = 'p1080',
       enableCDN = 'enableCDN',
@@ -107,6 +108,7 @@ class SettingBoxKey {
       fullScreenGestureReverse = 'fullScreenGestureReverse',
       enableShowDanmaku = 'enableShowDanmaku',
       enableBackgroundPlay = 'enableBackgroundPlay',
+      continuePlayInBackground = 'continuePlayInBackground',
 
       /// 隐私
       blackMidsList = 'blackMidsList',

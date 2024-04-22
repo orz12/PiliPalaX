@@ -225,6 +225,11 @@ class _VideoReplyNewDialogState extends State<VideoReplyNewDialog>
                 ),
                 const Spacer(),
                 TextButton(
+                    onPressed: () => Get.back(), child: Text('取消',
+                        style: TextStyle(
+                            color: Theme.of(context).colorScheme.secondary))),
+                const SizedBox(width: 10),
+                TextButton(
                     onPressed: () => submitReplyAdd(), child: const Text('发送'))
               ],
             ),

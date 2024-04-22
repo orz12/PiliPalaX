@@ -25,7 +25,7 @@ Future<VideoPlayerServiceHandler> initAudioService() async {
 class VideoPlayerServiceHandler extends BaseAudioHandler with SeekHandler {
   static final List<MediaItem> _item = [];
   Box setting = GStrorage.setting;
-  bool enableBackgroundPlay = false;
+  bool enableBackgroundPlay = true;
   PlPlayerController player = PlPlayerController.getInstance();
 
   VideoPlayerServiceHandler() {
@@ -34,7 +34,7 @@ class VideoPlayerServiceHandler extends BaseAudioHandler with SeekHandler {
 
   revalidateSetting() {
     enableBackgroundPlay =
-        setting.get(SettingBoxKey.enableBackgroundPlay, defaultValue: false);
+        setting.get(SettingBoxKey.enableBackgroundPlay, defaultValue: true);
   }
 
   @override

@@ -1,3 +1,4 @@
+import 'package:PiliPalaX/http/video.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -54,7 +55,7 @@ class ReplyItem extends StatelessWidget {
             useRootNavigator: true,
             isScrollControlled: true,
             builder: (context) {
-              return MorePanel(item: replyItem);
+              return MorePanel(item: replyItem!);
             },
           );
         },
@@ -273,6 +274,7 @@ class ReplyItem extends StatelessWidget {
             onPressed: () {
               feedBack();
               showModalBottomSheet(
+                isDismissible: false,
                 context: context,
                 isScrollControlled: true,
                 builder: (builder) {
@@ -347,7 +349,7 @@ class ReplyItemRow extends StatelessWidget {
     this.replyItem,
     this.replyReply,
   });
-  final List? replies;
+  final List<ReplyItemModel>? replies;
   ReplyControl? replyControl;
   // int? f_rpid;
   ReplyItemModel? replyItem;
@@ -392,9 +394,8 @@ class ReplyItemRow extends StatelessWidget {
                       i == 0 && (extraRow == 1 || replies!.length > 1) ? 4 : 6,
                     ),
                     child: Semantics(
-                        label: replies![i].member.uname +
-                            ' ' +
-                            replies![i].content.message,
+                        label:
+                            '${replies![i].member!.uname} ${replies![i].content!.message}',
                         excludeSemantics: true,
                         child: Text.rich(
                           style: TextStyle(
@@ -412,7 +413,7 @@ class ReplyItemRow extends StatelessWidget {
                           TextSpan(
                             children: [
                               TextSpan(
-                                text: replies![i].member.uname + ' ',
+                                text: '${replies![i].member!.uname} ',
                                 style: TextStyle(
                                   color: Theme.of(context)
                                       .colorScheme
@@ -423,16 +424,16 @@ class ReplyItemRow extends StatelessWidget {
                                   ..onTap = () {
                                     feedBack();
                                     final String heroTag = Utils.makeHeroTag(
-                                        replies![i].member.mid);
+                                        replies![i].member!.mid);
                                     Get.toNamed(
-                                        '/member?mid=${replies![i].member.mid}',
+                                        '/member?mid=${replies![i].member!.mid}',
                                         arguments: {
-                                          'face': replies![i].member.avatar,
+                                          'face': replies![i].member!.avatar,
                                           'heroTag': heroTag
                                         });
                                   },
                               ),
-                              if (replies![i].isUp)
+                              if (replies![i].isUp!)
                                 const WidgetSpan(
                                   alignment: PlaceholderAlignment.top,
                                   child: PBadge(
@@ -971,11 +972,11 @@ InlineSpan buildContent(
 }
 
 class MorePanel extends StatelessWidget {
-  final dynamic item;
+  final ReplyItemModel item;
   const MorePanel({super.key, required this.item});
 
   Future<dynamic> menuActionHandler(String type) async {
-    String message = item.content.message ?? item.content;
+    String message = item.content?.message ?? '';
     switch (type) {
       case 'copyAll':
         await Clipboard.setData(ClipboardData(text: message));
@@ -1000,9 +1001,46 @@ class MorePanel extends StatelessWidget {
       // case 'report':
       //   SmartDialog.showToast('举报');
       //   break;
-      // case 'delete':
-      //   SmartDialog.showToast('删除');
-      //   break;
+      case 'delete':
+        //弹出确认提示：
+        bool? isDelete = await showDialog<bool>(
+          context: Get.context!,
+          builder: (context) {
+            return AlertDialog(
+              title: const Text('删除评论（测试）'),
+              content:
+                  Text('确定尝试删除这条评论吗？\n\n$message\n\n注：只能删除自己的评论，或自己管理的评论区下的评论'),
+              actions: <Widget>[
+                TextButton(
+                  onPressed: () {
+                    Get.back(result: false);
+                  },
+                  child: const Text('取消'),
+                ),
+                TextButton(
+                  onPressed: () {
+                    Get.back(result: true);
+                  },
+                  child: const Text('确定'),
+                ),
+              ],
+            );
+          },
+        );
+        if (isDelete == null || !isDelete) {
+          return;
+        }
+        SmartDialog.showLoading(msg: '删除中...');
+        var result = await VideoHttp.replyDel(
+            type: item.type!, oid: item.oid!, rpid: item.rpid!);
+        SmartDialog.dismiss();
+        if (result['status']) {
+          SmartDialog.showToast('删除成功，请刷新');
+          // Get.back();
+        } else {
+          SmartDialog.showToast('删除失败, ${result["msg"]}');
+        }
+        break;
       default:
     }
   }
@@ -1011,7 +1049,12 @@ class MorePanel extends StatelessWidget {
   Widget build(BuildContext context) {
     Color errorColor = Theme.of(context).colorScheme.error;
     return Container(
-      padding: EdgeInsets.only(bottom: MediaQuery.of(context).padding.bottom),
+      padding: EdgeInsets.only(
+          bottom: MediaQueryData.fromView(
+                      WidgetsBinding.instance.platformDispatcher.views.single)
+                  .padding
+                  .bottom +
+              20),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -1031,6 +1074,18 @@ class MorePanel extends StatelessWidget {
               ),
             ),
           ),
+          // 已登录用户才显示删除
+          if (GStrorage.userInfo.get('userInfoCache') != null)
+            ListTile(
+              onTap: () async => await menuActionHandler('delete'),
+              minLeadingWidth: 0,
+              leading: Icon(Icons.delete_outlined, color: errorColor, size: 19),
+              title: Text('删除',
+                  style: Theme.of(context)
+                      .textTheme
+                      .titleSmall!
+                      .copyWith(color: errorColor)),
+            ),
           ListTile(
             onTap: () async => await menuActionHandler('copyAll'),
             minLeadingWidth: 0,
@@ -1054,12 +1109,6 @@ class MorePanel extends StatelessWidget {
           //   minLeadingWidth: 0,
           //   leading: Icon(Icons.report_outlined, color: errorColor),
           //   title: Text('举报', style: TextStyle(color: errorColor)),
-          // ),
-          // ListTile(
-          //   onTap: () async => await menuActionHandler('del'),
-          //   minLeadingWidth: 0,
-          //   leading: Icon(Icons.delete_outline, color: errorColor),
-          //   title: Text('删除', style: TextStyle(color: errorColor)),
           // ),
         ],
       ),

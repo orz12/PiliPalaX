@@ -403,6 +403,7 @@ class _HtmlRenderPageState extends State<HtmlRenderPage>
                   showModalBottomSheet(
                     context: context,
                     isScrollControlled: true,
+                    isDismissible: false,
                     builder: (BuildContext context) {
                       return VideoReplyNewDialog(
                         oid: _htmlRenderCtr.oid.value,

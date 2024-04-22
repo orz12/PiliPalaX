@@ -63,9 +63,9 @@ class _EmotePanelState extends State<EmotePanel>
                               return Material(
                                 color: Colors.transparent,
                                 clipBehavior: Clip.hardEdge,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(4),
-                                ),
+                                // shape: RoundedRectangleBorder(
+                                //   borderRadius: BorderRadius.circular(4),
+                                // ),
                                 child: InkWell(
                                   onTap: () {
                                     widget.onChoose(e, e.emote![index]);
@@ -83,6 +83,7 @@ class _EmotePanelState extends State<EmotePanel>
                                             width: size * 38,
                                             height: size * 38,
                                             semanticsLabel: e.emote![index].text!,
+                                            type: 'emote',
                                           ),
                                   ),
                                 ),

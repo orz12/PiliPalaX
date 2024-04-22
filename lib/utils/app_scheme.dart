@@ -251,7 +251,12 @@ class PiliSchame {
           break;
         case 'read':
           print('专栏');
-          String id = 'cv${matchNum(query!['id']!).first}';
+          late String id;
+          if (query != null && query!['id'] != null) {
+            id = 'cv${matchNum(query!['id']!).first}';
+          } else {
+            id = 'cv${matchNum(path).first}';
+          }
           Get.toNamed('/htmlRender', parameters: {
             'url': value.dataString!,
             'title': '',

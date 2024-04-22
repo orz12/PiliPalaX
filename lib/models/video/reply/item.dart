@@ -53,7 +53,7 @@ class ReplyItemModel {
   int? action;
   ReplyMember? member;
   ReplyContent? content;
-  List? replies;
+  List<ReplyItemModel>? replies;
   int? assist;
   UpAction? upAction;
   bool? invisible;
@@ -85,10 +85,9 @@ class ReplyItemModel {
     member = ReplyMember.fromJson(json['member']);
     content = ReplyContent.fromJson(json['content']);
     replies = json['replies'] != null
-        ? json['replies']
-            .map((item) => ReplyItemModel.fromJson(item, upperMid))
-            .toList()
-        : [];
+        ? List<ReplyItemModel>.from(json['replies']
+            .map((item) => ReplyItemModel.fromJson(item, upperMid)))
+        : <ReplyItemModel>[];
     assist = json['assist'];
     upAction = UpAction.fromJson(json['up_action']);
     invisible = json['invisible'];

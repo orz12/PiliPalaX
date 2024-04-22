@@ -78,57 +78,60 @@ class VideoContent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Expanded(
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(10, 2, 6, 0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              subFolderItem.title!,
-              textAlign: TextAlign.start,
-              style: const TextStyle(
-                fontWeight: FontWeight.w500,
-                letterSpacing: 0.3,
-              ),
-            ),
-            const SizedBox(height: 2),
-            Text(
-              '合集 UP主：${subFolderItem.upper!.name!}',
-              textAlign: TextAlign.start,
-              style: TextStyle(
-                fontSize: Theme.of(context).textTheme.labelMedium!.fontSize,
-                color: Theme.of(context).colorScheme.outline,
-              ),
-            ),
-            const SizedBox(height: 2),
-            Text(
-              '${subFolderItem.mediaCount}个视频',
-              textAlign: TextAlign.start,
-              style: TextStyle(
-                fontSize: Theme.of(context).textTheme.labelMedium!.fontSize,
-                color: Theme.of(context).colorScheme.outline,
-              ),
-            ),
-            const Spacer(),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
+      child: Stack(
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(10, 2, 6, 0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                SizedBox(
-                  height: 35,
-                  width: 35,
-                  child: IconButton(
-                    onPressed: () => cancelSub?.call(subFolderItem),
-                    style: TextButton.styleFrom(
-                      foregroundColor: Theme.of(context).colorScheme.outline,
-                      padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
-                    ),
-                    icon: const Icon(Icons.delete_outline, size: 18),
+                Text(
+                  subFolderItem.title!,
+                  textAlign: TextAlign.start,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w500,
+                    letterSpacing: 0.3,
                   ),
-                )
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  '合集 UP主：${subFolderItem.upper!.name!}',
+                  textAlign: TextAlign.start,
+                  style: TextStyle(
+                    fontSize: Theme.of(context).textTheme.labelMedium!.fontSize,
+                    color: Theme.of(context).colorScheme.outline,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  '${subFolderItem.mediaCount}个视频',
+                  textAlign: TextAlign.start,
+                  style: TextStyle(
+                    fontSize: Theme.of(context).textTheme.labelMedium!.fontSize,
+                    color: Theme.of(context).colorScheme.outline,
+                  ),
+                ),
+                const Spacer(),
               ],
-            )
-          ],
-        ),
+            ),
+          ),
+          Positioned(
+            bottom: 0,
+            right: 0,
+            child: SizedBox(
+              height: 35,
+              width: 35,
+              child: IconButton(
+                onPressed: () => cancelSub?.call(subFolderItem),
+                style: TextButton.styleFrom(
+                  foregroundColor: Theme.of(context).colorScheme.outline,
+                  padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
+                ),
+                icon: const Icon(Icons.delete_outline, size: 18),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

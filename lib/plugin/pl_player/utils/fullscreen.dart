@@ -5,6 +5,8 @@ import 'package:auto_orientation/auto_orientation.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 
+import '../../../utils/storage.dart';
+
 //横屏
 Future<void> landScape() async {
   dynamic document;
@@ -44,6 +46,10 @@ Future<void> verticalScreen() async {
 
 //全向
 Future<void> autoScreen() async {
+  if (!GStrorage.setting
+      .get(SettingBoxKey.allowRotateScreen, defaultValue: true)) {
+    return;
+  }
   await SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,

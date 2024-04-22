@@ -40,6 +40,9 @@ class FavController extends GetxController {
       }
       hasMore.value = res['data'].hasMore;
       currentPage++;
+      if (hasMore.value && type == 'init') {
+        queryFavFolder(type: 'onload');
+      }
     } else {
       SmartDialog.showToast(res['msg']);
     }

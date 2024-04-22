@@ -376,6 +376,25 @@ class VideoHttp {
     }
   }
 
+  static Future replyDel({
+    required int type,//replyType
+    required int oid,
+    required int rpid,
+  }) async {
+    var res = await Request().post(Api.replyDel, queryParameters: {
+      'type': type,//type.index
+      'oid': oid,
+      'rpid': rpid,
+      'csrf': await Request.getCsrf(),
+    });
+    log(res.toString());
+    if (res.data['code'] == 0) {
+      return {'status': true};
+    } else {
+      return {'status': false, 'msg': res.data['message']};
+    }
+  }
+
   // 查询是否关注up
   static Future hasFollow({required int mid}) async {
     var res = await Request().get(Api.hasFollow, data: {'fid': mid});
@@ -584,14 +603,11 @@ class VideoHttp {
       }
     }
     if (subtitlesVtt.isNotEmpty) {
-      subtitlesVtt.insert(0, {
-        'language': '',
-        'title': '关闭字幕',
-        'text': ""
-      });
+      subtitlesVtt.insert(0, {'language': '', 'title': '关闭字幕', 'text': ""});
     }
     return subtitlesVtt;
   }
+
   // 视频排行
   static Future getRankVideoList(int rid) async {
     try {
