@@ -27,30 +27,42 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: 获取first parent commit次数
-        id: get-first-parent-commit-count
+      #- name: 获取first parent commit次数
+      #  id: get-first-parent-commit-count
+      #  run: |
+      #    version=$(yq e .version pubspec.yaml | cut -d "+" -f 1)
+      #    recent_release_tag=$(git tag -l | grep $version | egrep -v "[-|+]" || true)
+      #    if [[ "x$recent_release_tag" == "x" ]]; then
+      #      echo "当前版本tag不存在，请手动生成tag."
+      #      exit 1
+      #    fi
+      #    git log --oneline HEAD
+      #    first_parent_commit_count=$(git rev-list --first-parent --count $recent_release_tag..HEAD)
+      #    echo "count=$first_parent_commit_count" >> $GITHUB_OUTPUT
+
+      - name: 从tag获取之前的version_code与beta版本号
+        id: get-previous-codes
         run: |
           version=$(yq e .version pubspec.yaml | cut -d "+" -f 1)
-          recent_release_tag=$(git tag -l | grep $version | egrep -v "[-|+]" || true)
-          if [[ "x$recent_release_tag" == "x" ]]; then
-            echo "当前版本tag不存在，请手动生成tag."
-            exit 1
-          fi
-          git log --oneline HEAD
-          first_parent_commit_count=$(git rev-list --first-parent --count $recent_release_tag..HEAD)
-          echo "count=$first_parent_commit_count" >> $GITHUB_OUTPUT
+          last_tag=$(git describe --tags | awk -F"-" '{for(i=1;i<=NF-2;i++) printf "%s", $i}')
+          echo $last_tag | grep "+" || echo "Tag格式不正确" && exit 1
+          echo $last_tag | grep $version || echo "当前版本tag不存在，请手动添加tag." && exit 1
+
+          version_code=$(echo $last_tag | cut -d "+" -f 2)
+          beta_code=0$(echo $last_tag | cut -d "+" -f 1 | cut -d "." -f 4)
+
+          echo "beta-code=$beta_code" >> $GITHUB_OUTPUT
+          echo "version-code=$version_code" >> $GITHUB_OUTPUT
 
       - name: 更新版本号
         id: version
         run: |
           # 读取版本号
-          VERSION=$(yq e .version pubspec.yaml | cut -d "+" -f 1)
-    
-          # 获取GitHub Actions的run_number
-          #RUN_NUMBER=${{ github.run_number }}
-    
+          version_name=$(yq e .version pubspec.yaml | cut -d "+" -f 1)
+          let beta_code=${{ steps.get-previous-codes.outputs.beta-code }}+1
+          let version_code=${{ steps.get-previous-codes.outputs.version-code }}+1
           # 构建新版本号
-          NEW_VERSION=$VERSION-beta.${{ steps.get-first-parent-commit-count.outputs.count }}
+          NEW_VERSION=${version_name}-beta.${beta_code}+${version_code}
     
           # 输出新版本号
           echo "New version: $NEW_VERSION"
@@ -100,7 +112,7 @@ jobs:
         id: version
         run: |
           # 更新pubspec.yaml文件中的版本号
-          sed -i "s/version: .*+/version: ${{ needs.update_version.outputs.new_version }}+/g" pubspec.yaml
+          sed -i "s/version: .*/version: ${{ needs.update_version.outputs.new_version }}/g" pubspec.yaml
 
       - name: flutter build apk
         run: flutter build apk --release --split-per-abi
@@ -111,9 +123,10 @@ jobs:
 
       - name: 重命名应用
         run: |
+          version_name=$(yq e .version pubspec.yaml | cut -d "+" -f 1)
           for file in build/app/outputs/flutter-apk/app-*.apk; do
             if [[ $file =~ app-(.?*)release.apk ]]; then
-              new_file_name="build/app/outputs/flutter-apk/Pili-${BASH_REMATCH[1]}${{ needs.update_version.outputs.new_version }}.apk"
+              new_file_name="build/app/outputs/flutter-apk/Pili-${BASH_REMATCH[1]}${version_name}.apk"
               mv "$file" "$new_file_name"
             fi
           done
@@ -145,7 +158,7 @@ jobs:
         id: version
         run: |
           # 更新pubspec.yaml文件中的版本号
-          sed -i "" "s/version: .*+/version: ${{ needs.update_version.outputs.new_version }}+/g" pubspec.yaml
+          sed -i "" "s/version: .*/version: ${{ needs.update_version.outputs.new_version }}/g" pubspec.yaml
 
       - name: flutter build ipa
         run: |
@@ -155,9 +168,9 @@ jobs:
 
       - name: 重命名应用
         run: |
-          DATE=${{ steps.date.outputs.date }}
+          version_name=$(yq e .version pubspec.yaml | cut -d "+" -f 1)
           for file in app.ipa; do
-            new_file_name="build/Pili-${{ needs.update_version.outputs.new_version }}.ipa"
+            new_file_name="build/Pili-${version_name}.ipa"
             mv "$file" "$new_file_name"
           done
 
