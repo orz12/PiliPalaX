@@ -5,7 +5,7 @@ on:
   push:
     # push tag时触发
     tags:
-      - "v*.*.*"
+      - "[0-9]+.[0-9]+.[0-9]+\+[0-9]+"
 
 # 可以有多个jobs
 jobs:
@@ -47,6 +47,14 @@ jobs:
         env:
           KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
 
+      - name: 获取版本号
+        id: version
+        run: echo "version=${GITHUB_REF#refs/tags/}" >>$GITHUB_OUTPUT
+      
+      - name: 修改pubspec.yaml
+        run: |
+          sed -i "s/version: .*/version: ${{ steps.version.outputs.version }}/g" pubspec.yaml
+
       - name: flutter build apk
         run: flutter build apk --release --split-per-abi
         env:
@@ -61,9 +69,6 @@ jobs:
           KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD}}
 
-      - name: 获取版本号
-        id: version
-        run: echo "version=${GITHUB_REF#refs/tags/v}" >>$GITHUB_OUTPUT
 
       # - name: 获取当前日期
       #   id: date
@@ -71,7 +76,6 @@ jobs:
 
       - name: 重命名应用
         run: |
-          # DATE=${{ steps.date.outputs.date }}
           for file in build/app/outputs/flutter-apk/app-*.apk; do
             if [[ $file =~ app-(.?*)release.apk ]]; then
               new_file_name="build/app/outputs/flutter-apk/Pili-${BASH_REMATCH[1]}${{ steps.version.outputs.version }}.apk"
@@ -100,19 +104,22 @@ jobs:
           cache: true
           flutter-version: 3.16.5
 
+      - name: 获取版本号
+        id: version
+        run: echo "version=${GITHUB_REF#refs/tags/}" >>$GITHUB_OUTPUT
+      
+      - name: 修改pubspec.yaml
+        run: |
+          sed -i "s/version: .*/version: ${{ steps.version.outputs.version }}/g" pubspec.yaml
+
       - name: flutter build ipa
         run: |
           flutter build ios --release --no-codesign 
           ln -sf ./build/ios/iphoneos Payload
           zip -r9 app.ipa Payload/runner.app
 
-      - name: 获取版本号
-        id: version
-        run: echo "version=${GITHUB_REF#refs/tags/v}" >>$GITHUB_OUTPUT
-
       - name: 重命名应用
         run: |
-          DATE=${{ steps.date.outputs.date }}
           for file in app.ipa; do
             new_file_name="build/Pili-${{ steps.version.outputs.version }}.ipa"
             mv "$file" "$new_file_name"
