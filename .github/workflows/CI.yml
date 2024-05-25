@@ -45,8 +45,13 @@ jobs:
         run: |
           version=$(yq e .version pubspec.yaml | cut -d "+" -f 1)
           last_tag=$(git describe --tags | awk -F"-" '{for(i=1;i<=NF-2;i++) printf "%s", $i}')
-          echo $last_tag | grep "+" || echo "Tag格式不正确" && exit 1
-          echo $last_tag | grep $version || echo "当前版本tag不存在，请手动添加tag." && exit 1
+          if $(echo $last_tag | grep -v "+"); then
+            echo "Tag格式不正确"
+            exit 1
+          elif $(echo $last_tag | grep $version); then
+            echo "当前版本tag不存在，请手动添加tag."
+            exit 1
+          fi
 
           version_code=$(echo $last_tag | cut -d "+" -f 2)
           beta_code=0$(echo $last_tag | cut -d "+" -f 1 | cut -d "." -f 4)
