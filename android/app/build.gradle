@@ -86,6 +86,10 @@ android {
             // Signing with the debug keys for now, so `flutter run --release` works.
             signingConfig signingConfigs.release
         }
+        debug {
+            //applicationId "com.orz12.PiliPalaX.debug"
+            applicationIdSuffix ".debug"
+        }
     }
 }
 
