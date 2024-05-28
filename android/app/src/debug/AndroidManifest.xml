@@ -1,8 +1,132 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+<manifest
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="com.orz12.PiliPalaX">
     <!-- The INTERNET permission is required for development. Specifically,
          the Flutter tool needs it to communicate with the running application
          to allow setting breakpoints, to provide hot reload, etc.
     -->
-    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission
+        android:name="android.permission.INTERNET"
+        />
+
+    <application
+        android:label="PiliPalaX Debug"
+        tools:replace="android:label">
+        <activity
+            android:name="com.orz12.PiliPalaX.MainActivity"
+            android:exported="true"
+            android:launchMode="singleTask"
+            android:theme="@style/LaunchTheme"
+            android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"
+            android:hardwareAccelerated="true"
+            android:windowSoftInputMode="adjustResize"
+            android:supportsPictureInPicture="true"
+            android:resizeableActivity="true"
+            >
+            <!-- Specifies an Android theme to apply to this Activity as soon as
+                 the Android process has started. This theme is visible to the user
+                 while the Flutter UI initializes. After that, this theme continues
+                 to determine the Window background behind the Flutter UI. -->
+            <meta-data
+                android:name="io.flutter.embedding.android.NormalTheme"
+                android:resource="@style/NormalTheme"
+                />
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+            <intent-filter android:label="PiliPalaX Debug">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="http"/>
+                <data android:scheme="https"/>
+                <data android:host="*.bilibili.com"/>
+                <data android:host="*.bilibili.cn"/>
+                <data android:host="*.bilibili.tv"/>
+                <data android:host="bilibili.com"/>
+                <data android:host="bilibili.cn"/>
+                <data android:host="bilibili.tv"/>
+                <data android:host="b23.tv" />
+                <!--<data android:host="live.bilibili.com"/>-->
+                <!--<data android:host="www.bilibili.com"/>-->
+                <!--<data android:host="www.bilibili.tv"/>-->
+                <!--<data android:host="www.bilibili.cn"/>-->
+                <!--<data android:host="m.bilibili.cn"/>-->
+                <!--<data android:host="m.bilibili.com"/>-->
+                <!--<data android:host="bilibili.cn"/>-->
+                <!--<data android:host="bilibili.com"/>-->
+                <!--<data android:host="bangumi.bilibili.com"/>-->
+                <!--<data android:host="space.bilibili.com"/>-->
+            </intent-filter>
+            <intent-filter android:label="PiliPalaX Debug">
+                <action android:name="android.intent.action.VIEW" />
+                <action android:name="android.intent.action.SEARCH" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="bilibili"/>
+                <data android:host="forward" />
+                <data android:host="comment"
+                    android:pathPattern="/detail/.*/.*/.*" />
+                <data android:host="uper" />
+                <data android:host="article"
+                    android:pathPattern="/readlist" />
+                <data android:host="advertise" android:path="/home" />
+                <data android:host="clip" />
+                <data android:host="search" />
+                <data android:host="stardust-search" />
+                <data android:host="music" />
+                <data android:host="bangumi"
+                    android:pathPattern="/season.*" />
+                <data android:host="bangumi" android:pathPattern="/.*" />
+                <data android:host="pictureshow"
+                    android:pathPrefix="/creative_center" />
+                <data android:host="cliparea" />
+                <data android:host="im" />
+                <data android:host="im" android:path="/notifications" />
+                <data android:host="following" />
+                <data android:host="following"
+                    android:pathPattern="/detail/.*" />
+                <data android:host="following"
+                    android:path="/publishInfo/" />
+                <data android:host="laser" android:pathPattern="/.*" />
+                <data android:host="livearea" />
+                <data android:host="live" />
+                <data android:host="catalog" />
+                <data android:host="browser" />
+                <data android:host="user_center" />
+                <data android:host="login" />
+                <data android:host="space" />
+                <data android:host="author" />
+                <data android:host="tag" />
+                <data android:host="rank" />
+                <data android:host="external" />
+                <data android:host="blank" />
+                <data android:host="home" />
+                <data android:host="root" />
+                <data android:host="video" />
+                <data android:host="story" />
+                <data android:host="podcast" />
+                <data android:host="search" />
+                <data android:host="main" android:path="/favorite" />
+                <data android:host="pgc" android:path="/theater/match" />
+                <data android:host="pgc" android:path="/theater/square" />
+                <data android:host="m.bilibili.com"
+                    android:path="/topic-detail" />
+                <data android:host="article" />
+                <data android:host="pegasus"
+                    android:pathPattern="/channel/v2/.*" />
+                <data android:host="feed" android:pathPattern="/channel" />
+                <data android:host="vip" />
+                <data android:host="user_center" android:path="/vip" />
+                <data android:host="history" />
+                <data android:host="charge" android:path="/rank" />
+                <data android:host="assistant" />
+                <data android:host="assistant" />
+                <data android:host="feedback" />
+                <data android:host="auth" android:path="/launch" />
+            </intent-filter>
+        </activity>
+    </application>
 </manifest>
