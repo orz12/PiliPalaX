@@ -10,7 +10,7 @@ import 'package:PiliPalaX/utils/storage.dart';
 class FavController extends GetxController {
   final ScrollController scrollController = ScrollController();
   Rx<FavFolderData> favFolderData = FavFolderData().obs;
-  Box userInfoCache = GStrorage.userInfo;
+  Box userInfoCache = GStorage.userInfo;
   UserInfoData? userInfo;
   int currentPage = 1;
   int pageSize = 10;

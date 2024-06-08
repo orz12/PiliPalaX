@@ -7,7 +7,7 @@ import 'package:PiliPalaX/utils/global_data.dart';
 import '../../utils/storage.dart';
 import '../constants.dart';
 
-Box<dynamic> setting = GStrorage.setting;
+Box<dynamic> setting = GStorage.setting;
 
 class NetworkImgLayer extends StatelessWidget {
   const NetworkImgLayer({

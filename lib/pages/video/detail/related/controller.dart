@@ -3,7 +3,7 @@ import 'package:get/get.dart';
 import 'package:PiliPalaX/http/video.dart';
 import '../../../../models/model_hot_video_item.dart';
 
-class ReleatedController extends GetxController {
+class RelatedController extends GetxController {
   // 视频aid
   String bvid = Get.parameters['bvid'] ?? "";
   // 推荐视频列表

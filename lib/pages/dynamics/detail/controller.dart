@@ -24,7 +24,7 @@ class DynamicDetailController extends GetxController {
   ReplySortType _sortType = ReplySortType.time;
   RxString sortTypeTitle = ReplySortType.time.titles.obs;
   RxString sortTypeLabel = ReplySortType.time.labels.obs;
-  Box setting = GStrorage.setting;
+  Box setting = GStorage.setting;
 
   @override
   void onInit() {

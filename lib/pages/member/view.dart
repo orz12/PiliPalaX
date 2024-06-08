@@ -215,7 +215,7 @@ class _MemberPageState extends State<MemberPage>
                               if (snapshot.data['status']) {
                                 Map data = snapshot.data as Map;
                                 if (data['data'].seasonsList.isEmpty) {
-                                  return commenWidget('用户没有设置专栏');
+                                  return commonWidget('用户没有设置专栏');
                                 } else {
                                   return MemberSeasonsPanel(data: data['data']);
                                 }
@@ -450,7 +450,7 @@ class _MemberPageState extends State<MemberPage>
     );
   }
 
-  Widget commenWidget(msg) {
+  Widget commonWidget(msg) {
     return Padding(
       padding: const EdgeInsets.only(
         top: 20,

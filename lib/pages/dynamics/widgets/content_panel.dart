@@ -38,7 +38,7 @@ class _ContentState extends State<Content> {
   }
 
   InlineSpan picsNodes() {
-    List<InlineSpan> spanChilds = [];
+    List<InlineSpan> spanChildren = [];
     int len = pics.length;
     List<String> picList = [];
 
@@ -47,8 +47,8 @@ class _ContentState extends State<Content> {
       picList.add(pictureItem.url!);
 
       /// 图片上方的空白间隔
-      // spanChilds.add(const TextSpan(text: '\n'));
-      spanChilds.add(
+      // spanChildren.add(const TextSpan(text: '\n'));
+      spanChildren.add(
         WidgetSpan(
           child: LayoutBuilder(
             builder: (context, BoxConstraints box) {
@@ -132,7 +132,7 @@ class _ContentState extends State<Content> {
           ),
         );
       }
-      spanChilds.add(
+      spanChildren.add(
         WidgetSpan(
           child: LayoutBuilder(
             builder: (context, BoxConstraints box) {
@@ -163,7 +163,7 @@ class _ContentState extends State<Content> {
       );
     }
     return TextSpan(
-      children: spanChilds,
+      children: spanChildren,
     );
   }
 

@@ -118,7 +118,7 @@ class IntroDetail extends StatelessWidget {
     // type
     // 1 普通文本
     // 2 @用户
-    final List<TextSpan> spanChilds = List.generate(descV2.length, (index) {
+    final List<TextSpan> spanChildren = List.generate(descV2.length, (index) {
       final currentDesc = descV2[index];
       switch (currentDesc.type) {
         case 1:
@@ -186,6 +186,6 @@ class IntroDetail extends StatelessWidget {
           return const TextSpan();
       }
     });
-    return TextSpan(children: spanChilds);
+    return TextSpan(children: spanChildren);
   }
 }

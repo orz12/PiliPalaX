@@ -27,7 +27,7 @@ class _MainAppState extends State<MainApp> with SingleTickerProviderStateMixin {
   final MediaController _mediaController = Get.put(MediaController());
 
   int? _lastSelectTime; //上次点击时间
-  Box setting = GStrorage.setting;
+  Box setting = GStorage.setting;
   late bool enableMYBar;
   late bool useSideBar;
   late bool enableGradientBg;
@@ -102,7 +102,7 @@ class _MainAppState extends State<MainApp> with SingleTickerProviderStateMixin {
 
   @override
   void dispose() async {
-    await GStrorage.close();
+    await GStorage.close();
     EventBus().off(EventName.loginEvent);
     super.dispose();
   }

@@ -46,7 +46,7 @@ Future<void> verticalScreen() async {
 
 //全向
 Future<void> autoScreen() async {
-  if (!GStrorage.setting
+  if (!GStorage.setting
       .get(SettingBoxKey.allowRotateScreen, defaultValue: true)) {
     return;
   }

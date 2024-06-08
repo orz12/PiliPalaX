@@ -8,7 +8,7 @@ import 'id_utils.dart';
 import 'url_utils.dart';
 import 'utils.dart';
 
-class PiliSchame {
+class PiliScheme {
   static AppScheme appScheme = AppSchemeImpl.getInstance()!;
   static Future<void> init() async {
     ///

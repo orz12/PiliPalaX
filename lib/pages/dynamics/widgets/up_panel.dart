@@ -22,7 +22,7 @@ class _UpPanelState extends State<UpPanel> {
   int currentMid = -1;
   List<UpItem> upList = [];
   List<LiveUserItem> liveList = [];
-  Box userInfoCache = GStrorage.userInfo;
+  Box userInfoCache = GStorage.userInfo;
   var userInfo;
   bool _showLiveItems = false;
   late DynamicsController dynamicsController;

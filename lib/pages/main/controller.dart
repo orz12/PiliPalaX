@@ -26,12 +26,12 @@ class MainController extends GetxController {
   RxList navigationBars = defaultNavigationBars.obs;
   final StreamController<bool> bottomBarStream =
       StreamController<bool>.broadcast();
-  Box setting = GStrorage.setting;
+  Box setting = GStorage.setting;
   DateTime? _lastPressedAt;
   late bool hideTabBar;
   late PageController pageController;
   int selectedIndex = 0;
-  Box userInfoCache = GStrorage.userInfo;
+  Box userInfoCache = GStorage.userInfo;
   RxBool userLogin = false.obs;
   late DynamicBadgeMode dynamicBadgeType;
 

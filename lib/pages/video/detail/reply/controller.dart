@@ -36,7 +36,7 @@ class VideoReplyController extends GetxController {
   RxString sortTypeTitle = ReplySortType.time.titles.obs;
   RxString sortTypeLabel = ReplySortType.time.labels.obs;
 
-  Box setting = GStrorage.setting;
+  Box setting = GStorage.setting;
 
   @override
   void onInit() {

@@ -20,7 +20,7 @@ import 'package:PiliPalaX/utils/utils.dart';
 import '../../../../../utils/app_scheme.dart';
 import 'zan.dart';
 
-Box setting = GStrorage.setting;
+Box setting = GStorage.setting;
 
 class ReplyItem extends StatelessWidget {
   const ReplyItem({
@@ -245,7 +245,7 @@ class ReplyItem extends StatelessWidget {
               )),
         ),
         // 操作区域
-        bottonAction(context, replyItem!.replyControl),
+        buttonAction(context, replyItem!.replyControl),
         // 一楼的评论
         if ((replyItem!.replyControl!.isShow! ||
                 replyItem!.replies!.isNotEmpty) &&
@@ -266,7 +266,7 @@ class ReplyItem extends StatelessWidget {
   }
 
   // 感谢、回复、复制
-  Widget bottonAction(BuildContext context, replyControl) {
+  Widget buttonAction(BuildContext context, replyControl) {
     return Row(
       children: <Widget>[
         const SizedBox(width: 32),
@@ -505,14 +505,14 @@ InlineSpan buildContent(
   // replyReply 查看二楼回复（回复详情）回调
   // fReplyItem 父级回复内容，用作二楼回复（回复详情）展示
   final content = replyItem.content;
-  final List<InlineSpan> spanChilds = <InlineSpan>[];
+  final List<InlineSpan> spanChildren = <InlineSpan>[];
 
   // 投票
   if (content.vote.isNotEmpty) {
     content.message.splitMapJoin(RegExp(r"\{vote:.*?\}"),
         onMatch: (Match match) {
       // String matchStr = match[0]!;
-      spanChilds.add(
+      spanChildren.add(
         TextSpan(
           text: '投票: ${content.vote['title']}',
           style: TextStyle(
@@ -564,7 +564,7 @@ InlineSpan buildContent(
   final RegExp pattern = RegExp(patternStr);
   List<String> matchedStrs = [];
   void addPlainTextSpan(str) {
-    spanChilds.add(TextSpan(
+    spanChildren.add(TextSpan(
       text: str,
     ));
     // TextSpan(
@@ -583,7 +583,7 @@ InlineSpan buildContent(
       if (content.emote.containsKey(matchStr)) {
         // 处理表情
         final int size = content.emote[matchStr]['meta']['size'];
-        spanChilds.add(WidgetSpan(
+        spanChildren.add(WidgetSpan(
           child: ExcludeSemantics(
               child: NetworkImgLayer(
             src: content.emote[matchStr]['url'],
@@ -598,7 +598,7 @@ InlineSpan buildContent(
         // 处理@用户
         final String userName = matchStr.substring(1);
         final int userId = content.atNameToMid[userName];
-        spanChilds.add(
+        spanChildren.add(
           TextSpan(
             text: matchStr,
             style: TextStyle(
@@ -617,7 +617,7 @@ InlineSpan buildContent(
       } else if (RegExp(r'^\b(?:\d+[:：])?[0-5]?[0-9][:：][0-5]?[0-9]\b$')
           .hasMatch(matchStr)) {
         matchStr = matchStr.replaceAll('：', ':');
-        spanChilds.add(
+        spanChildren.add(
           TextSpan(
             text: ' $matchStr ',
             style: isVideoPage
@@ -654,7 +654,7 @@ InlineSpan buildContent(
             addPlainTextSpan(matchStr);
             return "";
           }
-          spanChilds.addAll(
+          spanChildren.addAll(
             [
               if (content.jumpUrl[matchStr]?['prefix_icon'] != null) ...[
                 WidgetSpan(
@@ -698,7 +698,7 @@ InlineSpan buildContent(
                           source: '',
                           dataString: redirectUrl,
                         );
-                        PiliSchame.routePush(scheme);
+                        PiliScheme.routePush(scheme);
                         // final String pathSegment = Uri.parse(redirectUrl).path;
                         // final String lastPathSegment =
                         //     pathSegment.split('/').last;
@@ -765,7 +765,7 @@ InlineSpan buildContent(
         } else if (content
                 .topicsMeta[matchStr.substring(1, matchStr.length - 1)] !=
             null) {
-          spanChilds.add(
+          spanChildren.add(
             TextSpan(
               text: matchStr,
               style: TextStyle(
@@ -799,7 +799,7 @@ InlineSpan buildContent(
     if (unmatchedItems.isNotEmpty) {
       for (int i = 0; i < unmatchedItems.length; i++) {
         String patternStr = unmatchedItems[i];
-        spanChilds.addAll(
+        spanChildren.addAll(
           [
             if (content.jumpUrl[patternStr]?['prefix_icon'] != null) ...[
               WidgetSpan(
@@ -836,11 +836,11 @@ InlineSpan buildContent(
   if (content.pictures.isNotEmpty) {
     final List<String> picList = <String>[];
     final int len = content.pictures.length;
-    spanChilds.add(const TextSpan(text: '\n'));
+    spanChildren.add(const TextSpan(text: '\n'));
     if (len == 1) {
       Map pictureItem = content.pictures.first;
       picList.add(pictureItem['img_src']);
-      spanChilds.add(
+      spanChildren.add(
         WidgetSpan(
           child: LayoutBuilder(
             builder: (BuildContext context, BoxConstraints box) {
@@ -925,7 +925,7 @@ InlineSpan buildContent(
           ),
         );
       }
-      spanChilds.add(
+      spanChildren.add(
         WidgetSpan(
           child: Semantics(
               explicitChildNodes: true,
@@ -962,7 +962,7 @@ InlineSpan buildContent(
 
   // 笔记链接
   if (content.richText.isNotEmpty) {
-    spanChilds.add(
+    spanChildren.add(
       TextSpan(
         text: ' 笔记',
         style: TextStyle(
@@ -980,8 +980,8 @@ InlineSpan buildContent(
       ),
     );
   }
-  // spanChilds.add(TextSpan(text: matchMember));
-  return TextSpan(children: spanChilds);
+  // spanChildren.add(TextSpan(text: matchMember));
+  return TextSpan(children: spanChildren);
 }
 
 class MorePanel extends StatelessWidget {
@@ -1088,7 +1088,7 @@ class MorePanel extends StatelessWidget {
             ),
           ),
           // 已登录用户才显示删除
-          if (GStrorage.userInfo.get('userInfoCache') != null)
+          if (GStorage.userInfo.get('userInfoCache') != null)
             ListTile(
               onTap: () async => await menuActionHandler('delete'),
               minLeadingWidth: 0,

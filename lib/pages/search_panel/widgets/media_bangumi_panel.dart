@@ -11,7 +11,7 @@ import 'package:PiliPalaX/utils/utils.dart';
 
 import '../../../utils/grid.dart';
 
-Widget searchMbangumiPanel(BuildContext context, ctr, list) {
+Widget searchBangumiPanel(BuildContext context, ctr, list) {
   TextStyle style =
       TextStyle(fontSize: Theme.of(context).textTheme.labelMedium!.fontSize);
   return CustomScrollView(

@@ -113,13 +113,13 @@ class VideoPopupMenu extends StatelessWidget {
                             act: 5,
                             reSrc: 11,
                           );
-                          List<int> blackMidsList = GStrorage.setting
+                          List<int> blackMidsList = GStorage.setting
                               .get(SettingBoxKey.blackMidsList,
                                   defaultValue: [-1])
                               .map<int>((i) => i as int)
                               .toList();
                           blackMidsList.insert(0, videoItem.owner.mid);
-                          GStrorage.setting
+                          GStorage.setting
                               .put(SettingBoxKey.blackMidsList, blackMidsList);
                           Get.back();
                           SmartDialog.showToast(res['msg'] ?? '成功');

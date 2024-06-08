@@ -29,12 +29,12 @@ import './services/loggeer.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   MediaKit.ensureInitialized();
-  await GStrorage.init();
-  if (GStrorage.setting
+  await GStorage.init();
+  if (GStorage.setting
       .get(SettingBoxKey.autoClearCache, defaultValue: false)) {
     await CacheManage.clearLibraryCache();
   }
-  if (GStrorage.setting
+  if (GStorage.setting
       .get(SettingBoxKey.horizontalScreen, defaultValue: false)) {
     await SystemChrome.setPreferredOrientations(
       //支持竖屏与横屏
@@ -92,7 +92,7 @@ void main() async {
     statusBarColor: Colors.transparent,
   ));
   Data.init();
-  PiliSchame.init();
+  PiliScheme.init();
 }
 
 class MyApp extends StatelessWidget {
@@ -100,7 +100,7 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Box setting = GStrorage.setting;
+    Box setting = GStorage.setting;
     // 主题色
     Color defaultColor =
         colorThemeTypes[setting.get(SettingBoxKey.customColor, defaultValue: 0)]

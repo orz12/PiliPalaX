@@ -13,7 +13,7 @@ class DynamicsTabController extends GetxController {
   RxList<DynamicItemModel> dynamicsList = <DynamicItemModel>[].obs;
   RxBool isLoadingMore = false.obs;
   String dynamicsType = 'all';
-  // Box userInfoCache = GStrorage.userInfo;
+  // Box userInfoCache = GStorage.userInfo;
   // bool userLogin = false;
   int mid = -1;
 

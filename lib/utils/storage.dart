@@ -7,9 +7,9 @@ import 'package:PiliPalaX/models/search/hot.dart';
 import 'package:PiliPalaX/models/user/info.dart';
 import 'global_data.dart';
 
-class GStrorage {
+class GStorage {
   static late final Box<dynamic> userInfo;
-  static late final Box<dynamic> historyword;
+  static late final Box<dynamic> historyWord;
   static late final Box<dynamic> localCache;
   static late final Box<dynamic> setting;
   static late final Box<dynamic> video;
@@ -36,7 +36,7 @@ class GStrorage {
     // 设置
     setting = await Hive.openBox('setting');
     // 搜索历史
-    historyword = await Hive.openBox(
+    historyWord = await Hive.openBox(
       'historyWord',
       compactionStrategy: (int entries, int deletedEntries) {
         return deletedEntries > 10;
@@ -76,8 +76,8 @@ class GStrorage {
     // user.close();
     userInfo.compact();
     userInfo.close();
-    historyword.compact();
-    historyword.close();
+    historyWord.compact();
+    historyWord.close();
     localCache.compact();
     localCache.close();
     setting.compact();

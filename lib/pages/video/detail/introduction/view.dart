@@ -128,7 +128,7 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
   late final VideoDetailController videoDetailCtr;
   late final Map<dynamic, dynamic> videoItem;
 
-  final Box<dynamic> setting = GStrorage.setting;
+  final Box<dynamic> setting = GStorage.setting;
 
   late final bool loadingStatus; // 加载状态
 

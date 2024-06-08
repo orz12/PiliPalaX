@@ -16,7 +16,7 @@ class WhisperDetailController extends GetxController {
   //表情转换图片规则
   List<dynamic>? eInfos;
   final TextEditingController replyContentController = TextEditingController();
-  Box userInfoCache = GStrorage.userInfo;
+  Box userInfoCache = GStorage.userInfo;
 
   @override
   void onInit() {

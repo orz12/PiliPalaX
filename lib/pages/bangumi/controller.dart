@@ -11,7 +11,7 @@ class BangumiController extends GetxController {
   RxList<BangumiListItemModel> bangumiFollowList = <BangumiListItemModel>[].obs;
   int _currentPage = 1;
   bool isLoadingMore = true;
-  Box userInfoCache = GStrorage.userInfo;
+  Box userInfoCache = GStorage.userInfo;
   RxBool userLogin = false.obs;
   late int mid;
   var userInfo;

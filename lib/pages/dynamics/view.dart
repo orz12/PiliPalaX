@@ -24,7 +24,7 @@ class _DynamicsPageState extends State<DynamicsPage>
     with AutomaticKeepAliveClientMixin, SingleTickerProviderStateMixin {
   final DynamicsController _dynamicsController = Get.put(DynamicsController());
   late Future _futureBuilderFutureUp;
-  Box userInfoCache = GStrorage.userInfo;
+  Box userInfoCache = GStorage.userInfo;
   late ScrollController scrollController;
   late UpPanelPosition upPanelPosition;
 

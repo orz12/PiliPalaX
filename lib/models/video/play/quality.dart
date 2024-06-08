@@ -2,7 +2,7 @@
 
 enum VideoQuality {
   speed240,
-  flunt360,
+  fluent360,
   clear480,
   high720,
   high72060,

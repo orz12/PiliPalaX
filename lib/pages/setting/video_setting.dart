@@ -16,7 +16,7 @@ class VideoSetting extends StatefulWidget {
 }
 
 class _VideoSettingState extends State<VideoSetting> {
-  Box setting = GStrorage.setting;
+  Box setting = GStorage.setting;
   late dynamic defaultVideoQa;
   late dynamic defaultAudioQa;
   late dynamic defaultDecode;

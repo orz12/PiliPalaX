@@ -19,7 +19,7 @@ class _DanmakuBlockPageState extends State<DanmakuBlockPage> {
   final DanmakuBlockController _danmakuBlockController =
       Get.put(DanmakuBlockController());
   final ScrollController scrollController = ScrollController();
-  Box setting = GStrorage.setting;
+  Box setting = GStorage.setting;
   late PlPlayerController plPlayerController;
 
   static const Map<int, String> ruleLabels = {

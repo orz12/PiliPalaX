@@ -19,7 +19,7 @@ class ExtraSetting extends StatefulWidget {
 }
 
 class _ExtraSettingState extends State<ExtraSetting> {
-  Box setting = GStrorage.setting;
+  Box setting = GStorage.setting;
   final SettingController settingController = Get.put(SettingController());
   late dynamic defaultReplySort;
   late dynamic defaultDynamicType;

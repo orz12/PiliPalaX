@@ -72,7 +72,7 @@ class LiveRoomController extends GetxController {
     }
   }
 
-  void setVolumn(value) {
+  void setVolume(value) {
     if (value == 0) {
       // 设置音量
       volumeOff.value = false;

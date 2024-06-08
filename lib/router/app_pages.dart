@@ -60,7 +60,7 @@ import '../pages/whisper/index.dart';
 import '../pages/whisper_detail/index.dart';
 import '../utils/storage.dart';
 
-Box<dynamic> setting = GStrorage.setting;
+Box<dynamic> setting = GStorage.setting;
 
 class Routes {
   static final List<GetPage<dynamic>> getPages = [
@@ -137,7 +137,7 @@ class Routes {
         name: '/fontSizeSetting', page: () => const FontSizeSelectPage()),
     // 屏幕帧率
     CustomGetPage(
-        name: '/displayModeSetting', page: () => const SetDiaplayMode()),
+        name: '/displayModeSetting', page: () => const SetDisplayMode()),
     // 关于
     CustomGetPage(name: '/about', page: () => const AboutPage()),
     //

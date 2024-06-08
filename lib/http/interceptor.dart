@@ -27,7 +27,7 @@ class ApiInterceptor extends Interceptor {
             final String? accessKey = uri.queryParameters['access_key'];
             final String? mid = uri.queryParameters['mid'];
             try {
-              Box localCache = GStrorage.localCache;
+              Box localCache = GStorage.localCache;
               localCache.put(LocalCacheKey.accessKey,
                   <String, String?>{'mid': mid, 'value': accessKey});
             } catch (_) {}

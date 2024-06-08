@@ -49,11 +49,11 @@ class _VideoDetailPageState extends State<VideoDetailPage>
   PlayerStatus playerStatus = PlayerStatus.playing;
   double doubleOffset = 0;
 
-  final Box<dynamic> localCache = GStrorage.localCache;
-  final Box<dynamic> setting = GStrorage.setting;
+  final Box<dynamic> localCache = GStorage.localCache;
+  final Box<dynamic> setting = GStorage.setting;
   late Future _futureBuilderFuture;
   // 自动退出全屏
-  late bool autoExitFullcreen;
+  late bool autoExitFullscreen;
   late bool autoPlayEnable;
   late bool horizontalScreen;
   late bool enableVerticalExpand;
@@ -91,7 +91,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
       videoPlayerServiceHandler.onVideoDetailChange(
           bangumiIntroController.bangumiDetail.value, p0);
     });
-    autoExitFullcreen =
+    autoExitFullscreen =
         setting.get(SettingBoxKey.enableAutoExit, defaultValue: true);
     horizontalScreen =
         setting.get(SettingBoxKey.horizontalScreen, defaultValue: false);
@@ -176,7 +176,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
       }
 
       // 结束播放退出全屏
-      if (!notExitFlag && autoExitFullcreen) {
+      if (!notExitFlag && autoExitFullscreen) {
         plPlayerController!.triggerFullScreen(status: false);
       }
       // 播放完展示控制栏
@@ -485,12 +485,12 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                 children: [
                   Obx(
                     () {
-                      double videoheight = context.width * 9 / 16;
-                      final double videowidth = context.width;
+                      double videoHeight = context.width * 9 / 16;
+                      final double videoWidth = context.width;
                       // print(videoDetailController.tabCtr.index);
                       if (enableVerticalExpand &&
                           plPlayerController?.direction.value == 'vertical') {
-                        videoheight = context.width;
+                        videoHeight = context.width;
                       }
                       if (MediaQuery.of(context).orientation ==
                               Orientation.landscape &&
@@ -519,7 +519,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                                         removeSafeArea
                                     ? 0
                                     : MediaQuery.of(context).padding.top)
-                            : videoheight,
+                            : videoHeight,
                         width: context.width,
                         child: PopScope(
                             canPop: isFullScreen.value != true &&
@@ -560,8 +560,8 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                                             type: 'emote',
                                             src: videoDetailController
                                                 .videoItem['pic'],
-                                            width: videowidth,
-                                            height: videoheight,
+                                            width: videoWidth,
+                                            height: videoHeight,
                                           ),
                                         ),
                                       ),
@@ -651,16 +651,16 @@ class _VideoDetailPageState extends State<VideoDetailPage>
     Widget childWhenDisabledAlmostSquareInner = Obx(() {
       if (enableVerticalExpand &&
           plPlayerController?.direction.value == 'vertical') {
-        final double videoheight = context.height -
+        final double videoHeight = context.height -
             (removeSafeArea
                 ? 0
                 : (MediaQuery.of(context).padding.top +
                     MediaQuery.of(context).padding.bottom));
-        final double videowidth = videoheight * 9 / 16;
+        final double videoWidth = videoHeight * 9 / 16;
         return Row(children: [
           SizedBox(
-            height: videoheight,
-            width: isFullScreen.value == true ? context.width : videowidth,
+            height: videoHeight,
+            width: isFullScreen.value == true ? context.width : videoWidth,
             child: PopScope(
               canPop: isFullScreen.value != true,
               onPopInvoked: (bool didPop) {
@@ -692,8 +692,8 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                           child: NetworkImgLayer(
                             type: 'emote',
                             src: videoDetailController.videoItem['pic'],
-                            width: videowidth,
-                            height: videoheight,
+                            width: videoWidth,
+                            height: videoHeight,
                           ),
                         ),
                       ),
@@ -743,19 +743,19 @@ class _VideoDetailPageState extends State<VideoDetailPage>
           ),
         ]);
       }
-      final double videoheight = context.height / 2.5;
-      final double videowidth = context.width;
+      final double videoHeight = context.height / 2.5;
+      final double videoWidth = context.width;
       return Column(
         children: [
           SizedBox(
-            width: videowidth,
+            width: videoWidth,
             height: isFullScreen.value == true
                 ? context.height -
                     (removeSafeArea
                         ? 0
                         : (MediaQuery.of(context).padding.top +
                             MediaQuery.of(context).padding.bottom))
-                : videoheight,
+                : videoHeight,
             child: PopScope(
               canPop: isFullScreen.value != true,
               onPopInvoked: (bool didPop) {
@@ -787,8 +787,8 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                           child: NetworkImgLayer(
                             type: 'emote',
                             src: videoDetailController.videoItem['pic'],
-                            width: videowidth,
-                            height: videoheight,
+                            width: videoWidth,
+                            height: videoHeight,
                           ),
                         ),
                       ),
@@ -831,14 +831,14 @@ class _VideoDetailPageState extends State<VideoDetailPage>
     Widget childWhenDisabledLandscapeInner = Obx(() {
       if (enableVerticalExpand &&
           plPlayerController?.direction.value == 'vertical') {
-        final double videoheight = context.height -
+        final double videoHeight = context.height -
             (removeSafeArea ? 0 : MediaQuery.of(context).padding.top);
-        final double videowidth = videoheight * 9 / 16;
+        final double videoWidth = videoHeight * 9 / 16;
         return Row(
           children: [
             SizedBox(
-              height: videoheight,
-              width: isFullScreen.value == true ? context.width : videowidth,
+              height: videoHeight,
+              width: isFullScreen.value == true ? context.width : videoWidth,
               child: PopScope(
                 canPop: isFullScreen.value != true,
                 onPopInvoked: (bool didPop) {
@@ -871,8 +871,8 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                               child: NetworkImgLayer(
                                 type: 'emote',
                                 src: videoDetailController.videoItem['pic'],
-                                width: videowidth,
-                                height: videoheight,
+                                width: videoWidth,
+                                height: videoHeight,
                               ),
                             ),
                           ),
@@ -949,18 +949,18 @@ class _VideoDetailPageState extends State<VideoDetailPage>
           ],
         );
       }
-      final double videowidth =
+      final double videoWidth =
           max(context.height / context.width * 1.04, 1 / 2) * context.width;
-      final double videoheight = videowidth * 9 / 16;
+      final double videoHeight = videoWidth * 9 / 16;
       return Row(
         children: [
           Column(
             children: [
               SizedBox(
                   width:
-                      isFullScreen.value == true ? context.width : videowidth,
+                      isFullScreen.value == true ? context.width : videoWidth,
                   height:
-                      isFullScreen.value == true ? context.height : videoheight,
+                      isFullScreen.value == true ? context.height : videoHeight,
                   child: PopScope(
                       canPop: isFullScreen.value != true,
                       onPopInvoked: (bool didPop) {
@@ -996,8 +996,8 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                                       type: 'emote',
                                       src: videoDetailController
                                           .videoItem['pic'],
-                                      width: videowidth,
-                                      height: videoheight,
+                                      width: videoWidth,
+                                      height: videoHeight,
                                     ),
                                   ),
                                 ),
@@ -1009,11 +1009,11 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                       ))),
               SizedBox(
                   width:
-                      isFullScreen.value == true ? context.width : videowidth,
+                      isFullScreen.value == true ? context.width : videoWidth,
                   height: isFullScreen.value == true
                       ? 0
                       : context.height -
-                          videoheight -
+                          videoHeight -
                           (removeSafeArea
                               ? 0
                               : MediaQuery.of(context).padding.top),
@@ -1039,7 +1039,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
               width: isFullScreen.value == true
                   ? 0
                   : (context.width -
-                      videowidth -
+                      videoWidth -
                       (removeSafeArea
                           ? 0
                           : (MediaQuery.of(context).padding.left +

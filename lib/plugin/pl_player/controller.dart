@@ -26,9 +26,9 @@ import 'package:universal_platform/universal_platform.dart';
 import '../../models/video/play/subtitle.dart';
 // import 'package:wakelock_plus/wakelock_plus.dart';
 
-Box videoStorage = GStrorage.video;
-Box setting = GStrorage.setting;
-Box localCache = GStrorage.localCache;
+Box videoStorage = GStorage.video;
+Box setting = GStorage.setting;
+Box localCache = GStorage.localCache;
 
 class PlPlayerController {
   Player? _videoPlayerController;
@@ -165,7 +165,7 @@ class PlPlayerController {
   /// [videoPlayerController] instance of Player
   Player? get videoPlayerController => _videoPlayerController;
 
-  /// [videoController] instace of Player
+  /// [videoController] instance of Player
   VideoController? get videoController => _videoController;
 
   Rx<bool> get isSliderMoving => _isSliderMoving;
@@ -629,7 +629,7 @@ class PlPlayerController {
   }
 
   Future<void> autoEnterFullscreen() async {
-    bool autoEnterFullscreen = GStrorage.setting
+    bool autoEnterFullscreen = GStorage.setting
         .get(SettingBoxKey.enableAutoEnter, defaultValue: false);
     if (autoEnterFullscreen) {
       Future.delayed(const Duration(milliseconds: 500), () {
@@ -724,7 +724,7 @@ class PlPlayerController {
         }),
         onPositionChanged.listen((event) {
           EasyThrottle.throttle(
-              'mediaServicePositon',
+              'mediaServicePosition',
               const Duration(seconds: 1),
               () => videoPlayerServiceHandler.onPositionChange(event));
         }),
@@ -945,10 +945,10 @@ class PlPlayerController {
     }
   }
 
-  Future<void> setBrightness(double brightnes) async {
+  Future<void> setBrightness(double brightness) async {
     try {
-      brightness.value = brightnes;
-      ScreenBrightness().setScreenBrightness(brightnes);
+      this.brightness.value = brightness;
+      ScreenBrightness().setScreenBrightness(brightness);
       // setVideoBrightness();
     } catch (e) {
       throw 'Failed to set brightness';

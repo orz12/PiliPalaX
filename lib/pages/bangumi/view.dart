@@ -12,7 +12,7 @@ import 'package:PiliPalaX/pages/main/index.dart';
 
 import '../../utils/grid.dart';
 import 'controller.dart';
-import 'widgets/bangumu_card_v.dart';
+import 'widgets/bangumi_card_v.dart';
 
 class BangumiPage extends StatefulWidget {
   const BangumiPage({super.key});
@@ -23,7 +23,7 @@ class BangumiPage extends StatefulWidget {
 
 class _BangumiPageState extends State<BangumiPage>
     with AutomaticKeepAliveClientMixin {
-  final BangumiController _bangumidController = Get.put(BangumiController());
+  final BangumiController _bangumiController = Get.put(BangumiController());
   late Future? _futureBuilderFuture;
   late Future? _futureBuilderFutureFollow;
   late ScrollController scrollController;
@@ -34,20 +34,20 @@ class _BangumiPageState extends State<BangumiPage>
   @override
   void initState() {
     super.initState();
-    scrollController = _bangumidController.scrollController;
+    scrollController = _bangumiController.scrollController;
     StreamController<bool> mainStream =
         Get.find<MainController>().bottomBarStream;
     StreamController<bool> searchBarStream =
         Get.find<HomeController>().searchBarStream;
-    _futureBuilderFuture = _bangumidController.queryBangumiListFeed();
-    _futureBuilderFutureFollow = _bangumidController.queryBangumiFollow();
+    _futureBuilderFuture = _bangumiController.queryBangumiListFeed();
+    _futureBuilderFutureFollow = _bangumiController.queryBangumiFollow();
     scrollController.addListener(
       () async {
         if (scrollController.position.pixels >=
             scrollController.position.maxScrollExtent - 200) {
           EasyThrottle.throttle('my-throttler', const Duration(seconds: 1), () {
-            _bangumidController.isLoadingMore = true;
-            _bangumidController.onLoad();
+            _bangumiController.isLoadingMore = true;
+            _bangumiController.onLoad();
           });
         }
 
@@ -75,17 +75,17 @@ class _BangumiPageState extends State<BangumiPage>
     super.build(context);
     return RefreshIndicator(
       onRefresh: () async {
-        await _bangumidController.queryBangumiListFeed();
-        return _bangumidController.queryBangumiFollow();
+        await _bangumiController.queryBangumiListFeed();
+        return _bangumiController.queryBangumiFollow();
       },
       child: CustomScrollView(
-        controller: _bangumidController.scrollController,
+        controller: _bangumiController.scrollController,
         physics: const AlwaysScrollableScrollPhysics(),
         slivers: [
           SliverToBoxAdapter(
             child: Obx(
               () => Visibility(
-                visible: _bangumidController.userLogin.value,
+                visible: _bangumiController.userLogin.value,
                 child: Column(
                   children: [
                     Padding(
@@ -103,7 +103,7 @@ class _BangumiPageState extends State<BangumiPage>
                             onPressed: () {
                               setState(() {
                                 _futureBuilderFutureFollow =
-                                    _bangumidController.queryBangumiFollow();
+                                    _bangumiController.queryBangumiFollow();
                               });
                             },
                             icon: const Icon(
@@ -126,7 +126,7 @@ class _BangumiPageState extends State<BangumiPage>
                               return const SizedBox();
                             }
                             Map data = snapshot.data as Map;
-                            List list = _bangumidController.bangumiFollowList;
+                            List list = _bangumiController.bangumiFollowList;
                             if (data['status']) {
                               return Obx(
                                 () => list.isNotEmpty
@@ -140,14 +140,14 @@ class _BangumiPageState extends State<BangumiPage>
                                             margin: EdgeInsets.only(
                                                 left: StyleString.safeSpace,
                                                 right: index ==
-                                                        _bangumidController
+                                                        _bangumiController
                                                                 .bangumiFollowList
                                                                 .length -
                                                             1
                                                     ? StyleString.safeSpace
                                                     : 0),
                                             child: BangumiCardV(
-                                              bangumiItem: _bangumidController
+                                              bangumiItem: _bangumiController
                                                   .bangumiFollowList[index],
                                             ),
                                           );
@@ -197,18 +197,18 @@ class _BangumiPageState extends State<BangumiPage>
                   Map data = snapshot.data as Map;
                   if (data['status']) {
                     return Obx(() => contentGrid(
-                        _bangumidController, _bangumidController.bangumiList));
+                        _bangumiController, _bangumiController.bangumiList));
                   } else {
                     return HttpError(
                       errMsg: data['msg'],
                       fn: () {
                         _futureBuilderFuture =
-                            _bangumidController.queryBangumiListFeed();
+                            _bangumiController.queryBangumiListFeed();
                       },
                     );
                   }
                 } else {
-                  return contentGrid(_bangumidController, []);
+                  return contentGrid(_bangumiController, []);
                 }
               },
             ),

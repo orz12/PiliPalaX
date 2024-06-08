@@ -10,7 +10,7 @@ InlineSpan richNode(item, context) {
   try {
     TextStyle authorStyle =
         TextStyle(color: Theme.of(context).colorScheme.primary);
-    List<InlineSpan> spanChilds = [];
+    List<InlineSpan> spanChildren = [];
 
     dynamic richTextNodes;
     if (item.modules.moduleDynamic.desc != null) {
@@ -20,7 +20,7 @@ InlineSpan richNode(item, context) {
       richTextNodes =
           item.modules.moduleDynamic.major.opus.summary.richTextNodes;
       if (item.modules.moduleDynamic.major.opus.title != null) {
-        spanChilds.add(
+        spanChildren.add(
           TextSpan(
             text: item.modules.moduleDynamic.major.opus.title + '\n',
             style: Theme.of(context)
@@ -39,12 +39,12 @@ InlineSpan richNode(item, context) {
         // if (item.modules.moduleDynamic.major.opus.title == null &&
         //     i.type == 'RICH_TEXT_NODE_TYPE_TEXT') {
         if (i.type == 'RICH_TEXT_NODE_TYPE_TEXT') {
-          spanChilds.add(
+          spanChildren.add(
               TextSpan(text: i.origText, style: const TextStyle(height: 1.65)));
         }
         // @用户
         if (i.type == 'RICH_TEXT_NODE_TYPE_AT') {
-          spanChilds.add(
+          spanChildren.add(
             WidgetSpan(
               alignment: PlaceholderAlignment.middle,
               child: Row(
@@ -65,7 +65,7 @@ InlineSpan richNode(item, context) {
         }
         // 话题
         if (i.type == 'RICH_TEXT_NODE_TYPE_TOPIC') {
-          spanChilds.add(
+          spanChildren.add(
             WidgetSpan(
               alignment: PlaceholderAlignment.middle,
               child: GestureDetector(
@@ -80,7 +80,7 @@ InlineSpan richNode(item, context) {
         }
         // 网页链接
         if (i.type == 'RICH_TEXT_NODE_TYPE_WEB') {
-          spanChilds.add(
+          spanChildren.add(
             WidgetSpan(
               alignment: PlaceholderAlignment.middle,
               child: Icon(
@@ -90,7 +90,7 @@ InlineSpan richNode(item, context) {
               ),
             ),
           );
-          spanChilds.add(
+          spanChildren.add(
             WidgetSpan(
               alignment: PlaceholderAlignment.middle,
               child: GestureDetector(
@@ -114,7 +114,7 @@ InlineSpan richNode(item, context) {
         }
         // 投票
         if (i.type == 'RICH_TEXT_NODE_TYPE_VOTE') {
-          spanChilds.add(
+          spanChildren.add(
             WidgetSpan(
               alignment: PlaceholderAlignment.middle,
               child: GestureDetector(
@@ -142,7 +142,7 @@ InlineSpan richNode(item, context) {
         }
         // 表情
         if (i.type == 'RICH_TEXT_NODE_TYPE_EMOJI') {
-          spanChilds.add(
+          spanChildren.add(
             WidgetSpan(
               child: NetworkImgLayer(
                 src: i.emoji.iconUrl,
@@ -155,7 +155,7 @@ InlineSpan richNode(item, context) {
         }
         // 抽奖
         if (i.type == 'RICH_TEXT_NODE_TYPE_LOTTERY') {
-          spanChilds.add(
+          spanChildren.add(
             WidgetSpan(
               alignment: PlaceholderAlignment.middle,
               child: Icon(
@@ -165,7 +165,7 @@ InlineSpan richNode(item, context) {
               ),
             ),
           );
-          spanChilds.add(
+          spanChildren.add(
             WidgetSpan(
               alignment: PlaceholderAlignment.middle,
               child: GestureDetector(
@@ -181,7 +181,7 @@ InlineSpan richNode(item, context) {
 
         /// TODO 商品
         if (i.type == 'RICH_TEXT_NODE_TYPE_GOODS') {
-          spanChilds.add(
+          spanChildren.add(
             WidgetSpan(
               alignment: PlaceholderAlignment.middle,
               child: Icon(
@@ -191,7 +191,7 @@ InlineSpan richNode(item, context) {
               ),
             ),
           );
-          spanChilds.add(
+          spanChildren.add(
             WidgetSpan(
               alignment: PlaceholderAlignment.middle,
               child: GestureDetector(
@@ -206,7 +206,7 @@ InlineSpan richNode(item, context) {
         }
         // 投稿
         if (i.type == 'RICH_TEXT_NODE_TYPE_BV') {
-          spanChilds.add(
+          spanChildren.add(
             WidgetSpan(
               alignment: PlaceholderAlignment.middle,
               child: Icon(
@@ -216,7 +216,7 @@ InlineSpan richNode(item, context) {
               ),
             ),
           );
-          spanChilds.add(
+          spanChildren.add(
             WidgetSpan(
               alignment: PlaceholderAlignment.middle,
               child: GestureDetector(
@@ -248,8 +248,8 @@ InlineSpan richNode(item, context) {
       //   if (len == 1) {
       //     OpusPicsModel pictureItem = pics.first;
       //     picList.add(pictureItem.url!);
-      //     spanChilds.add(const TextSpan(text: '\n'));
-      //     spanChilds.add(
+      //     spanChildren.add(const TextSpan(text: '\n'));
+      //     spanChildren.add(
       //       WidgetSpan(
       //         child: LayoutBuilder(
       //           builder: (context, BoxConstraints box) {
@@ -309,7 +309,7 @@ InlineSpan richNode(item, context) {
       //       ),
       //     );
       //   }
-      //   spanChilds.add(
+      //   spanChildren.add(
       //     WidgetSpan(
       //       child: LayoutBuilder(
       //         builder: (context, BoxConstraints box) {
@@ -339,7 +339,7 @@ InlineSpan richNode(item, context) {
       //     ),
       //   );
       // }
-      // spanChilds.add(
+      // spanChildren.add(
       //   WidgetSpan(
       //     child: NetworkImgLayer(
       //       src: pics.first.url,
@@ -351,7 +351,7 @@ InlineSpan richNode(item, context) {
       // );
       // }
       return TextSpan(
-        children: spanChilds,
+        children: spanChildren,
       );
     }
   } catch (err) {

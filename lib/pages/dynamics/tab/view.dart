@@ -68,7 +68,7 @@ class _DynamicsTabPageState extends State<DynamicsTabPage>
       _futureBuilderFuture = _dynamicsTabController.queryFollowDynamic(
           'init', widget.dynamicsType, mid);
     });
-    dynamicsWaterfallFlow = GStrorage.setting
+    dynamicsWaterfallFlow = GStorage.setting
         .get(SettingBoxKey.dynamicsWaterfallFlow, defaultValue: true);
   }
 
@@ -87,7 +87,7 @@ class _DynamicsTabPageState extends State<DynamicsTabPage>
         // key:
         //     ValueKey<String>(widget.dynamicsType + widget.mid.value.toString()),
         onRefresh: () async {
-          dynamicsWaterfallFlow = GStrorage.setting
+          dynamicsWaterfallFlow = GStorage.setting
               .get(SettingBoxKey.dynamicsWaterfallFlow, defaultValue: true);
           await Future.wait(<Future>[
             _dynamicsTabController.onRefresh(),

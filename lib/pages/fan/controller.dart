@@ -6,7 +6,7 @@ import 'package:PiliPalaX/models/fans/result.dart';
 import 'package:PiliPalaX/utils/storage.dart';
 
 class FansController extends GetxController {
-  Box userInfoCache = GStrorage.userInfo;
+  Box userInfoCache = GStorage.userInfo;
   int pn = 1;
   int ps = 20;
   int total = 0;

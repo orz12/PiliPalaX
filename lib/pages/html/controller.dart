@@ -25,7 +25,7 @@ class HtmlRenderController extends GetxController {
   late ReplySortType _sortType;
   late RxString sortTypeTitle;
   late RxString sortTypeLabel;
-  Box setting = GStrorage.setting;
+  Box setting = GStorage.setting;
 
   @override
   void onInit() {

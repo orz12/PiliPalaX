@@ -14,11 +14,11 @@ class MineController extends GetxController {
   // 用户状态 动态、关注、粉丝
   Rx<UserStat> userStat = UserStat().obs;
   RxBool userLogin = false.obs;
-  Box userInfoCache = GStrorage.userInfo;
-  Box setting = GStrorage.setting;
+  Box userInfoCache = GStorage.userInfo;
+  Box setting = GStorage.setting;
   Rx<ThemeType> themeType = ThemeType.system.obs;
   static bool anonymity =
-      GStrorage.setting.get(SettingBoxKey.anonymity, defaultValue: false);
+      GStorage.setting.get(SettingBoxKey.anonymity, defaultValue: false);
 
   @override
   onInit() {
@@ -131,7 +131,7 @@ class MineController extends GetxController {
                           TextButton(
                               onPressed: () {
                                 SmartDialog.dismiss();
-                                GStrorage.setting
+                                GStorage.setting
                                     .put(SettingBoxKey.anonymity, true);
                                 anonymity = true;
                                 SmartDialog.showToast('已设为永久无痕模式');
@@ -146,7 +146,7 @@ class MineController extends GetxController {
                           TextButton(
                               onPressed: () {
                                 SmartDialog.dismiss();
-                                GStrorage.setting
+                                GStorage.setting
                                     .put(SettingBoxKey.anonymity, false);
                                 anonymity = true;
                                 SmartDialog.showToast('已设为临时无痕模式');
@@ -164,7 +164,7 @@ class MineController extends GetxController {
             );
           });
     } else {
-      GStrorage.setting.put(SettingBoxKey.anonymity, false);
+      GStorage.setting.put(SettingBoxKey.anonymity, false);
       SmartDialog.show(
           clickMaskDismiss: false,
           usePenetrate: true,

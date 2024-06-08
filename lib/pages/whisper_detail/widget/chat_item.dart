@@ -52,7 +52,7 @@ class ChatItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     bool isOwner =
-        item.senderUid == GStrorage.userInfo.get('userInfoCache').mid;
+        item.senderUid == GStorage.userInfo.get('userInfoCache').mid;
 
     bool isPic = item.msgType == MsgType.pic.value; // 图片
     bool isText = item.msgType == MsgType.text.value; // 文本

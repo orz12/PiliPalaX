@@ -51,7 +51,7 @@ class _VideoReplyNewDialogState extends State<VideoReplyNewDialog>
     // 自动聚焦
     _autoFocus();
     // 监听聚焦状态
-    _focuslistener();
+    _focusListener();
   }
 
   _autoFocus() async {
@@ -61,7 +61,7 @@ class _VideoReplyNewDialogState extends State<VideoReplyNewDialog>
     }
   }
 
-  _focuslistener() {
+  _focusListener() {
     replyContentFocusNode.addListener(() {
       if (replyContentFocusNode.hasFocus) {
         setState(() {

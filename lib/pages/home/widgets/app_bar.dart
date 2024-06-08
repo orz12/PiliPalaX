@@ -6,7 +6,7 @@ import 'package:PiliPalaX/common/widgets/network_img_layer.dart';
 import 'package:PiliPalaX/pages/mine/view.dart';
 import 'package:PiliPalaX/utils/storage.dart';
 
-Box userInfoCache = GStrorage.userInfo;
+Box userInfoCache = GStorage.userInfo;
 
 class HomeAppBar extends StatelessWidget {
   const HomeAppBar({super.key});

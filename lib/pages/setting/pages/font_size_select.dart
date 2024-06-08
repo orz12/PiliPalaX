@@ -11,17 +11,17 @@ class FontSizeSelectPage extends StatefulWidget {
 }
 
 class _FontSizeSelectPageState extends State<FontSizeSelectPage> {
-  Box setting = GStrorage.setting;
+  Box setting = GStorage.setting;
   List<double> list = List.generate(12, (index) => 0.85 + index * 0.05);
   //[0.85, 0.9, 0.95, 1.0, 1.05, 1.1, 1.15, 1.2, 1.25, 1.3, 1.35];
-  late double minsize;
+  late double minSize;
   late double maxSize;
   late double currentSize;
 
   @override
   void initState() {
     super.initState();
-    minsize = list.first;
+    minSize = list.first;
     maxSize = list.last;
     currentSize =
         setting.get(SettingBoxKey.defaultTextScale, defaultValue: 1.0);
@@ -74,7 +74,7 @@ class _FontSizeSelectPageState extends State<FontSizeSelectPage> {
                 const Text('小'),
                 Expanded(
                   child: Slider(
-                    min: minsize,
+                    min: minSize,
                     value: currentSize,
                     max: maxSize,
                     divisions: list.length - 1,

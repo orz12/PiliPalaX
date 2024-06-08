@@ -28,7 +28,7 @@ class _BangumiPanelState extends State<BangumiPanel> {
   late int currentIndex;
   final ScrollController listViewScrollCtr = ScrollController();
   final ScrollController listViewScrollCtr_2 = ScrollController();
-  Box userInfoCache = GStrorage.userInfo;
+  Box userInfoCache = GStorage.userInfo;
   dynamic userInfo;
   // 默认未开通
   int vipStatus = 0;

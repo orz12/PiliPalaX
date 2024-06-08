@@ -46,7 +46,7 @@ class _MemberDynamicsPageState extends State<MemberDynamicsPage> {
         }
       },
     );
-    dynamicsWaterfallFlow = GStrorage.setting
+    dynamicsWaterfallFlow = GStorage.setting
         .get(SettingBoxKey.dynamicsWaterfallFlow, defaultValue: true);
   }
 

@@ -24,7 +24,7 @@ class PrivacySetting extends StatefulWidget {
 
 class _PrivacySettingState extends State<PrivacySetting> {
   bool userLogin = false;
-  Box userInfoCache = GStrorage.userInfo;
+  Box userInfoCache = GStorage.userInfo;
   UserInfoData? userInfo;
   late bool hiddenSettingUnlocked;
 
@@ -33,7 +33,7 @@ class _PrivacySettingState extends State<PrivacySetting> {
     super.initState();
     userInfo = userInfoCache.get('userInfoCache');
     userLogin = userInfo != null;
-    hiddenSettingUnlocked = GStrorage.setting
+    hiddenSettingUnlocked = GStorage.setting
         .get(SettingBoxKey.hiddenSettingUnlocked, defaultValue: false);
   }
 
@@ -256,9 +256,9 @@ class _PrivacySettingState extends State<PrivacySetting> {
                                 if (result['status'] &&
                                     result['data'].isLogin) {
                                   SmartDialog.showToast('登录成功，当前采用「'
-                                      '${GStrorage.setting.get(SettingBoxKey.defaultRcmdType, defaultValue: 'web')}'
+                                      '${GStorage.setting.get(SettingBoxKey.defaultRcmdType, defaultValue: 'web')}'
                                       '端」推荐');
-                                  Box userInfoCache = GStrorage.userInfo;
+                                  Box userInfoCache = GStorage.userInfo;
                                   await userInfoCache.put(
                                       'userInfoCache', result['data']);
                                   final HomeController homeCtr =

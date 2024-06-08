@@ -91,7 +91,7 @@ class _SearchPanelState extends State<SearchPanel>
                         list: list.value,
                       );
                     case SearchType.media_bangumi:
-                      return searchMbangumiPanel(context, ctr, list);
+                      return searchBangumiPanel(context, ctr, list);
                     case SearchType.bili_user:
                       return searchUserPanel(context, ctr, list);
                     case SearchType.live_room:

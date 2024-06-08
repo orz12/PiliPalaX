@@ -20,7 +20,7 @@ class PlaySetting extends StatefulWidget {
 }
 
 class _PlaySettingState extends State<PlaySetting> {
-  Box setting = GStrorage.setting;
+  Box setting = GStorage.setting;
   late String defaultSubtitlePreference;
   late int defaultFullScreenMode;
   late int defaultBtmProgressBehavior;
@@ -31,7 +31,7 @@ class _PlaySettingState extends State<PlaySetting> {
     defaultFullScreenMode = setting.get(SettingBoxKey.fullScreenMode,
         defaultValue: FullScreenMode.values.first.code);
     defaultBtmProgressBehavior = setting.get(SettingBoxKey.btmProgressBehavior,
-        defaultValue: BtmProgresBehavior.values.first.code);
+        defaultValue: BtmProgressBehavior.values.first.code);
     defaultSubtitlePreference = setting.get(SettingBoxKey.subtitlePreference,
         defaultValue: SubtitlePreference.values.first.code);
   }
@@ -231,7 +231,7 @@ class _PlaySettingState extends State<PlaySetting> {
                   return SelectDialog<int>(
                       title: '底部进度条展示',
                       value: defaultBtmProgressBehavior,
-                      values: BtmProgresBehavior.values.map((e) {
+                      values: BtmProgressBehavior.values.map((e) {
                         return {'title': e.description, 'value': e.code};
                       }).toList());
                 },

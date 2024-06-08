@@ -27,7 +27,7 @@ class _WhisperDetailPageState extends State<WhisperDetailPage>
   late double emoteHeight = 0.0;
   double keyboardHeight = 0.0; // 键盘高度
   String toolbarType = 'input';
-  Box userInfoCache = GStrorage.userInfo;
+  Box userInfoCache = GStorage.userInfo;
 
   @override
   void initState() {
@@ -35,10 +35,10 @@ class _WhisperDetailPageState extends State<WhisperDetailPage>
     WidgetsBinding.instance.addObserver(this);
     _whisperDetailController.querySessionMsg();
     _replyContentController = _whisperDetailController.replyContentController;
-    _focuslistener();
+    _focusListener();
   }
 
-  _focuslistener() {
+  _focusListener() {
     replyContentFocusNode.addListener(() {
       if (replyContentFocusNode.hasFocus) {
         setState(() {

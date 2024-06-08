@@ -8,7 +8,7 @@ import 'package:PiliPalaX/utils/storage.dart';
 
 class MediaController extends GetxController {
   Rx<FavFolderData> favFolderData = FavFolderData().obs;
-  Box userInfoCache = GStrorage.userInfo;
+  Box userInfoCache = GStorage.userInfo;
   RxBool userLogin = false.obs;
   List list = [
     {
@@ -61,7 +61,7 @@ class MediaController extends GetxController {
     var res = await await UserHttp.userfavFolder(
       pn: 1,
       ps: 5,
-      mid: mid ?? GStrorage.userInfo.get('userInfoCache').mid,
+      mid: mid ?? GStorage.userInfo.get('userInfoCache').mid,
     );
     favFolderData.value = res['data'];
     return res;

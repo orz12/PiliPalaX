@@ -45,7 +45,7 @@ class ListSheet {
     return ListTile(
       onTap: () {
         if (episode.badge != null && episode.badge == "会员") {
-          dynamic userInfo = GStrorage.userInfo.get('userInfoCache');
+          dynamic userInfo = GStorage.userInfo.get('userInfoCache');
           int vipStatus = 0;
           if (userInfo != null) {
             vipStatus = userInfo.vipStatus;

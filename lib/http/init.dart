@@ -23,8 +23,8 @@ class Request {
   static late CookieManager cookieManager;
   static late final Dio dio;
   factory Request() => _instance;
-  Box setting = GStrorage.setting;
-  static Box localCache = GStrorage.localCache;
+  Box setting = GStorage.setting;
+  static Box localCache = GStorage.localCache;
   late bool enableSystemProxy;
   late String systemProxyHost;
   late String systemProxyPort;
@@ -32,7 +32,7 @@ class Request {
 
   /// 设置cookie
   static setCookie() async {
-    Box userInfoCache = GStrorage.userInfo;
+    Box userInfoCache = GStorage.userInfo;
     final String cookiePath = await Utils.getCookiePath();
     final PersistCookieJar cookieJar = PersistCookieJar(
       ignoreExpires: true,

@@ -196,7 +196,7 @@ class _AboutPageState extends State<AboutPage> {
                           title: const Text('导出设置至剪贴板'),
                           onTap: () async {
                             Get.back();
-                            String data = await GStrorage.exportAllSettings();
+                            String data = await GStorage.exportAllSettings();
                             Clipboard.setData(ClipboardData(text: data));
                             SmartDialog.showToast('已复制到剪贴板');
                           },
@@ -231,7 +231,7 @@ class _AboutPageState extends State<AboutPage> {
                                       onPressed: () async {
                                         Get.back();
                                         try {
-                                          await GStrorage.importAllSettings(
+                                          await GStorage.importAllSettings(
                                               data.text!);
                                           SmartDialog.showToast('导入成功');
                                         } catch (e) {
@@ -271,9 +271,9 @@ class _AboutPageState extends State<AboutPage> {
                       TextButton(
                         onPressed: () {
                           Get.back();
-                          GStrorage.setting.clear();
-                          GStrorage.localCache.clear();
-                          GStrorage.video.clear();
+                          GStorage.setting.clear();
+                          GStorage.localCache.clear();
+                          GStorage.video.clear();
                           SmartDialog.showToast('重置成功');
                         },
                         child: const Text('确定'),
@@ -291,7 +291,7 @@ class _AboutPageState extends State<AboutPage> {
 }
 
 class AboutController extends GetxController {
-  Box setting = GStrorage.setting;
+  Box setting = GStorage.setting;
   final SettingController settingController = Get.put(SettingController());
   RxString currentVersion = ''.obs;
   RxString remoteVersion = ''.obs;

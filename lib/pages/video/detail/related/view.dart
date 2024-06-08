@@ -18,7 +18,7 @@ class RelatedVideoPanel extends StatefulWidget {
 
 class _RelatedVideoPanelState extends State<RelatedVideoPanel>
     with AutomaticKeepAliveClientMixin {
-  late ReleatedController _releatedController;
+  late RelatedController _relatedController;
   late Future _futureBuilder;
 
   @override
@@ -27,8 +27,8 @@ class _RelatedVideoPanelState extends State<RelatedVideoPanel>
   @override
   void initState() {
     super.initState();
-    _releatedController = Get.put(ReleatedController(), tag: widget.heroTag);
-    _futureBuilder = _releatedController.queryRelatedVideo();
+    _relatedController = Get.put(RelatedController(), tag: widget.heroTag);
+    _futureBuilder = _relatedController.queryRelatedVideo();
   }
 
   @override
@@ -44,7 +44,7 @@ class _RelatedVideoPanelState extends State<RelatedVideoPanel>
                 return const SliverToBoxAdapter(child: SizedBox());
               }
               if (snapshot.data!['status'] && snapshot.hasData) {
-                RxList relatedVideoList = _releatedController.relatedVideoList;
+                RxList relatedVideoList = _relatedController.relatedVideoList;
                 // 请求成功
                 return Obx(
                   () => SliverGrid(
@@ -65,17 +65,17 @@ class _RelatedVideoPanelState extends State<RelatedVideoPanel>
                             showPubdate: true,
                             longPress: () {
                               try {
-                                _releatedController.popupDialog =
-                                    _createPopupDialog(_releatedController
+                                _relatedController.popupDialog =
+                                    _createPopupDialog(_relatedController
                                         .relatedVideoList[index]);
                                 Overlay.of(context)
-                                    .insert(_releatedController.popupDialog!);
+                                    .insert(_relatedController.popupDialog!);
                               } catch (err) {
                                 return {};
                               }
                             },
                             longPressEnd: () {
-                              _releatedController.popupDialog?.remove();
+                              _relatedController.popupDialog?.remove();
                             },
                           ),
                         );
@@ -108,10 +108,10 @@ class _RelatedVideoPanelState extends State<RelatedVideoPanel>
   OverlayEntry _createPopupDialog(videoItem) {
     return OverlayEntry(
       builder: (BuildContext context) => AnimatedDialog(
-        closeFn: _releatedController.popupDialog?.remove,
+        closeFn: _relatedController.popupDialog?.remove,
         child: OverlayPop(
             videoItem: videoItem,
-            closeFn: _releatedController.popupDialog?.remove),
+            closeFn: _relatedController.popupDialog?.remove),
       ),
     );
   }

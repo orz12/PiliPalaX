@@ -18,10 +18,10 @@ class RecommendSetting extends StatefulWidget {
 }
 
 class _RecommendSettingState extends State<RecommendSetting> {
-  Box setting = GStrorage.setting;
-  static Box localCache = GStrorage.localCache;
+  Box setting = GStorage.setting;
+  static Box localCache = GStorage.localCache;
   late dynamic defaultRcmdType;
-  Box userInfoCache = GStrorage.userInfo;
+  Box userInfoCache = GStorage.userInfo;
   late dynamic userInfo;
   bool userLogin = false;
   late dynamic accessKeyInfo;

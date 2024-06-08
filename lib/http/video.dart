@@ -23,11 +23,11 @@ import 'init.dart';
 /// 返回{'status': bool, 'data': List}
 /// view层根据 status 判断渲染逻辑
 class VideoHttp {
-  static Box localCache = GStrorage.localCache;
-  static Box setting = GStrorage.setting;
+  static Box localCache = GStorage.localCache;
+  static Box setting = GStorage.setting;
   static bool enableRcmdDynamic =
       setting.get(SettingBoxKey.enableRcmdDynamic, defaultValue: true);
-  static Box userInfoCache = GStrorage.userInfo;
+  static Box userInfoCache = GStorage.userInfo;
 
   // 首页推荐视频
   static Future rcmdVideoList({required int ps, required int freshIdx}) async {
@@ -322,7 +322,7 @@ class VideoHttp {
 
   // （取消）点踩
   static Future dislikeVideo({required String bvid, required bool type}) async {
-    String? accessKey = GStrorage.localCache
+    String? accessKey = GStorage.localCache
         .get(LocalCacheKey.accessKey, defaultValue: {})['value'];
     if (accessKey == null || accessKey == "") {
       return {'status': false, 'data': [], 'msg': "本操作使用app端接口，请前往【隐私设置】刷新access_key"};
