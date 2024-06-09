@@ -94,23 +94,6 @@ class ReplyItem extends StatelessWidget {
             type: 'avatar',
           ),
         ),
-        if (replyItem!.member!.officialVerify != null &&
-            replyItem!.member!.officialVerify!['type'] == 0)
-          Positioned(
-            right: 0,
-            bottom: 0,
-            child: Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(7),
-                color: Theme.of(context).colorScheme.background,
-              ),
-              child: Icon(
-                Icons.offline_bolt,
-                color: Theme.of(context).colorScheme.primary,
-                size: 16,
-              ),
-            ),
-          ),
         if (replyItem!.member!.vip!['vipStatus'] > 0 &&
             replyItem!.member!.vip!['vipType'] == 2)
           Positioned(
@@ -118,13 +101,50 @@ class ReplyItem extends StatelessWidget {
             bottom: 0,
             child: Container(
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(7),
+                //borderRadius: BorderRadius.circular(7),
+                shape: BoxShape.circle,
                 color: Theme.of(context).colorScheme.background,
               ),
               child: Image.asset(
                 'assets/images/big-vip.png',
                 height: 14,
                 semanticLabel: "大会员",
+              ),
+            ),
+          ),
+        if (replyItem!.member!.officialVerify != null &&
+            replyItem!.member!.officialVerify!['type'] == 0)
+          Positioned(
+            right: -1,
+            bottom: -1,
+            child: Container(
+              decoration: BoxDecoration(
+                // borderRadius: BorderRadius.circular(8),
+                shape: BoxShape.circle,
+                color: Theme.of(context).colorScheme.background,
+              ),
+              child: const Icon(
+                Icons.offline_bolt,
+                color: Colors.yellow,
+                size: 16,
+              ),
+            ),
+          ),
+        if (replyItem!.member!.officialVerify != null &&
+            replyItem!.member!.officialVerify!['type'] == 1)
+          Positioned(
+            right: -1,
+            bottom: -1,
+            child: Container(
+              decoration: BoxDecoration(
+                // borderRadius: BorderRadius.circular(8),
+                shape: BoxShape.circle,
+                color: Theme.of(context).colorScheme.background,
+              ),
+              child: const Icon(
+                Icons.offline_bolt,
+                color: Colors.lightBlueAccent,
+                size: 16,
               ),
             ),
           ),
