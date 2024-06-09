@@ -115,7 +115,7 @@ class ReplyItem extends StatelessWidget {
         if (replyItem!.member!.officialVerify != null &&
             replyItem!.member!.officialVerify!['type'] == 0)
           Positioned(
-            right: -1,
+            left: -1,
             bottom: -1,
             child: Container(
               decoration: BoxDecoration(
@@ -133,7 +133,7 @@ class ReplyItem extends StatelessWidget {
         if (replyItem!.member!.officialVerify != null &&
             replyItem!.member!.officialVerify!['type'] == 1)
           Positioned(
-            right: -1,
+            left: -1,
             bottom: -1,
             child: Container(
               decoration: BoxDecoration(
