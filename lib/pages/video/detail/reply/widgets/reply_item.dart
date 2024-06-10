@@ -94,8 +94,7 @@ class ReplyItem extends StatelessWidget {
             type: 'avatar',
           ),
         ),
-        if (replyItem!.member!.vip!['vipStatus'] > 0 &&
-            replyItem!.member!.vip!['vipType'] == 2)
+        if (replyItem!.member!.vip!['vipStatus'] > 0)
           Positioned(
             right: 0,
             bottom: 0,
@@ -182,7 +181,8 @@ class ReplyItem extends StatelessWidget {
                       Text(
                         replyItem!.member!.uname!,
                         style: TextStyle(
-                          color: replyItem!.member!.vip!['vipStatus'] > 0
+                          color: (replyItem!.member!.vip!['vipStatus'] > 0 &&
+                                  replyItem!.member!.vip!['vipType'] == 2)
                               ? const Color.fromARGB(255, 251, 100, 163)
                               : Theme.of(context).colorScheme.outline,
                           fontSize: 13,
