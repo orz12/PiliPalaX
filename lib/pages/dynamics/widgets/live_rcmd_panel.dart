@@ -44,9 +44,8 @@ Widget liveRcmdPanel(item, context, {floor = 1}) {
       const SizedBox(height: 4),
       if (item.modules.moduleDynamic.topic != null) ...[
         Padding(
-          padding: floor == 2
-              ? EdgeInsets.zero
-              : const EdgeInsets.only(left: 12, right: 12),
+          padding:
+              const EdgeInsets.symmetric(horizontal: StyleString.safeSpace),
           child: GestureDetector(
             child: Text(
               '#${item.modules.moduleDynamic.topic.name}',
@@ -60,90 +59,91 @@ Widget liveRcmdPanel(item, context, {floor = 1}) {
         Text.rich(richNode(item, context)),
         const SizedBox(height: 6),
       ],
-      GestureDetector(
-        onTap: () {
-          _dynamicsController.pushDetail(item, floor);
-        },
-        child: LayoutBuilder(builder: (context, box) {
-          double width = box.maxWidth;
-          return Stack(
-            children: [
-              Hero(
-                tag: liveRcmd.roomId.toString(),
-                child: NetworkImgLayer(
-                  type: floor == 1 ? 'emote' : null,
-                  width: width,
-                  height: width / StyleString.aspectRatio,
-                  src: item.modules.moduleDynamic.major.liveRcmd.cover,
-                ),
-              ),
-              PBadge(
-                text: watchedShow['text_large'],
-                top: 6,
-                right: 56,
-                bottom: null,
-                left: null,
-                type: 'gray',
-              ),
-              PBadge(
-                text: liveStatus == 1 ? '直播中' : '直播结束',
-                top: 6,
-                right: 6,
-                bottom: null,
-                left: null,
-              ),
-              Positioned(
-                left: 0,
-                right: 0,
-                bottom: 0,
-                child: Container(
-                  height: 80,
-                  padding: const EdgeInsets.fromLTRB(12, 0, 10, 10),
-                  clipBehavior: Clip.hardEdge,
-                  decoration: BoxDecoration(
-                      gradient: const LinearGradient(
-                        begin: Alignment.topCenter,
-                        end: Alignment.bottomCenter,
-                        colors: <Color>[
-                          Colors.transparent,
-                          Colors.black45,
+      Padding(
+          padding:
+              const EdgeInsets.symmetric(horizontal: StyleString.safeSpace),
+          child: GestureDetector(
+            onTap: () {
+              _dynamicsController.pushDetail(item, floor);
+            },
+            child: LayoutBuilder(builder: (context, box) {
+              double width = box.maxWidth;
+              return Stack(
+                children: [
+                  Hero(
+                    tag: liveRcmd.roomId.toString(),
+                    child: NetworkImgLayer(
+                      type: floor == 1 ? 'emote' : null,
+                      width: width,
+                      height: width / StyleString.aspectRatio,
+                      src: item.modules.moduleDynamic.major.liveRcmd.cover,
+                    ),
+                  ),
+                  PBadge(
+                    text: watchedShow['text_large'],
+                    top: 6,
+                    right: 56,
+                    bottom: null,
+                    left: null,
+                    type: 'gray',
+                  ),
+                  PBadge(
+                    text: liveStatus == 1 ? '直播中' : '直播结束',
+                    top: 6,
+                    right: 6,
+                    bottom: null,
+                    left: null,
+                  ),
+                  Positioned(
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    child: Container(
+                      height: 80,
+                      padding: const EdgeInsets.fromLTRB(12, 0, 10, 10),
+                      clipBehavior: Clip.hardEdge,
+                      decoration: BoxDecoration(
+                          gradient: const LinearGradient(
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                            colors: <Color>[
+                              Colors.transparent,
+                              Colors.black45,
+                            ],
+                          ),
+                          borderRadius: floor == 1
+                              ? null
+                              : const BorderRadius.all(Radius.circular(6))),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          DefaultTextStyle.merge(
+                            style: TextStyle(
+                                fontSize: Theme.of(context)
+                                    .textTheme
+                                    .labelMedium!
+                                    .fontSize,
+                                color: Colors.white),
+                            child: Row(
+                              children: [
+                                Text(item.modules.moduleDynamic.major.liveRcmd
+                                        .areaName ??
+                                    ''),
+                              ],
+                            ),
+                          ),
                         ],
                       ),
-                      borderRadius: floor == 1
-                          ? null
-                          : const BorderRadius.all(Radius.circular(6))),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      DefaultTextStyle.merge(
-                        style: TextStyle(
-                            fontSize: Theme.of(context)
-                                .textTheme
-                                .labelMedium!
-                                .fontSize,
-                            color: Colors.white),
-                        child: Row(
-                          children: [
-                            Text(item.modules.moduleDynamic.major.liveRcmd
-                                    .areaName ??
-                                ''),
-                          ],
-                        ),
-                      ),
-                    ],
+                    ),
                   ),
-                ),
-              ),
-            ],
-          );
-        }),
-      ),
+                ],
+              );
+            }),
+          )),
       const SizedBox(height: 6),
       Padding(
-        padding: floor == 1
-            ? const EdgeInsets.only(left: 12, right: 12)
-            : EdgeInsets.zero,
+        padding: const EdgeInsets.symmetric(horizontal: StyleString.safeSpace),
         child: Text(
           item.modules.moduleDynamic.major.liveRcmd.title,
           maxLines: 1,

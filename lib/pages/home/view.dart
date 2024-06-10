@@ -46,61 +46,78 @@ class _HomePageState extends State<HomePage>
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    Brightness currentBrightness = MediaQuery.of(context).platformBrightness;
-    // 设置状态栏图标的亮度
-    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
-      statusBarIconBrightness: currentBrightness == Brightness.light
-          ? Brightness.dark
-          : Brightness.light,
-    ));
+    // Brightness currentBrightness = MediaQuery.of(context).platformBrightness;
+    // // 设置状态栏图标的亮度
+    // if (_homeController.enableGradientBg) {
+    //   SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+    //     statusBarIconBrightness: currentBrightness == Brightness.light
+    //         ? Brightness.dark
+    //         : Brightness.light,
+    //   ));
+    // }
     return Scaffold(
       extendBody: true,
       extendBodyBehindAppBar: true,
-      body: Stack(
+      backgroundColor: Colors.transparent,
+      appBar: AppBar(
+        toolbarHeight: 0,
+        elevation: 0,
+        backgroundColor: Colors.transparent,
+        systemOverlayStyle: SystemUiOverlayStyle(
+          statusBarIconBrightness:
+              Theme.of(context).brightness == Brightness.dark
+                  ? Brightness.light
+                  : Brightness.dark,
+        ),
+      ),
+      body: Column(
         children: [
-          // gradient background
-          Align(
-            alignment: Alignment.topLeft,
-            child: Opacity(
-              opacity: 0.6,
-              child: Container(
-                width: MediaQuery.of(context).size.width,
-                height: MediaQuery.of(context).size.height,
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                      colors: [
-                        Theme.of(context).colorScheme.primary.withOpacity(0.9),
-                        Theme.of(context).colorScheme.primary.withOpacity(0.5),
-                        Theme.of(context).colorScheme.surface
-                      ],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                      stops: const [0, 0.0034, 0.34]),
-                ),
-              ),
-            ),
+          CustomAppBar(
+            stream: _homeController.hideSearchBar
+                ? stream
+                : StreamController<bool>.broadcast().stream,
+            ctr: _homeController,
+            callback: showUserBottomSheet,
           ),
-          Column(
-            children: [
-              CustomAppBar(
-                stream: _homeController.hideSearchBar
-                    ? stream
-                    : StreamController<bool>.broadcast().stream,
-                ctr: _homeController,
-                callback: showUserBottomSheet,
-              ),
-              if (_homeController.tabs.length > 1) ...[
-                const CustomTabs(),
-              ] else ...[
-                const SizedBox(height: 6),
-              ],
-              Expanded(
-                child: TabBarView(
-                  controller: _homeController.tabController,
-                  children: _homeController.tabsPageList,
+          if (_homeController.tabs.length > 1) ...[
+            if (_homeController.enableGradientBg) ...[
+              const CustomTabs(),
+            ] else ...[
+              const SizedBox(height: 4),
+              SizedBox(
+                width: double.infinity,
+                height: 42,
+                child: Align(
+                  alignment: Alignment.center,
+                  child: TabBar(
+                    controller: _homeController.tabController,
+                    tabs: [
+                      for (var i in _homeController.tabs) Tab(text: i['label'])
+                    ],
+                    isScrollable: true,
+                    dividerColor: Colors.transparent,
+                    enableFeedback: true,
+                    splashBorderRadius: BorderRadius.circular(10),
+                    tabAlignment: TabAlignment.center,
+                    onTap: (value) {
+                      feedBack();
+                      if (_homeController.initialIndex.value == value) {
+                        _homeController.tabsCtrList[value]().animateToTop();
+                      }
+                      _homeController.initialIndex.value = value;
+                    },
+                  ),
                 ),
               ),
             ],
+          ] else ...[
+            const SizedBox(height: 6),
+          ],
+          Expanded(
+            child: TabBarView(
+              controller: _homeController.tabController,
+              children: _homeController.tabsPageList,
+            ),
           ),
         ],
       ),
@@ -141,12 +158,14 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
             duration: const Duration(milliseconds: 500),
             height: snapshot.data ? top + 52 : top,
             padding: EdgeInsets.fromLTRB(14, top + 6, 14, 0),
-            child: UserInfoWidget(
-              top: top,
-              ctr: ctr,
-              userLogin: isUserLoggedIn,
-              userFace: ctr?.userFace.value,
-              callback: () => callback!(),
+            child: Obx(
+              () => UserInfoWidget(
+                top: top,
+                ctr: ctr,
+                userLogin: isUserLoggedIn,
+                userFace: ctr?.userFace.value,
+                callback: () => callback!(),
+              ),
             ),
           ),
         );
@@ -176,45 +195,50 @@ class UserInfoWidget extends StatelessWidget {
     return Row(
       children: [
         SearchBar(ctr: ctr),
-        if (userLogin.value) ...[
-          const SizedBox(width: 4),
-          ClipRect(
-            child: IconButton(
-              onPressed: () => Get.toNamed('/whisper'),
-              icon: const Icon(Icons.notifications_none),
-            ),
-          )
-        ],
+        const SizedBox(width: 4),
+        Obx(() => userLogin.value
+            ? ClipRect(
+                child: IconButton(
+                  tooltip: '消息',
+                  onPressed: () => Get.toNamed('/whisper'),
+                  icon: const Icon(
+                    Icons.notifications_none,
+                  ),
+                ),
+              )
+            : const SizedBox.shrink()),
         const SizedBox(width: 8),
-        Obx(
-          () => userLogin.value
-              ? Stack(
-                  children: [
-                    NetworkImgLayer(
-                      type: 'avatar',
-                      width: 34,
-                      height: 34,
-                      src: userFace,
-                    ),
-                    Positioned.fill(
-                      child: Material(
-                        color: Colors.transparent,
-                        child: InkWell(
-                          onTap: () => callback?.call(),
-                          splashColor: Theme.of(context)
-                              .colorScheme
-                              .primaryContainer
-                              .withOpacity(0.3),
-                          borderRadius: const BorderRadius.all(
-                            Radius.circular(50),
-                          ),
+        Semantics(
+            label: "我的",
+            child: Obx(
+              () => userLogin.value
+                  ? Stack(
+                      children: [
+                        NetworkImgLayer(
+                          type: 'avatar',
+                          width: 34,
+                          height: 34,
+                          src: userFace,
                         ),
-                      ),
+                        Positioned.fill(
+                          child: Material(
+                            color: Colors.transparent,
+                            child: InkWell(
+                              onTap: () => callback?.call(),
+                              splashColor: Theme.of(context)
+                                  .colorScheme
+                                  .primaryContainer
+                                  .withOpacity(0.3),
+                              borderRadius: const BorderRadius.all(
+                                Radius.circular(50),
+                              ),
+                            ),
+                          ),
+                        )
+                      ],
                     )
-                  ],
-                )
-              : DefaultUser(callback: () => callback!()),
-        ),
+                  : DefaultUser(callback: () => callback!()),
+            )),
       ],
     );
   }
@@ -230,6 +254,7 @@ class DefaultUser extends StatelessWidget {
       width: 38,
       height: 38,
       child: IconButton(
+        tooltip: '默认用户头像',
         style: ButtonStyle(
           padding: MaterialStateProperty.all(EdgeInsets.zero),
           backgroundColor: MaterialStateProperty.resolveWith((states) {
@@ -369,14 +394,17 @@ class SearchBar extends StatelessWidget {
                 Icon(
                   Icons.search_outlined,
                   color: colorScheme.onSecondaryContainer,
+                  semanticLabel: '搜索',
                 ),
                 const SizedBox(width: 10),
-                Obx(
-                  () => Text(
-                    ctr!.defaultSearch.value,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(color: colorScheme.outline),
+                Expanded(
+                  child: Obx(
+                    () => Text(
+                      ctr!.defaultSearch.value,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(color: colorScheme.outline),
+                    ),
                   ),
                 ),
               ],

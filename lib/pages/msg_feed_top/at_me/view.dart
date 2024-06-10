@@ -74,22 +74,33 @@ class _AtMePageState extends State<AtMePage> {
                         src: _atMeController.msgFeedAtMeList[i].user?.avatar,
                       ),
                       title: Text(
-                        "${_atMeController.msgFeedAtMeList[i].user?.nickname}  "
-                        "在${_atMeController.msgFeedAtMeList[i].item?.business}中@了我",
-                        style: Theme.of(context).textTheme.bodyMedium!,
-                      ),
-                      subtitle: Text(
-                          _atMeController
-                                  .msgFeedAtMeList[i].item?.sourceContent ??
-                              "",
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
+                          "${_atMeController.msgFeedAtMeList[i].user?.nickname}  "
+                          "在${_atMeController.msgFeedAtMeList[i].item?.business}中@了我",
                           style: Theme.of(context)
                               .textTheme
-                              .labelMedium!
+                              .titleMedium!
                               .copyWith(
-                                  color:
-                                      Theme.of(context).colorScheme.outline)),
+                                color: Theme.of(context).colorScheme.primary,
+                              )),
+                      subtitle:
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const SizedBox(height: 4),
+                              Text(
+                                  _atMeController
+                                      .msgFeedAtMeList[i].item?.sourceContent ??
+                                      "",
+                                  maxLines: 3,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .bodyMedium!
+                                      .copyWith(
+                                      color:
+                                      Theme.of(context).colorScheme.outline))
+                            ],
+                          ),
                       trailing: _atMeController
                                       .msgFeedAtMeList[i].item?.image !=
                                   null &&

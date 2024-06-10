@@ -43,7 +43,7 @@ class _MemberSeasonsPageState extends State<MemberSeasonsPage> {
       appBar: AppBar(
         titleSpacing: 0,
         centerTitle: false,
-        title: Text('他的专栏', style: Theme.of(context).textTheme.titleMedium),
+        title: Text('Ta的专栏', style: Theme.of(context).textTheme.titleMedium),
       ),
       body: Padding(
         padding: const EdgeInsets.only(

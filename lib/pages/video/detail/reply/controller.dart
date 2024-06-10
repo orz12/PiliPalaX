@@ -22,7 +22,7 @@ class VideoReplyController extends GetxController {
   String? replyLevel;
   // rpid 请求楼中楼回复
   String? rpid;
-  RxList<ReplyItemModel> replyList = [ReplyItemModel()].obs;
+  RxList<ReplyItemModel> replyList = <ReplyItemModel>[].obs;
   // 当前页
   int currentPage = 0;
   bool isLoadingMore = false;
@@ -41,13 +41,13 @@ class VideoReplyController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    int deaultReplySortIndex =
+    int defaultReplySortIndex =
         setting.get(SettingBoxKey.replySortType, defaultValue: 0) as int;
-    if (deaultReplySortIndex == 2) {
+    if (defaultReplySortIndex == 2) {
       setting.put(SettingBoxKey.replySortType, 0);
-      deaultReplySortIndex = 0;
+      defaultReplySortIndex = 0;
     }
-    _sortType = ReplySortType.values[deaultReplySortIndex];
+    _sortType = ReplySortType.values[defaultReplySortIndex];
     sortTypeTitle.value = _sortType.titles;
     sortTypeLabel.value = _sortType.labels;
   }
@@ -56,7 +56,6 @@ class VideoReplyController extends GetxController {
     if (isLoadingMore) {
       return;
     }
-    isLoadingMore = true;
     if (type == 'init') {
       currentPage = 0;
       noMore.value = '';
@@ -64,6 +63,7 @@ class VideoReplyController extends GetxController {
     if (noMore.value == '没有更多了') {
       return;
     }
+    isLoadingMore = true;
     final res = await ReplyHttp.replyList(
       oid: aid!,
       pageNum: currentPage + 1,
@@ -71,6 +71,7 @@ class VideoReplyController extends GetxController {
       type: ReplyType.video.index,
       sort: _sortType.index,
     );
+    isLoadingMore = false;
     if (res['status']) {
       final List<ReplyItemModel> replies = res['data'].replies;
       if (replies.isNotEmpty) {
@@ -105,8 +106,6 @@ class VideoReplyController extends GetxController {
         replyList.addAll(replies);
       }
     }
-    isLoadingMore = false;
-    return res;
   }
 
   // 上拉加载

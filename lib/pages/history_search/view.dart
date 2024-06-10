@@ -1,11 +1,10 @@
 import 'package:easy_debounce/easy_throttle.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:PiliPalaX/common/skeleton/video_card_h.dart';
-import 'package:PiliPalaX/common/widgets/http_error.dart';
-import 'package:PiliPalaX/common/widgets/no_data.dart';
 import 'package:PiliPalaX/pages/history/widgets/item.dart';
 
+import '../../common/constants.dart';
+import '../../utils/grid.dart';
 import 'controller.dart';
 
 class HistorySearchPage extends StatefulWidget {
@@ -50,6 +49,7 @@ class _HistorySearchPageState extends State<HistorySearchPage> {
         titleSpacing: 0,
         actions: [
           IconButton(
+              tooltip: '搜索',
               onPressed: () => _historySearchCtr.submit(),
               icon: const Icon(Icons.search_outlined, size: 22)),
           const SizedBox(width: 10)
@@ -65,6 +65,7 @@ class _HistorySearchPageState extends State<HistorySearchPage> {
               hintText: _historySearchCtr.hintText,
               border: InputBorder.none,
               suffixIcon: IconButton(
+                tooltip: '清空',
                 icon: Icon(
                   Icons.clear,
                   size: 22,
@@ -78,95 +79,32 @@ class _HistorySearchPageState extends State<HistorySearchPage> {
         ),
       ),
       body: Obx(
-        () => Column(
-          children: _historySearchCtr.loadingStatus.value == 'init'
-              ? [const SizedBox()]
-              : [
-                  Expanded(
-                    child: FutureBuilder(
-                      future: _historySearchCtr.searchHistories(),
-                      builder: (context, snapshot) {
-                        if (snapshot.connectionState == ConnectionState.done) {
-                          Map data = snapshot.data as Map;
-                          if (data['status']) {
-                            return Obx(
-                              () => _historySearchCtr.historyList.isNotEmpty
-                                  ? ListView.builder(
-                                      controller: scrollController,
-                                      itemCount:
-                                          _historySearchCtr.historyList.length +
-                                              1,
-                                      itemBuilder: (context, index) {
-                                        if (index ==
-                                            _historySearchCtr
-                                                .historyList.length) {
-                                          return Container(
-                                            height: MediaQuery.of(context)
-                                                    .padding
-                                                    .bottom +
-                                                60,
-                                            padding: EdgeInsets.only(
-                                                bottom: MediaQuery.of(context)
-                                                    .padding
-                                                    .bottom),
-                                            child: Center(
-                                              child: Obx(
-                                                () => Text(
-                                                  _historySearchCtr
-                                                      .loadingText.value,
-                                                  style: TextStyle(
-                                                      color: Theme.of(context)
-                                                          .colorScheme
-                                                          .outline,
-                                                      fontSize: 13),
-                                                ),
-                                              ),
-                                            ),
-                                          );
-                                        } else {
-                                          return HistoryItem(
-                                            videoItem: _historySearchCtr
-                                                .historyList[index],
-                                            ctr: _historySearchCtr,
-                                            onChoose: null,
-                                            onUpdateMultiple: () => null,
-                                          );
-                                        }
-                                      },
-                                    )
-                                  : _historySearchCtr.loadingStatus.value ==
-                                          'loading'
-                                      ? const SizedBox(child: Text('加载中...'))
-                                      : const CustomScrollView(
-                                          slivers: <Widget>[
-                                            NoData(),
-                                          ],
-                                        ),
-                            );
-                          } else {
-                            return CustomScrollView(
-                              slivers: <Widget>[
-                                HttpError(
-                                  errMsg: data['msg'],
-                                  fn: () => setState(() {}),
-                                )
-                              ],
-                            );
-                          }
-                        } else {
-                          // 骨架屏
-                          return ListView.builder(
-                            itemCount: 10,
-                            itemBuilder: (context, index) {
-                              return const VideoCardHSkeleton();
-                            },
+        () => _historySearchCtr.loadingStatus.value == 'init'
+            ? const SizedBox()
+            : CustomScrollView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                controller: scrollController,
+                slivers: [
+                  Obx(() => SliverGrid(
+                      gridDelegate: SliverGridDelegateWithExtentAndRatio(
+                          mainAxisSpacing: StyleString.cardSpace,
+                          crossAxisSpacing: StyleString.safeSpace,
+                          maxCrossAxisExtent: Grid.maxRowWidth * 2,
+                          childAspectRatio: StyleString.aspectRatio * 2.3,
+                          mainAxisExtent: 0),
+                      delegate: SliverChildBuilderDelegate(
+                        (context, index) {
+                          return HistoryItem(
+                            videoItem: _historySearchCtr.historyList[index],
+                            ctr: _historySearchCtr,
+                            onChoose: null,
+                            onUpdateMultiple: () => null,
                           );
-                        }
-                      },
-                    ),
-                  ),
+                        },
+                        childCount: _historySearchCtr.historyList.length,
+                      )))
                 ],
-        ),
+              ),
       ),
     );
   }

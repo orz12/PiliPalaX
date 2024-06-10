@@ -9,7 +9,7 @@ import 'forward_panel.dart';
 class DynamicPanel extends StatelessWidget {
   final dynamic item;
   final String? source;
-  DynamicPanel({this.item, this.source, Key? key}) : super(key: key);
+  DynamicPanel({required this.item, this.source, Key? key}) : super(key: key);
   final DynamicsController _dynamicsController = Get.put(DynamicsController());
 
   @override
@@ -18,19 +18,20 @@ class DynamicPanel extends StatelessWidget {
       padding: source == 'detail'
           ? const EdgeInsets.only(bottom: 12)
           : EdgeInsets.zero,
-      decoration: BoxDecoration(
-        border: Border(
-          bottom: BorderSide(
-            width: 8,
-            color: Theme.of(context).dividerColor.withOpacity(0.05),
-          ),
-        ),
-      ),
+      // decoration: BoxDecoration(
+      //   border: Border(
+      //     bottom: BorderSide(
+      //       width: 8,
+      //       color: Theme.of(context).dividerColor.withOpacity(0.05),
+      //     ),
+      //   ),
+      // ),
       child: Material(
         elevation: 0,
         clipBehavior: Clip.hardEdge,
+        color: Theme.of(context).cardColor.withOpacity(0.5),
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(0),
+          borderRadius: BorderRadius.circular(5),
         ),
         child: InkWell(
           onTap: () => _dynamicsController.pushDetail(item, 1),
@@ -38,7 +39,7 @@ class DynamicPanel extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
               Padding(
-                padding: const EdgeInsets.fromLTRB(12, 12, 12, 8),
+                padding: const EdgeInsets.fromLTRB(12, 12, 12, 6),
                 child: AuthorPanel(item: item),
               ),
               if (item!.modules!.moduleDynamic!.desc != null ||

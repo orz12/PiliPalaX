@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
@@ -17,7 +18,6 @@ import 'package:PiliPalaX/utils/feed_back.dart';
 import 'package:PiliPalaX/utils/storage.dart';
 import 'package:PiliPalaX/utils/utils.dart';
 
-import '../../../../utils/id_utils.dart';
 import 'widgets/action_item.dart';
 import 'widgets/action_row_item.dart';
 import 'widgets/fav_panel.dart';
@@ -26,7 +26,8 @@ import 'widgets/page.dart';
 import 'widgets/season.dart';
 
 class VideoIntroPanel extends StatefulWidget {
-  const VideoIntroPanel({super.key});
+  const VideoIntroPanel({required this.heroTag, super.key});
+  final String heroTag;
 
   @override
   State<VideoIntroPanel> createState() => _VideoIntroPanelState();
@@ -48,7 +49,10 @@ class _VideoIntroPanelState extends State<VideoIntroPanel>
     super.initState();
 
     /// fix 全屏时参数丢失
-    heroTag = Get.arguments['heroTag'];
+    // if (Get.arguments != null) {
+    //   heroTag = Get.arguments['heroTag'];
+    // }
+    heroTag = widget.heroTag;
     videoIntroController = Get.put(VideoIntroController(), tag: heroTag);
     _futureBuilderFuture = videoIntroController.queryVideoIntro();
     videoIntroController.videoDetail.listen((value) {
@@ -87,7 +91,7 @@ class _VideoIntroPanelState extends State<VideoIntroPanel>
               errMsg: snapshot.data['msg'],
               btnText: snapshot.data['code'] == -404 ||
                       snapshot.data['code'] == 62002
-                  ? '返回上一页'
+                  ? '上一页'
                   : null,
               fn: () => Get.back(),
             );
@@ -175,18 +179,7 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
     // 长按选择文件夹
     if (enableDragQuickFav) {
       if (type == 'tap') {
-        if (!videoIntroController.hasFav.value) {
-          videoIntroController.actionFavVideo(type: 'default');
-        } else {
-          showModalBottomSheet(
-            context: context,
-            useRootNavigator: true,
-            isScrollControlled: true,
-            builder: (BuildContext context) {
-              return FavPanel(ctr: videoIntroController);
-            },
-          );
-        }
+        videoIntroController.actionFavVideo(type: 'default');
       } else {
         showModalBottomSheet(
           context: context,
@@ -253,6 +246,7 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
   Widget build(BuildContext context) {
     final ThemeData t = Theme.of(context);
     final Color outline = t.colorScheme.outline;
+    bool isHorizontal = context.width > context.height * 1.25;
     return SliverPadding(
       padding: const EdgeInsets.only(
           left: StyleString.safeSpace, right: StyleString.safeSpace, top: 10),
@@ -261,20 +255,132 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
             ? Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  Row(children: [
+                    Expanded(
+                        child: GestureDetector(
+                      onTap: onPushMember,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 1, horizontal: 0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            NetworkImgLayer(
+                              type: 'avatar',
+                              src: loadingStatus
+                                  ? owner.face
+                                  : widget.videoDetail!.owner!.face,
+                              width: 30,
+                              height: 30,
+                              fadeInDuration: Duration.zero,
+                              fadeOutDuration: Duration.zero,
+                            ),
+                            const SizedBox(width: 10),
+                            Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    owner.name,
+                                    style: TextStyle(
+                                        fontSize: 12,
+                                        color: t.colorScheme.primary),
+                                    // semanticsLabel: "Up主：${owner.name}",
+                                  ),
+                                  const SizedBox(height: 0),
+                                  Text(
+                                    follower,
+                                    semanticsLabel: "$follower粉丝",
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      color: outline,
+                                    ),
+                                  ),
+                                ]),
+                            const Spacer(),
+                            Obx(() => AnimatedOpacity(
+                                  opacity: loadingStatus ||
+                                          videoIntroController
+                                              .followStatus.isEmpty
+                                      ? 0
+                                      : 1,
+                                  duration: const Duration(milliseconds: 50),
+                                  child: SizedBox(
+                                    height: 32,
+                                    child: Obx(
+                                      () => videoIntroController
+                                              .followStatus.isNotEmpty
+                                          ? TextButton(
+                                              onPressed: () =>
+                                                  videoIntroController
+                                                      .actionRelationMod(
+                                                          context),
+                                              style: TextButton.styleFrom(
+                                                padding: const EdgeInsets.only(
+                                                    left: 8, right: 8),
+                                                foregroundColor:
+                                                    followStatus['attribute'] !=
+                                                            0
+                                                        ? outline
+                                                        : t.colorScheme
+                                                            .onPrimary,
+                                                backgroundColor:
+                                                    followStatus['attribute'] !=
+                                                            0
+                                                        ? t.colorScheme
+                                                            .onInverseSurface
+                                                        : t.colorScheme
+                                                            .primary, // 设置按钮背景色
+                                              ),
+                                              child: Text(
+                                                followStatus['attribute'] != 0
+                                                    ? '已关注'
+                                                    : '关注',
+                                                style: TextStyle(
+                                                    fontSize: t.textTheme
+                                                        .labelMedium!.fontSize),
+                                              ),
+                                            )
+                                          : ElevatedButton(
+                                              onPressed: () =>
+                                                  videoIntroController
+                                                      .actionRelationMod(
+                                                          context),
+                                              child: const Text('关注'),
+                                            ),
+                                    ),
+                                  ),
+                                )),
+                          ],
+                        ),
+                      ),
+                    )),
+                    if (isHorizontal)
+                      Expanded(
+                          child: actionGrid(context, videoIntroController)),
+                  ]),
+                  const SizedBox(height: 8),
                   GestureDetector(
                     behavior: HitTestBehavior.translucent,
                     onTap: () => showIntroDetail(),
-                    child: Text(
-                      !loadingStatus
-                          ? widget.videoDetail!.title
-                          : videoItem['title'],
-                      style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
+                    child: Row(children: [
+                      Expanded(
+                          child: Text(
+                        !loadingStatus
+                            ? widget.videoDetail!.title
+                            : videoItem['title'],
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                        ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      )),
+                      Icon(
+                        Icons.arrow_forward_ios,
+                        size: 16,
+                        color: t.colorScheme.outline,
                       ),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
+                    ]),
                   ),
                   Stack(
                     children: [
@@ -296,8 +402,8 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
                               StatDanMu(
                                 theme: 'gray',
                                 danmu: !loadingStatus
-                                    ? widget.videoDetail!.stat!.danmaku
-                                    : videoItem['stat'].danmaku,
+                                    ? widget.videoDetail!.stat!.danmu
+                                    : videoItem['stat'].danmu,
                                 size: 'medium',
                               ),
                               const SizedBox(width: 10),
@@ -315,11 +421,10 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
                               if (MineController.anonymity) ...<Widget>[
                                 const SizedBox(width: 10),
                                 Icon(
-                                  Icons.visibility_off_outlined,
+                                  CupertinoIcons.checkmark_shield,
                                   size: 15,
                                   color: t.colorScheme.outline,
                                 ),
-                                const SizedBox(width: 2),
                                 Text(
                                   '无痕',
                                   style: TextStyle(
@@ -346,17 +451,19 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
                         Positioned(
                           right: 10,
                           top: 6,
-                          child: GestureDetector(
-                            onTap: () async {
-                              final res =
-                                  await videoIntroController.aiConclusion();
-                              if (res['status']) {
-                                showAiBottomSheet();
-                              }
-                            },
-                            child:
-                                Image.asset('assets/images/ai.png', height: 22),
-                          ),
+                          child: Semantics(
+                              label: 'AI总结',
+                              child: GestureDetector(
+                                onTap: () async {
+                                  final res =
+                                      await videoIntroController.aiConclusion();
+                                  if (res['status']) {
+                                    showAiBottomSheet();
+                                  }
+                                },
+                                child: Image.asset('assets/images/ai.png',
+                                    height: 22),
+                              )),
                         )
                     ],
                   ),
@@ -371,18 +478,18 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
                   //   ),
                   // ),
                   // 点赞收藏转发 布局样式2
-                  actionGrid(context, videoIntroController),
+                  if (!isHorizontal) actionGrid(context, videoIntroController),
                   // 合集
                   if (!loadingStatus &&
                       widget.videoDetail!.ugcSeason != null) ...[
                     Obx(
                       () => SeasonPanel(
+                        heroTag: heroTag,
                         ugcSeason: widget.videoDetail!.ugcSeason!,
                         cid: videoIntroController.lastPlayCid.value != 0
                             ? videoIntroController.lastPlayCid.value
                             : widget.videoDetail!.pages!.first.cid,
-                        changeFuc: (bvid, cid, aid) => videoIntroController
-                            .changeSeasonOrbangu(bvid, cid, aid),
+                        changeFuc: videoIntroController.changeSeasonOrbangu,
                       ),
                     )
                   ],
@@ -390,98 +497,17 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
                       widget.videoDetail!.pages != null &&
                       widget.videoDetail!.pages!.length > 1) ...[
                     Obx(() => PagesPanel(
+                          heroTag: heroTag,
                           pages: widget.videoDetail!.pages!,
                           cid: videoIntroController.lastPlayCid.value,
-                          changeFuc: (cid) =>
-                              videoIntroController.changeSeasonOrbangu(
-                                  videoIntroController.bvid,
-                                  cid,
-                                  IdUtils.bv2av(videoIntroController.bvid)),
+                          bvid: videoIntroController.bvid,
+                          changeFuc: videoIntroController.changeSeasonOrbangu,
                         ))
                   ],
-                  GestureDetector(
-                    onTap: onPushMember,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                          vertical: 12, horizontal: 4),
-                      child: Row(
-                        children: [
-                          NetworkImgLayer(
-                            type: 'avatar',
-                            src: loadingStatus
-                                ? owner.face
-                                : widget.videoDetail!.owner!.face,
-                            width: 34,
-                            height: 34,
-                            fadeInDuration: Duration.zero,
-                            fadeOutDuration: Duration.zero,
-                          ),
-                          const SizedBox(width: 10),
-                          Text(owner.name,
-                              style: const TextStyle(fontSize: 13)),
-                          const SizedBox(width: 6),
-                          Text(
-                            follower,
-                            style: TextStyle(
-                              fontSize: t.textTheme.labelSmall!.fontSize,
-                              color: outline,
-                            ),
-                          ),
-                          const Spacer(),
-                          Obx(() => AnimatedOpacity(
-                                opacity: loadingStatus ||
-                                        videoIntroController
-                                            .followStatus.isEmpty
-                                    ? 0
-                                    : 1,
-                                duration: const Duration(milliseconds: 50),
-                                child: SizedBox(
-                                  height: 32,
-                                  child: Obx(
-                                    () => videoIntroController
-                                            .followStatus.isNotEmpty
-                                        ? TextButton(
-                                            onPressed: videoIntroController
-                                                .actionRelationMod,
-                                            style: TextButton.styleFrom(
-                                              padding: const EdgeInsets.only(
-                                                  left: 8, right: 8),
-                                              foregroundColor:
-                                                  followStatus['attribute'] != 0
-                                                      ? outline
-                                                      : t.colorScheme.onPrimary,
-                                              backgroundColor:
-                                                  followStatus['attribute'] != 0
-                                                      ? t.colorScheme
-                                                          .onInverseSurface
-                                                      : t.colorScheme
-                                                          .primary, // 设置按钮背景色
-                                            ),
-                                            child: Text(
-                                              followStatus['attribute'] != 0
-                                                  ? '已关注'
-                                                  : '关注',
-                                              style: TextStyle(
-                                                  fontSize: t.textTheme
-                                                      .labelMedium!.fontSize),
-                                            ),
-                                          )
-                                        : ElevatedButton(
-                                            onPressed: videoIntroController
-                                                .actionRelationMod,
-                                            child: const Text('关注'),
-                                          ),
-                                  ),
-                                ),
-                              )),
-                        ],
-                      ),
-                    ),
-                  ),
                 ],
               )
             : const SizedBox(
-                height: 100,
+                height: 130,
                 child: Center(
                   child: CircularProgressIndicator(),
                 ),
@@ -494,13 +520,10 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
     return LayoutBuilder(
         builder: (BuildContext context, BoxConstraints constraints) {
       return Container(
-        margin: const EdgeInsets.only(top: 6, bottom: 4),
-        height: constraints.maxWidth / 5 * 0.8,
-        child: GridView.count(
-          primary: false,
-          padding: EdgeInsets.zero,
-          crossAxisCount: 5,
-          childAspectRatio: 1.25,
+        margin: const EdgeInsets.only(top: 1),
+        height: 48,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: <Widget>[
             Obx(
               () => ActionItem(
@@ -509,9 +532,20 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
                   onTap: handleState(videoIntroController.actionLikeVideo),
                   selectStatus: videoIntroController.hasLike.value,
                   loadingStatus: loadingStatus,
+                  semanticsLabel: '点赞',
                   text: !loadingStatus
-                      ? widget.videoDetail!.stat!.like!.toString()
+                      ? Utils.numFormat(widget.videoDetail!.stat!.like!)
                       : '-'),
+            ),
+            Obx(
+              () => ActionItem(
+                  icon: const Icon(FontAwesomeIcons.thumbsDown),
+                  selectIcon: const Icon(FontAwesomeIcons.solidThumbsDown),
+                  onTap: handleState(videoIntroController.actionDislikeVideo),
+                  selectStatus: videoIntroController.hasDislike.value,
+                  loadingStatus: loadingStatus,
+                  semanticsLabel: '点踩',
+                  text: "点踩"),
             ),
             // ActionItem(
             //     icon: const Icon(FontAwesomeIcons.clock),
@@ -526,8 +560,9 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
                   onTap: handleState(videoIntroController.actionCoinVideo),
                   selectStatus: videoIntroController.hasCoin.value,
                   loadingStatus: loadingStatus,
+                  semanticsLabel: '投币',
                   text: !loadingStatus
-                      ? widget.videoDetail!.stat!.coin!.toString()
+                      ? Utils.numFormat(widget.videoDetail!.stat!.coin!)
                       : '-'),
             ),
             Obx(
@@ -538,24 +573,30 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
                   onLongPress: () => showFavBottomSheet(type: 'longPress'),
                   selectStatus: videoIntroController.hasFav.value,
                   loadingStatus: loadingStatus,
+                  semanticsLabel: '收藏',
                   text: !loadingStatus
-                      ? widget.videoDetail!.stat!.favorite!.toString()
+                      ? Utils.numFormat(widget.videoDetail!.stat!.favorite!)
                       : '-'),
             ),
             ActionItem(
                 icon: const Icon(FontAwesomeIcons.comment),
-                onTap: () => videoDetailCtr.tabCtr.animateTo(1),
+                onTap: () => videoDetailCtr.tabCtr
+                    .animateTo(videoDetailCtr.tabCtr.index == 1 ? 0 : 1),
                 selectStatus: false,
                 loadingStatus: loadingStatus,
+                semanticsLabel: '评论',
                 text: !loadingStatus
-                    ? widget.videoDetail!.stat!.reply!.toString()
+                    ? Utils.numFormat(widget.videoDetail!.stat!.reply!)
                     : '评论'),
             ActionItem(
                 icon: const Icon(FontAwesomeIcons.shareFromSquare),
                 onTap: () => videoIntroController.actionShareVideo(),
                 selectStatus: false,
                 loadingStatus: loadingStatus,
-                text: '分享'),
+                semanticsLabel: '分享',
+                text: !loadingStatus
+                    ? Utils.numFormat(widget.videoDetail!.stat!.share!)
+                    : '分享'),
           ],
         ),
       );

@@ -6,6 +6,8 @@ import 'package:PiliPalaX/common/skeleton/video_card_h.dart';
 import 'package:PiliPalaX/common/widgets/http_error.dart';
 import 'package:PiliPalaX/models/common/search_type.dart';
 
+import '../../common/constants.dart';
+import '../../utils/grid.dart';
 import 'controller.dart';
 import 'widgets/article_panel.dart';
 import 'widgets/live_panel.dart';
@@ -80,6 +82,7 @@ class _SearchPanelState extends State<SearchPanel>
               RxList list = ctr.resultList;
               if (data['status']) {
                 return Obx(() {
+                  list.length;
                   switch (widget.searchType) {
                     case SearchType.video:
                       return SearchVideoPanel(
@@ -131,25 +134,34 @@ class _SearchPanelState extends State<SearchPanel>
             }
           } else {
             // 骨架屏
-            return ListView.builder(
-              addAutomaticKeepAlives: false,
-              addRepaintBoundaries: false,
-              itemCount: 15,
-              itemBuilder: (context, index) {
-                switch (widget.searchType) {
-                  case SearchType.video:
-                    return const VideoCardHSkeleton();
-                  case SearchType.media_bangumi:
-                    return const MediaBangumiSkeleton();
-                  case SearchType.bili_user:
-                    return const VideoCardHSkeleton();
-                  case SearchType.live_room:
-                    return const VideoCardHSkeleton();
-                  default:
-                    return const VideoCardHSkeleton();
-                }
-              },
-            );
+            return CustomScrollView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                slivers: [
+                  SliverGrid(
+                      gridDelegate: SliverGridDelegateWithExtentAndRatio(
+                          mainAxisSpacing: StyleString.safeSpace,
+                          crossAxisSpacing: StyleString.safeSpace,
+                          maxCrossAxisExtent: Grid.maxRowWidth * 2,
+                          childAspectRatio: StyleString.aspectRatio * 2.3,
+                          mainAxisExtent: 0),
+                      delegate: SliverChildBuilderDelegate(
+                        (context, index) {
+                          switch (widget.searchType) {
+                            case SearchType.video:
+                              return const VideoCardHSkeleton();
+                            case SearchType.media_bangumi:
+                              return const MediaBangumiSkeleton();
+                            case SearchType.bili_user:
+                              return const VideoCardHSkeleton();
+                            case SearchType.live_room:
+                              return const VideoCardHSkeleton();
+                            default:
+                              return const VideoCardHSkeleton();
+                          }
+                        },
+                        childCount: 15,
+                      ))
+                ]);
           }
         },
       ),

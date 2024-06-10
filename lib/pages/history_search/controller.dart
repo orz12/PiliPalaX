@@ -12,7 +12,6 @@ class HistorySearchController extends GetxController {
   String hintText = '搜索';
   RxString loadingStatus = 'init'.obs;
   RxString loadingText = '加载中...'.obs;
-  bool hasRequest = false;
   late int mid;
   RxString uname = ''.obs;
   int pn = 1;
@@ -37,10 +36,8 @@ class HistorySearchController extends GetxController {
   //  提交搜索内容
   void submit() {
     loadingStatus.value = 'loading';
-    if (hasRequest) {
-      pn = 1;
-      searchHistories();
-    }
+    pn = 1;
+    searchHistories();
   }
 
   // 搜索视频
@@ -58,18 +55,18 @@ class HistorySearchController extends GetxController {
       } else {
         historyList.addAll(res['data'].list);
       }
+      historyList.refresh();
       count = res['data'].page['total'];
       if (historyList.length == count) {
         loadingText.value = '没有更多了';
       }
-      pn += 1;
-      hasRequest = true;
     }
     loadingStatus.value = 'finish';
-    return res;
+    // return res;
   }
 
   onLoad() {
+    pn += 1;
     searchHistories(type: 'onLoad');
   }
 

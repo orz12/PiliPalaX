@@ -75,7 +75,7 @@ class RcmdController extends GetxController {
       _currentPage += 1;
       // 若videoList数量太小，可能会影响翻页，此时再次请求
       // 为避免请求到的数据太少时还在反复请求，要求本次返回数据大于1条才触发
-      if (res['data'].length > 1 && videoList.length < 10) {
+      if (res['data'].length > 1 && videoList.length < 20) {
         queryRcmdFeed('onLoad');
       }
     }

@@ -12,10 +12,10 @@ class SSearchController extends GetxController {
   RxString searchKeyWord = ''.obs;
   Rx<TextEditingController> controller = TextEditingController().obs;
   RxList<HotSearchItem> hotSearchList = <HotSearchItem>[].obs;
-  Box histiryWord = GStrorage.historyword;
-  List historyCacheList = [];
-  RxList historyList = [].obs;
-  RxList<SearchSuggestItem> searchSuggestList = [SearchSuggestItem()].obs;
+  Box historyWord = GStrorage.historyword;
+  List<String> historyCacheList = [];
+  RxList<String> historyList = <String>[].obs;
+  RxList<SearchSuggestItem> searchSuggestList = <SearchSuggestItem>[].obs;
   final _debouncer =
       Debouncer(delay: const Duration(milliseconds: 200)); // 设置延迟时间
   String hintText = '搜索';
@@ -36,7 +36,7 @@ class SSearchController extends GetxController {
         searchKeyWord.value = hintText;
       }
     }
-    historyCacheList = histiryWord.get('cacheList') ?? [];
+    historyCacheList = List<String>.from(historyWord.get('cacheList')??[]);
     historyList.value = historyCacheList;
     enableHotKey = setting.get(SettingBoxKey.enableHotKey, defaultValue: true);
   }
@@ -64,16 +64,19 @@ class SSearchController extends GetxController {
   void submit() {
     // ignore: unrelated_type_equality_checks
     if (searchKeyWord == '') {
-      return;
+      if (hintText == ''){
+        return;
+      }
+      searchKeyWord.value = hintText;
     }
-    List arr = historyCacheList.where((e) => e != searchKeyWord.value).toList();
+    List<String> arr = historyCacheList.where((e) => e != searchKeyWord.value).toList();
     arr.insert(0, searchKeyWord.value);
     historyCacheList = arr;
 
     historyList.value = historyCacheList;
     // 手动刷新
     historyList.refresh();
-    histiryWord.put('cacheList', historyCacheList);
+    historyWord.put('cacheList', historyCacheList);
     searchFocusNode.unfocus();
     Get.toNamed('/searchResult', parameters: {'keyword': searchKeyWord.value});
   }
@@ -115,15 +118,14 @@ class SSearchController extends GetxController {
 
   onLongSelect(word) {
     int index = historyList.indexOf(word);
-    historyList.value = historyList.removeAt(index);
-    historyList.refresh();
-    histiryWord.put('cacheList', historyList);
+    historyList.removeAt(index);
+    historyWord.put('cacheList', historyList);
   }
 
   onClearHis() {
     historyList.value = [];
     historyCacheList = [];
     historyList.refresh();
-    histiryWord.put('cacheList', []);
+    historyWord.put('cacheList', []);
   }
 }

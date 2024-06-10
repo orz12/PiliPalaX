@@ -11,6 +11,7 @@ import 'package:PiliPalaX/pages/setting/pages/logs.dart';
 
 import '../pages/about/index.dart';
 import '../pages/blacklist/index.dart';
+import '../pages/danmaku_block/index.dart';
 import '../pages/dynamics/detail/index.dart';
 import '../pages/dynamics/index.dart';
 import '../pages/fan/index.dart';
@@ -34,6 +35,7 @@ import '../pages/member_dynamics/index.dart';
 import '../pages/member_like/index.dart';
 import '../pages/member_search/index.dart';
 import '../pages/member_seasons/index.dart';
+import '../pages/msg_feed_top/sys_msg/view.dart';
 import '../pages/search/index.dart';
 import '../pages/search_result/index.dart';
 import '../pages/setting/extra_setting.dart';
@@ -45,9 +47,12 @@ import '../pages/setting/pages/home_tabbar_set.dart';
 import '../pages/setting/pages/play_speed_set.dart';
 import '../pages/setting/recommend_setting.dart';
 import '../pages/setting/play_setting.dart';
+import '../pages/setting/video_setting.dart';
 import '../pages/setting/privacy_setting.dart';
 import '../pages/setting/style_setting.dart';
 import '../pages/setting/hidden_settings.dart';
+import '../pages/subscription/index.dart';
+import '../pages/subscription_detail/index.dart';
 import '../pages/video/detail/index.dart';
 import '../pages/video/detail/reply_reply/index.dart';
 import '../pages/webview/index.dart';
@@ -108,16 +113,18 @@ class Routes {
     // 二级回复
     CustomGetPage(
         name: '/replyReply', page: () => const VideoReplyReplyPanel()),
-    // 推荐设置
+    // 推荐流设置
     CustomGetPage(
         name: '/recommendSetting', page: () => const RecommendSetting()),
-    // 播放设置
+    // 音视频设置
+    CustomGetPage(name: '/videoSetting', page: () => const VideoSetting()),
+    // 播放器设置
     CustomGetPage(name: '/playSetting', page: () => const PlaySetting()),
     // 外观设置
     CustomGetPage(name: '/styleSetting', page: () => const StyleSetting()),
     // 隐私设置
     CustomGetPage(name: '/privacySetting', page: () => const PrivacySetting()),
-    // 其他设置
+    // 其它设置
     CustomGetPage(name: '/extraSetting', page: () => const ExtraSetting()),
     //
     CustomGetPage(name: '/blackListPage', page: () => const BlackListPage()),
@@ -154,7 +161,7 @@ class Routes {
     // 收到的赞
     CustomGetPage(name: '/likeMe', page: () => const LikeMePage()),
     // 系统消息
-    CustomGetPage(name: '/sysMsg', page: () => const WhisperPage()),
+    CustomGetPage(name: '/sysMsg', page: () => const SysMsgPage()),
     // 登录页面
     CustomGetPage(name: '/loginPage', page: () => const LoginPage()),
     // 用户动态
@@ -174,6 +181,12 @@ class Routes {
     CustomGetPage(name: '/logs', page: () => const LogsPage()),
     // 搜索关注
     CustomGetPage(name: '/followSearch', page: () => const FollowSearchPage()),
+    // 订阅
+    CustomGetPage(name: '/subscription', page: () => const SubPage()),
+    // 订阅详情
+    CustomGetPage(name: '/subDetail', page: () => const SubDetailPage()),
+    // 弹幕屏蔽管理
+    CustomGetPage(name: '/danmakuBlock', page: () => const DanmakuBlockPage()),
   ];
 }
 

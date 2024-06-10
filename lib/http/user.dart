@@ -6,6 +6,8 @@ import '../models/user/fav_folder.dart';
 import '../models/user/history.dart';
 import '../models/user/info.dart';
 import '../models/user/stat.dart';
+import '../models/user/sub_detail.dart';
+import '../models/user/sub_folder.dart';
 import 'api.dart';
 import 'init.dart';
 
@@ -145,7 +147,11 @@ class UserHttp {
   // 观看历史暂停状态
   static Future historyStatus() async {
     var res = await Request().get(Api.historyStatus);
-    return res;
+    if (res.data['code'] == 0) {
+      return {'status': true, 'data': res.data['data']};
+    } else {
+      return {'status': false, 'data': [], 'msg': res.data['message']};
+    }
   }
 
   // 清空历史记录
@@ -301,6 +307,96 @@ class UserHttp {
     );
     if (res.data['code'] == 0) {
       return {'status': true, 'data': HistoryData.fromJson(res.data['data'])};
+    } else {
+      return {'status': false, 'msg': res.data['message']};
+    }
+  }
+
+  // 我的订阅
+  static Future userSubFolder({
+    required int mid,
+    required int pn,
+    required int ps,
+  }) async {
+    var res = await Request().get(Api.userSubFolder, data: {
+      'up_mid': mid,
+      'ps': ps,
+      'pn': pn,
+      'platform': 'web',
+    });
+    if (res.data['code'] == 0) {
+      return {
+        'status': true,
+        'data': SubFolderModelData.fromJson(res.data['data'])
+      };
+    } else {
+      return {'status': false, 'msg': res.data['message']};
+    }
+  }
+
+  static Future favSeasonList({
+    required int id,
+    required int pn,
+    required int ps,
+  }) async {
+    var res = await Request().get(Api.favSeasonList, data: {
+      'season_id': id,
+      'ps': ps,
+      'pn': pn,
+    });
+    if (res.data['code'] == 0) {
+      return {
+        'status': true,
+        'data': SubDetailModelData.fromJson(res.data['data'])
+      };
+    } else {
+      return {'status': false, 'msg': res.data['message']};
+    }
+  }
+
+  static Future favResourceList({
+    required int id,
+    required int pn,
+    required int ps,
+  }) async {
+    var res = await Request().get(Api.favResourceList, data: {
+      'media_id': id,
+      'ps': ps,
+      'pn': pn,
+    });
+    if (res.data['code'] == 0) {
+      return {
+        'status': true,
+        'data': SubDetailModelData.fromJson(res.data['data'])
+      };
+    } else {
+      return {'status': false, 'msg': res.data['message']};
+    }
+  }
+
+  // 取消订阅
+  static Future cancelSub({required int id, required int type}) async {
+    late dynamic res;
+    if (type == 11) {
+      res = await Request().post(
+        Api.unfavFolder,
+        queryParameters: {
+          'media_id': id,
+          'csrf': await Request.getCsrf(),
+        },
+      );
+    } else {
+      res = await Request().post(
+        Api.unfavSeason,
+        queryParameters: {
+          'platform': 'web',
+          'season_id': id,
+          'csrf': await Request.getCsrf(),
+        },
+      );
+    }
+    if (res.data['code'] == 0) {
+      return {'status': true};
     } else {
       return {'status': false, 'msg': res.data['message']};
     }

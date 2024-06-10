@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:PiliPalaX/utils/cache_manage.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_displaymode/flutter_displaymode.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -29,12 +30,17 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   MediaKit.ensureInitialized();
   await GStrorage.init();
-  if (GStrorage.setting.get(SettingBoxKey.horizontalScreen, defaultValue: false)) {
+  if (GStrorage.setting
+      .get(SettingBoxKey.autoClearCache, defaultValue: false)) {
+    await CacheManage.clearLibraryCache();
+  }
+  if (GStrorage.setting
+      .get(SettingBoxKey.horizontalScreen, defaultValue: false)) {
     await SystemChrome.setPreferredOrientations(
       //支持竖屏与横屏
       [
         DeviceOrientation.portraitUp,
-        DeviceOrientation.portraitDown,
+        // DeviceOrientation.portraitDown,
         DeviceOrientation.landscapeLeft,
         DeviceOrientation.landscapeRight,
       ],
@@ -51,7 +57,8 @@ void main() async {
   Request();
   await Request.setCookie();
   RecommendFilter();
-
+  SmartDialog.config.toast =
+      SmartConfigToast(displayType: SmartToastType.onlyRefresh);
   // 异常捕获 logo记录
   final Catcher2Options debugConfig = Catcher2Options(
     SilentReportMode(),
@@ -111,19 +118,18 @@ class MyApp extends StatelessWidget {
 
     // 强制设置高帧率
     if (Platform.isAndroid) {
-      try {
-        late List modes;
-        FlutterDisplayMode.supported.then((value) {
-          modes = value;
-          var storageDisplay = setting.get(SettingBoxKey.displayMode);
-          DisplayMode f = DisplayMode.auto;
-          if (storageDisplay != null) {
-            f = modes.firstWhere((e) => e.toString() == storageDisplay);
-          }
-          DisplayMode preferred = modes.toList().firstWhere((el) => el == f);
-          FlutterDisplayMode.setPreferredMode(preferred);
-        });
-      } catch (_) {}
+      late List modes;
+      FlutterDisplayMode.supported.then((value) {
+        modes = value;
+        var storageDisplay = setting.get(SettingBoxKey.displayMode);
+        DisplayMode f = DisplayMode.auto;
+        if (storageDisplay != null) {
+          f = modes.firstWhere((e) => e.toString() == storageDisplay,
+              orElse: () => f);
+        }
+        DisplayMode preferred = modes.toList().firstWhere((el) => el == f);
+        FlutterDisplayMode.setPreferredMode(preferred);
+      });
     }
 
     return DynamicColorBuilder(
@@ -148,6 +154,7 @@ class MyApp extends StatelessWidget {
         // 图片缓存
         // PaintingBinding.instance.imageCache.maximumSizeBytes = 1000 << 20;
         return GetMaterialApp(
+          // showSemanticsDebugger: true,
           title: 'PiliPalaX',
           theme: ThemeData(
             // fontFamily: 'HarmonyOS',

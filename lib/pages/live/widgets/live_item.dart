@@ -165,10 +165,12 @@ class VideoStat extends StatelessWidget {
           Text(
             liveItem!.areaName!,
             style: const TextStyle(fontSize: 11, color: Colors.white),
+            semanticsLabel: "${liveItem!.areaName!}直播",
           ),
           Text(
             liveItem!.watchedShow!['text_small'],
             style: const TextStyle(fontSize: 11, color: Colors.white),
+            semanticsLabel: "${liveItem!.watchedShow!['text_small']}围观",
           ),
         ],
       ),

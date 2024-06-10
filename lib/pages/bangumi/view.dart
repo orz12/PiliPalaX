@@ -80,6 +80,7 @@ class _BangumiPageState extends State<BangumiPage>
       },
       child: CustomScrollView(
         controller: _bangumidController.scrollController,
+        physics: const AlwaysScrollableScrollPhysics(),
         slivers: [
           SliverToBoxAdapter(
             child: Obx(
@@ -98,6 +99,7 @@ class _BangumiPageState extends State<BangumiPage>
                             style: Theme.of(context).textTheme.titleMedium,
                           ),
                           IconButton(
+                            tooltip: '刷新',
                             onPressed: () {
                               setState(() {
                                 _futureBuilderFutureFollow =
@@ -113,7 +115,7 @@ class _BangumiPageState extends State<BangumiPage>
                       ),
                     ),
                     SizedBox(
-                      height: 268,
+                      height: Grid.maxRowWidth * 1,
                       child: FutureBuilder(
                         future: _futureBuilderFutureFollow,
                         builder:
@@ -133,8 +135,8 @@ class _BangumiPageState extends State<BangumiPage>
                                         itemCount: list.length,
                                         itemBuilder: (context, index) {
                                           return Container(
-                                            width: Get.size.width / 3,
-                                            height: 254,
+                                            width: Grid.maxRowWidth / 2,
+                                            height: Grid.maxRowWidth * 1,
                                             margin: EdgeInsets.only(
                                                 left: StyleString.safeSpace,
                                                 right: index ==
@@ -217,17 +219,16 @@ class _BangumiPageState extends State<BangumiPage>
   }
 
   Widget contentGrid(ctr, bangumiList) {
-
     return SliverGrid(
-      gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+      gridDelegate: SliverGridDelegateWithExtentAndRatio(
         // 行间距
-          mainAxisSpacing: StyleString.cardSpace - 2,
-          // 列间距
-          crossAxisSpacing: StyleString.cardSpace,
-          // 最大宽度
-          maxCrossAxisExtent: Grid.maxRowWidth / 3 * 2,
-          mainAxisExtent: Grid.calculateActualWidth(context, Grid.maxRowWidth / 3 * 2, StyleString.safeSpace) / 0.65+
-              MediaQuery.textScalerOf(context).scale(60),
+        mainAxisSpacing: StyleString.cardSpace - 2,
+        // 列间距
+        crossAxisSpacing: StyleString.cardSpace,
+        // 最大宽度
+        maxCrossAxisExtent: Grid.maxRowWidth / 3 * 2,
+        childAspectRatio: 0.65,
+        mainAxisExtent: MediaQuery.textScalerOf(context).scale(60),
       ),
       delegate: SliverChildBuilderDelegate(
         (BuildContext context, int index) {

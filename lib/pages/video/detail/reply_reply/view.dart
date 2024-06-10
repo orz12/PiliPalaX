@@ -39,11 +39,11 @@ class _VideoReplyReplyPanelState extends State<VideoReplyReplyPanel> {
 
   @override
   void initState() {
+    super.initState();
     _videoReplyReplyController = Get.put(
         VideoReplyReplyController(
             widget.oid, widget.rpid.toString(), widget.replyType!),
         tag: widget.rpid.toString());
-    super.initState();
 
     // 上拉加载更多
     scrollController = _videoReplyReplyController.scrollController;
@@ -51,7 +51,8 @@ class _VideoReplyReplyPanelState extends State<VideoReplyReplyPanel> {
       () {
         if (scrollController.position.pixels >=
             scrollController.position.maxScrollExtent - 300) {
-          EasyThrottle.throttle('replylist', const Duration(seconds: 2), () {
+          EasyThrottle.throttle('replylist', const Duration(milliseconds: 200),
+              () {
             _videoReplyReplyController.queryReplyList(type: 'onLoad');
           });
         }
@@ -85,6 +86,7 @@ class _VideoReplyReplyPanelState extends State<VideoReplyReplyPanel> {
                 children: <Widget>[
                   const Text('评论详情'),
                   IconButton(
+                    tooltip: '关闭',
                     icon: const Icon(Icons.close, size: 20),
                     onPressed: () {
                       _videoReplyReplyController.currentPage = 0;
@@ -108,6 +110,7 @@ class _VideoReplyReplyPanelState extends State<VideoReplyReplyPanel> {
               },
               child: CustomScrollView(
                 controller: _videoReplyReplyController.scrollController,
+                physics: const AlwaysScrollableScrollPhysics(),
                 slivers: <Widget>[
                   if (widget.firstFloor != null) ...[
                     // const SliverToBoxAdapter(child: SizedBox(height: 10)),

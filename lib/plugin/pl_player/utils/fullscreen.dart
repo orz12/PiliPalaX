@@ -5,6 +5,8 @@ import 'package:auto_orientation/auto_orientation.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 
+import '../../../utils/storage.dart';
+
 //横屏
 Future<void> landScape() async {
   dynamic document;
@@ -12,16 +14,6 @@ Future<void> landScape() async {
     if (kIsWeb) {
       await document.documentElement?.requestFullscreen();
     } else if (Platform.isAndroid || Platform.isIOS) {
-      // await SystemChrome.setEnabledSystemUIMode(
-      //   SystemUiMode.immersiveSticky,
-      //   overlays: [],
-      // );
-      // await SystemChrome.setPreferredOrientations(
-      //   [
-      //     DeviceOrientation.landscapeLeft,
-      //     DeviceOrientation.landscapeRight,
-      //   ],
-      // );
       await AutoOrientation.landscapeAutoMode(forceSensor: true);
     } else if (Platform.isMacOS || Platform.isWindows || Platform.isLinux) {
       await const MethodChannel('com.alexmercerind/media_kit_video')
@@ -36,6 +28,16 @@ Future<void> landScape() async {
 }
 
 //竖屏
+Future<void> verticalScreenForTwoSeconds() async {
+  await SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+  ]);
+  Future.delayed(const Duration(seconds: 2), () {
+    autoScreen();
+  });
+}
+
+//竖屏
 Future<void> verticalScreen() async {
   await SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
@@ -44,22 +46,26 @@ Future<void> verticalScreen() async {
 
 //全向
 Future<void> autoScreen() async {
+  if (!GStrorage.setting
+      .get(SettingBoxKey.allowRotateScreen, defaultValue: true)) {
+    return;
+  }
   await SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
-    DeviceOrientation.portraitDown,
+    // DeviceOrientation.portraitDown,
     DeviceOrientation.landscapeLeft,
     DeviceOrientation.landscapeRight,
   ]);
 }
 
-Future<void> enterFullScreen() async {
+Future<void> hideStatusBar() async {
   await SystemChrome.setEnabledSystemUIMode(
     SystemUiMode.immersiveSticky,
   );
 }
 
 //退出全屏显示
-Future<void> exitFullScreen() async {
+Future<void> showStatusBar() async {
   dynamic document;
   late SystemUiMode mode = SystemUiMode.edgeToEdge;
   try {
@@ -74,7 +80,6 @@ Future<void> exitFullScreen() async {
         mode,
         overlays: SystemUiOverlay.values,
       );
-      await SystemChrome.setPreferredOrientations([]);
     } else if (Platform.isMacOS || Platform.isWindows || Platform.isLinux) {
       await const MethodChannel('com.alexmercerind/media_kit_video')
           .invokeMethod(

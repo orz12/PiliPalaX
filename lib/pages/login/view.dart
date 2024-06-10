@@ -25,6 +25,7 @@ class _LoginPageState extends State<LoginPage> {
         leading: Obx(
           () => _loginPageCtr.currentIndex.value == 0
               ? IconButton(
+                  tooltip: '关闭',
                   onPressed: () async {
                     _loginPageCtr.mobTextFieldNode.unfocus();
                     await Future.delayed(const Duration(milliseconds: 200));
@@ -33,6 +34,7 @@ class _LoginPageState extends State<LoginPage> {
                   icon: const Icon(Icons.close_outlined),
                 )
               : IconButton(
+                  tooltip: '返回',
                   onPressed: () => _loginPageCtr.previousPage(),
                   icon: const Icon(Icons.arrow_back),
                 ),
@@ -174,6 +176,7 @@ class _LoginPageState extends State<LoginPage> {
                               ),
                               const SizedBox(width: 4),
                               IconButton(
+                                tooltip: '切换至验证码登录',
                                 style: ButtonStyle(
                                   backgroundColor:
                                       MaterialStateProperty.resolveWith(
@@ -265,6 +268,7 @@ class _LoginPageState extends State<LoginPage> {
                               ),
                               const SizedBox(width: 4),
                               IconButton(
+                                tooltip: '切换至密码登录',
                                 style: ButtonStyle(
                                   backgroundColor:
                                       MaterialStateProperty.resolveWith(

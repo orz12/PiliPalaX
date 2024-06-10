@@ -16,7 +16,7 @@ publish_to: "none" # Remove this line if you wish to publish to pub.dev
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
 # In Windows, build-name is used as the major, minor, and patch parts
 # of the product and file versions while build-number is used as the build suffix.
-version: 1.0.19+114514
+version: 1.0.20+114514
 
 environment:
   sdk: ">=2.19.6 <3.0.0"
@@ -98,8 +98,6 @@ dependencies:
   screen_brightness: ^0.2.2+1
   wakelock_plus: ^1.1.1
   universal_platform: ^1.0.0+1
-  # 进度条
-  audio_video_progress_bar: ^2.0.1
   auto_orientation: ^2.3.1
   protobuf: ^3.0.0
   animations: ^2.0.8
@@ -117,17 +115,14 @@ dependencies:
   # 弹幕
   ns_danmaku:
     git:
-      url: https://github.com/guozhigq/flutter_ns_danmaku.git
+      url: https://github.com/orz12/flutter_ns_danmaku.git
       ref: master
   # 状态栏图标控制
   status_bar_control: ^3.2.1
   # 代理
   system_proxy: ^0.1.0
   # pip
-  floating:
-    git:
-      url: https://github.com/guozhigq/floating.git
-      ref: main
+  floating: ^2.0.2
   # html解析
   html: ^0.15.4
   # html渲染
@@ -142,6 +137,10 @@ dependencies:
   path: 1.8.3
   #瀑布流
   waterfall_flow: ^3.0.3
+  marquee: ^2.2.3
+dependency_overrides:
+  mime:
+    git: https://github.com/orz12/mime.git
 
 dev_dependencies:
   flutter_test:

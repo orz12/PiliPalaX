@@ -134,15 +134,15 @@ class VListItemModel {
 class Stat {
   Stat({
     this.view,
-    this.danmaku,
+    this.danmu,
   });
 
   int? view;
-  int? danmaku;
+  int? danmu;
 
   Stat.fromJson(Map<String, dynamic> json) {
     view = json["play"];
-    danmaku = json['comment'];
+    danmu = json['video_review'];
   }
 }
 

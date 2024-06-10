@@ -6,6 +6,7 @@ import 'package:PiliPalaX/models/common/rcmd_type.dart';
 import 'package:PiliPalaX/pages/setting/widgets/select_dialog.dart';
 import 'package:PiliPalaX/utils/recommend_filter.dart';
 import 'package:PiliPalaX/utils/storage.dart';
+import 'package:get/get.dart';
 
 import 'widgets/switch_item.dart';
 
@@ -57,7 +58,7 @@ class _RecommendSettingState extends State<RecommendSetting> {
         centerTitle: false,
         titleSpacing: 0,
         title: Text(
-          '推荐设置',
+          '推荐流设置',
           style: Theme.of(context).textTheme.titleMedium,
         ),
       ),
@@ -66,6 +67,7 @@ class _RecommendSettingState extends State<RecommendSetting> {
           ListTile(
             dense: false,
             title: Text('首页推荐类型', style: titleStyle),
+            leading: const Icon(Icons.model_training_outlined),
             subtitle: Text(
               '当前使用「$defaultRcmdType端」推荐¹',
               style: subTitleStyle,
@@ -92,8 +94,9 @@ class _RecommendSettingState extends State<RecommendSetting> {
                       return;
                     }
                     // 显示一个确认框，告知用户可能会导致账号被风控
-                    SmartDialog.show(
-                        animationType: SmartAnimationType.centerFade_otherSlide,
+                    if (!context.mounted) return;
+                    await showDialog(
+                        context: context,
                         builder: (context) {
                           return AlertDialog(
                             title: const Text('提示'),
@@ -103,14 +106,20 @@ class _RecommendSettingState extends State<RecommendSetting> {
                               TextButton(
                                 onPressed: () {
                                   result = null;
-                                  SmartDialog.dismiss();
+                                  Get.back();
                                 },
                                 child: const Text('取消'),
                               ),
                               TextButton(
                                 onPressed: () async {
-                                  SmartDialog.dismiss();
-                                  await MemberHttp.cookieToKey();
+                                  Get.back();
+                                  var res = await MemberHttp.cookieToKey();
+                                  if (res['status']) {
+                                    SmartDialog.showToast(res['msg']);
+                                  } else {
+                                    SmartDialog.showToast(
+                                        '获取access_key失败：${res['msg']}');
+                                  }
                                 },
                                 child: const Text('确定'),
                               ),
@@ -131,12 +140,14 @@ class _RecommendSettingState extends State<RecommendSetting> {
           const SetSwitchItem(
             title: '推荐动态',
             subTitle: '是否在推荐内容中展示动态(仅app端)',
+            leading: Icon(Icons.motion_photos_on_outlined),
             setKey: SettingBoxKey.enableRcmdDynamic,
             defaultVal: true,
           ),
           const SetSwitchItem(
             title: '首页推荐刷新',
             subTitle: '下拉刷新时保留上次内容',
+            leading: Icon(Icons.refresh),
             setKey: SettingBoxKey.enableSaveLastData,
             defaultVal: false,
           ),
@@ -144,6 +155,7 @@ class _RecommendSettingState extends State<RecommendSetting> {
           const Divider(height: 1),
           ListTile(
             dense: false,
+            leading: const Icon(Icons.thumb_up_outlined),
             title: Text('点赞率过滤', style: titleStyle),
             subtitle: Text(
               '过滤掉点赞数/播放量「小于$minLikeRatioForRecommend%」的推荐视频(仅web端)',
@@ -172,6 +184,7 @@ class _RecommendSettingState extends State<RecommendSetting> {
           ListTile(
             dense: false,
             title: Text('视频时长过滤', style: titleStyle),
+            leading: const Icon(Icons.timelapse_outlined),
             subtitle: Text(
               '过滤掉时长「小于$minDurationForRcmd秒」的推荐视频',
               style: subTitleStyle,
@@ -199,6 +212,7 @@ class _RecommendSettingState extends State<RecommendSetting> {
           SetSwitchItem(
             title: '已关注Up豁免推荐过滤',
             subTitle: '推荐中已关注用户发布的内容不会被过滤',
+            leading: const Icon(Icons.favorite_border_outlined),
             setKey: SettingBoxKey.exemptFilterForFollowed,
             defaultVal: true,
             callFn: (_) => {RecommendFilter.update},
@@ -234,6 +248,7 @@ class _RecommendSettingState extends State<RecommendSetting> {
           SetSwitchItem(
             title: '过滤器也应用于相关视频',
             subTitle: '视频详情页的相关视频也进行过滤²',
+            leading: const Icon(Icons.explore_outlined),
             setKey: SettingBoxKey.applyFilterToRelatedVideos,
             defaultVal: true,
             callFn: (_) => {RecommendFilter.update},
@@ -242,15 +257,14 @@ class _RecommendSettingState extends State<RecommendSetting> {
             dense: true,
             subtitle: Text(
               '¹ 若默认web端推荐不太符合预期，可尝试切换至app端。\n'
-              '¹ 选择“模拟未登录(notLogin)”，将以空的key请求推荐接口，但播放页仍会携带用户信息，保证账号能正常记录进度、点赞投币等。\n\n'
+              '¹ 选择“游客模式(notLogin)”，将以空的key请求app推荐接口，但播放页仍会携带用户信息，保证账号能正常记录进度、点赞投币等。\n\n'
               '² 由于接口未提供关注信息，无法豁免相关视频中的已关注Up。\n\n'
               '* 其它（如热门视频、手动搜索、链接跳转等）均不受过滤器影响。\n'
               '* 设定较严苛的条件可导致推荐项数锐减或多次请求，请酌情选择。\n'
               '* 后续可能会增加更多过滤条件，敬请期待。',
-              style: Theme.of(context)
-                  .textTheme
-                  .labelSmall!
-                  .copyWith(color: Theme.of(context).colorScheme.outline.withOpacity(0.7)),
+              style: Theme.of(context).textTheme.labelSmall!.copyWith(
+                  color:
+                      Theme.of(context).colorScheme.outline.withOpacity(0.7)),
             ),
           )
         ],

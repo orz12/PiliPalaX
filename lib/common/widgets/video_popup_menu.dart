@@ -1,15 +1,18 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
+import 'package:get/get.dart';
 
 import '../../http/user.dart';
 import '../../http/video.dart';
 import '../../pages/mine/controller.dart';
+import '../../utils/storage.dart';
 
 class VideoPopupMenu extends StatelessWidget {
   final double? size;
   final double? iconSize;
   final dynamic videoItem;
-  final double menuItemHeight = 50;
+  final double menuItemHeight = 45;
 
   const VideoPopupMenu({
     Key? key,
@@ -43,7 +46,7 @@ class VideoPopupMenu extends StatelessWidget {
             height: menuItemHeight,
             child: const Row(
               children: [
-                Icon(Icons.watch_later_outlined, size: 16),
+                Icon(CupertinoIcons.clock, size: 16),
                 SizedBox(width: 6),
                 Text('稍后再看', style: TextStyle(fontSize: 13))
               ],
@@ -51,10 +54,44 @@ class VideoPopupMenu extends StatelessWidget {
           ),
           PopupMenuItem<String>(
             onTap: () async {
-              SmartDialog.show(
-                useSystem: true,
-                animationType: SmartAnimationType.centerFade_otherSlide,
-                builder: (BuildContext context) {
+              Get.toNamed('/member?mid=${videoItem.owner.mid}', arguments: {
+                'face': videoItem.owner.face,
+                'heroTag': '${videoItem.owner.mid}',
+              });
+            },
+            value: 'visit',
+            height: menuItemHeight,
+            child: Row(
+              children: [
+                const Icon(CupertinoIcons.person, size: 16),
+                const SizedBox(width: 6),
+                Text('访问：${videoItem.owner.name}',
+                    style: const TextStyle(fontSize: 13))
+              ],
+            ),
+          ),
+          // 不感兴趣
+          PopupMenuItem<String>(
+            onTap: () async {
+              // var res = await VideoHttp.dislike(bvid: videoItem.bvid as String);
+              // SmartDialog.showToast(res['msg']);
+              SmartDialog.showToast("暂未实现");
+            },
+            value: 'dislike',
+            height: menuItemHeight,
+            child: const Row(
+              children: [
+                Icon(CupertinoIcons.hand_thumbsdown, size: 16),
+                SizedBox(width: 6),
+                Text('不感兴趣', style: TextStyle(fontSize: 13))
+              ],
+            ),
+          ),
+          PopupMenuItem<String>(
+            onTap: () async {
+              await showDialog(
+                context: context,
+                builder: (context) {
                   return AlertDialog(
                     title: const Text('提示'),
                     content: Text(
@@ -62,7 +99,7 @@ class VideoPopupMenu extends StatelessWidget {
                         '\n\n注：被拉黑的Up可以在隐私设置-黑名单管理中解除'),
                     actions: [
                       TextButton(
-                        onPressed: () => SmartDialog.dismiss(),
+                        onPressed: () => Get.back(),
                         child: Text(
                           '点错了',
                           style: TextStyle(
@@ -76,7 +113,15 @@ class VideoPopupMenu extends StatelessWidget {
                             act: 5,
                             reSrc: 11,
                           );
-                          SmartDialog.dismiss();
+                          List<int> blackMidsList = GStrorage.setting
+                              .get(SettingBoxKey.blackMidsList,
+                                  defaultValue: [-1])
+                              .map<int>((i) => i as int)
+                              .toList();
+                          blackMidsList.insert(0, videoItem.owner.mid);
+                          GStrorage.setting
+                              .put(SettingBoxKey.blackMidsList, blackMidsList);
+                          Get.back();
                           SmartDialog.showToast(res['msg'] ?? '成功');
                         },
                         child: const Text('确认'),
@@ -90,7 +135,7 @@ class VideoPopupMenu extends StatelessWidget {
             height: menuItemHeight,
             child: Row(
               children: [
-                const Icon(Icons.block, size: 16),
+                const Icon(CupertinoIcons.nosign, size: 16),
                 const SizedBox(width: 6),
                 Text('拉黑：${videoItem.owner.name}',
                     style: const TextStyle(fontSize: 13))
@@ -122,12 +167,12 @@ class VideoPopupMenu extends StatelessWidget {
               children: [
                 Icon(
                   MineController.anonymity
-                      ? Icons.visibility_outlined
-                      : Icons.visibility_off_outlined,
+                      ? CupertinoIcons.shield_slash
+                      : CupertinoIcons.checkmark_shield,
                   size: 16,
                 ),
                 const SizedBox(width: 6),
-                Text(MineController.anonymity ? '退出无痕模式' : '进入无痕模式',
+                Text("${MineController.anonymity ? '退出' : '进入'}无痕模式",
                     style: const TextStyle(fontSize: 13))
               ],
             ),

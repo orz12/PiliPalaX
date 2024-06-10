@@ -89,8 +89,10 @@ class SearchHttp {
       try {
         switch (searchType) {
           case SearchType.video:
-            List<int> blackMidsList =
-                setting.get(SettingBoxKey.blackMidsList, defaultValue: [-1]);
+            List<int> blackMidsList = setting
+                .get(SettingBoxKey.blackMidsList, defaultValue: [-1])
+                .map<int>((i) => i as int)
+                .toList();
             for (var i in res.data['data']['result']) {
               // 屏蔽推广和拉黑用户
               i['available'] = !blackMidsList.contains(i['mid']);
@@ -159,7 +161,7 @@ class SearchHttp {
       return {
         'status': false,
         'data': [],
-        'msg': '请求错误 🙅',
+        'msg': res.data['message'],
       };
     }
   }

@@ -1,5 +1,6 @@
 import 'package:easy_debounce/easy_throttle.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:PiliPalaX/common/widgets/network_img_layer.dart';
 import 'package:PiliPalaX/utils/utils.dart';
@@ -43,9 +44,25 @@ class _WhisperPageState extends State<WhisperPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('消息'),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.open_in_browser_outlined,
+                color: Theme.of(context).colorScheme.primary),
+            tooltip: '用浏览器打开',
+            onPressed: () {
+              Get.toNamed('/webview', parameters: {
+                'url': 'https://message.bilibili.com',
+                'type': 'whisper',
+                'pageTitle': '消息中心',
+              });
+            },
+          ),
+          const SizedBox(width: 12)
+        ],
       ),
       body: RefreshIndicator(
         onRefresh: () async {
+          await _whisperController.queryMsgFeedUnread();
           await _whisperController.onRefresh();
         },
         child: SingleChildScrollView(
@@ -58,27 +75,29 @@ class _WhisperPageState extends State<WhisperPage> {
                 return Padding(
                   padding: const EdgeInsets.only(left: 20, right: 20),
                   child: SizedBox(
-                    height: constraints.maxWidth / 4,
+                    height: 90,
                     child: Obx(
-                      () => GridView.count(
-                        primary: false,
-                        crossAxisCount: 4,
-                        padding: const EdgeInsets.all(0),
-                        childAspectRatio: 1.25,
-                        children: _whisperController.msgFeedTop.map((item) {
-                          return GestureDetector(
+                      () => Row(
+                        children: Iterable<int>.generate(
+                                _whisperController.msgFeedTop.length)
+                            .map((idx) {
+                          return Expanded(
+                              child: GestureDetector(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.center,
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 Badge(
-                                  isLabelVisible: item['value'] > 0,
+                                  isLabelVisible: _whisperController
+                                          .msgFeedTop[idx]['value'] >
+                                      0,
                                   backgroundColor:
                                       Theme.of(context).colorScheme.primary,
                                   textColor: Theme.of(context)
                                       .colorScheme
                                       .onInverseSurface,
-                                  label: Text(" ${item['value']} "),
+                                  label: Text(
+                                      " ${_whisperController.msgFeedTop[idx]['value']} "),
                                   alignment: Alignment.topRight,
                                   child: CircleAvatar(
                                     radius: 22,
@@ -86,7 +105,8 @@ class _WhisperPageState extends State<WhisperPage> {
                                         .colorScheme
                                         .onInverseSurface,
                                     child: Icon(
-                                      item['icon'],
+                                      _whisperController.msgFeedTop[idx]
+                                          ['icon'],
                                       size: 20,
                                       color:
                                           Theme.of(context).colorScheme.primary,
@@ -94,12 +114,23 @@ class _WhisperPageState extends State<WhisperPage> {
                                   ),
                                 ),
                                 const SizedBox(height: 6),
-                                Text(item['name'],
+                                Text(_whisperController.msgFeedTop[idx]['name'],
                                     style: const TextStyle(fontSize: 13))
                               ],
                             ),
-                            onTap: () => Get.toNamed(item['route']),
-                          );
+                            onTap: () {
+                              if (!_whisperController.msgFeedTop[idx]
+                                  ['enabled']) {
+                                SmartDialog.showToast('已禁用');
+                                return;
+                              }
+                              setState(() {
+                                _whisperController.msgFeedTop[idx]['value'] = 0;
+                              });
+                              Get.toNamed(
+                                  _whisperController.msgFeedTop[idx]['route']);
+                            },
+                          ));
                         }).toList(),
                       ),
                     ),
@@ -123,19 +154,27 @@ class _WhisperPageState extends State<WhisperPage> {
                                 physics: const NeverScrollableScrollPhysics(),
                                 itemBuilder: (_, int i) {
                                   return ListTile(
-                                    onTap: () => Get.toNamed(
-                                      '/whisperDetail',
-                                      parameters: {
-                                        'talkerId':
-                                            sessionList[i].talkerId.toString(),
-                                        'name': sessionList[i].accountInfo.name,
-                                        'face': sessionList[i].accountInfo.face,
-                                        'mid': sessionList[i]
-                                            .accountInfo
-                                            .mid
-                                            .toString(),
-                                      },
-                                    ),
+                                    onTap: () {
+                                      setState(() {
+                                        sessionList[i].unreadCount = 0;
+                                      });
+                                      Get.toNamed(
+                                        '/whisperDetail',
+                                        parameters: {
+                                          'talkerId': sessionList[i]
+                                              .talkerId
+                                              .toString(),
+                                          'name':
+                                              sessionList[i].accountInfo.name,
+                                          'face':
+                                              sessionList[i].accountInfo.face,
+                                          'mid': sessionList[i]
+                                              .accountInfo
+                                              .mid
+                                              .toString(),
+                                        },
+                                      );
+                                    },
                                     leading: Badge(
                                       isLabelVisible:
                                           sessionList[i].unreadCount > 0,
@@ -157,19 +196,27 @@ class _WhisperPageState extends State<WhisperPage> {
                                     title:
                                         Text(sessionList[i].accountInfo.name),
                                     subtitle: Text(
-                                        sessionList[i]
-                                                .lastMsg
-                                                .content['text'] ??
-                                            sessionList[i]
-                                                .lastMsg
-                                                .content['content'] ??
-                                            sessionList[i]
-                                                .lastMsg
-                                                .content['title'] ??
-                                            sessionList[i]
-                                                .lastMsg
-                                                .content['reply_content'] ??
-                                            '',
+                                        sessionList[i].lastMsg.content !=
+                                                    null &&
+                                                sessionList[i]
+                                                        .lastMsg
+                                                        .content !=
+                                                    ''
+                                            ? (sessionList[i]
+                                                        .lastMsg
+                                                        .content['text'] ??
+                                                    sessionList[i]
+                                                        .lastMsg
+                                                        .content['content'] ??
+                                                    sessionList[i]
+                                                        .lastMsg
+                                                        .content['title'] ??
+                                                    sessionList[i]
+                                                            .lastMsg
+                                                            .content[
+                                                        'reply_content']) ??
+                                                sessionList[i].lastMsg.content
+                                            : '不支持的消息类型',
                                         maxLines: 1,
                                         overflow: TextOverflow.ellipsis,
                                         style: Theme.of(context)
@@ -181,7 +228,8 @@ class _WhisperPageState extends State<WhisperPage> {
                                                     .outline)),
                                     trailing: Text(
                                       Utils.dateFormat(
-                                          sessionList[i].lastMsg.timestamp),
+                                          sessionList[i].lastMsg.timestamp,
+                                          formatType: "day"),
                                       style: Theme.of(context)
                                           .textTheme
                                           .labelSmall!
@@ -205,7 +253,9 @@ class _WhisperPageState extends State<WhisperPage> {
                       );
                     } else {
                       // 请求错误
-                      return const SizedBox();
+                      return Center(
+                        child: Text(data['msg'] ?? '请求异常'),
+                      );
                     }
                   } else {
                     // 骨架屏

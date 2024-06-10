@@ -1,6 +1,8 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:PiliPalaX/common/constants.dart';
@@ -54,11 +56,14 @@ class _MemberPageState extends State<MemberPage>
   @override
   void dispose() {
     _extendNestCtr.removeListener(() {});
+    _extendNestCtr.dispose();
+    appbarStream.close();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    bool isHorizontal = context.width > context.height;
     return Scaffold(
       primary: true,
       body: Column(
@@ -104,6 +109,7 @@ class _MemberPageState extends State<MemberPage>
             ),
             actions: [
               IconButton(
+                tooltip: '搜索',
                 onPressed: () => Get.toNamed(
                     '/memberSearch?mid=$mid&uname=${_memberController.memberInfo.value.name!}'),
                 icon: const Icon(Icons.search_outlined),
@@ -113,7 +119,7 @@ class _MemberPageState extends State<MemberPage>
                 itemBuilder: (BuildContext context) => <PopupMenuEntry>[
                   if (_memberController.ownerMid != _memberController.mid) ...[
                     PopupMenuItem(
-                      onTap: () => _memberController.blockUser(),
+                      onTap: () => _memberController.blockUser(context),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
@@ -153,29 +159,42 @@ class _MemberPageState extends State<MemberPage>
                 ),
                 child: Column(
                   children: [
-                    profileWidget(),
-
-                    /// 动态链接
-                    ListTile(
-                      onTap: _memberController.pushDynamicsPage,
-                      title: const Text('Ta的动态'),
-                      trailing:
-                          const Icon(Icons.arrow_forward_outlined, size: 19),
-                    ),
-
-                    /// 视频
-                    ListTile(
-                      onTap: _memberController.pushArchivesPage,
-                      title: const Text('Ta的投稿'),
-                      trailing:
-                          const Icon(Icons.arrow_forward_outlined, size: 19),
-                    ),
-
-                    /// 专栏
-                    ListTile(
-                      onTap: () {},
-                      title: const Text('Ta的专栏'),
-                    ),
+                    profileWidget(isHorizontal),
+                    Row(children: [
+                      const Spacer(),
+                      InkWell(
+                            onTap: _memberController.pushDynamicsPage,
+                            child: const Row(
+                              children: [
+                                Text('Ta的动态', style: TextStyle(height: 2)),
+                                SizedBox(width: 5),
+                                Icon(Icons.arrow_forward_ios, size: 19),
+                              ],
+                            ),
+                          ),
+                      const Spacer(),
+                      InkWell(
+                            onTap: _memberController.pushArchivesPage,
+                            child: const Row(
+                              children: [
+                                Text('Ta的投稿', style: TextStyle(height: 2)),
+                                SizedBox(width: 5),
+                                Icon(Icons.arrow_forward_ios, size: 19),
+                              ],
+                            ),
+                          ),
+                      const Spacer(),
+                      InkWell(
+                            onTap: () {},
+                            child: const Row(
+                              children: [
+                                Text('Ta的专栏', style: TextStyle(height: 2)),
+                                SizedBox(width: 5),
+                              ],
+                            ),
+                          ),
+                      const Spacer(),
+                    ]),
                     MediaQuery.removePadding(
                       removeTop: true,
                       removeBottom: true,
@@ -274,124 +293,160 @@ class _MemberPageState extends State<MemberPage>
     );
   }
 
-  Widget profileWidget() {
+  Widget profileWidget(bool isHorizontal) {
     return Padding(
       padding: const EdgeInsets.only(left: 18, right: 18, bottom: 20),
       child: FutureBuilder(
         future: _futureBuilderFuture,
         builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.done) {
+          if (snapshot.connectionState == ConnectionState.done &&
+              snapshot.hasData) {
             Map data = snapshot.data!;
             if (data['status']) {
               return Obx(
                 () => Stack(
-                  alignment: AlignmentDirectional.center,
-                  children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        ProfilePanel(ctr: _memberController),
-                        const SizedBox(height: 20),
-                        Row(
-                          children: [
-                            Flexible(
-                                child: Text(
-                              _memberController.memberInfo.value.name!,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .titleMedium!
-                                  .copyWith(fontWeight: FontWeight.bold),
-                            )),
-                            const SizedBox(width: 2),
-                            if (_memberController.memberInfo.value.sex == '女')
-                              const Icon(
-                                FontAwesomeIcons.venus,
-                                size: 14,
-                                color: Colors.pink,
-                              ),
-                            if (_memberController.memberInfo.value.sex == '男')
-                              const Icon(
-                                FontAwesomeIcons.mars,
-                                size: 14,
-                                color: Colors.blue,
-                              ),
-                            const SizedBox(width: 4),
-                            Image.asset(
-                              'assets/images/lv/lv${_memberController.memberInfo.value.level}.png',
-                              height: 11,
-                            ),
-                            const SizedBox(width: 6),
-                            if (_memberController
-                                        .memberInfo.value.vip!.status ==
-                                    1 &&
-                                _memberController.memberInfo.value.vip!
-                                        .label!['img_label_uri_hans'] !=
-                                    '') ...[
-                              Image.network(
-                                _memberController.memberInfo.value.vip!
-                                    .label!['img_label_uri_hans'],
-                                height: 20,
-                              ),
-                            ] else if (_memberController
-                                        .memberInfo.value.vip!.status ==
-                                    1 &&
-                                _memberController.memberInfo.value.vip!
-                                        .label!['img_label_uri_hans_static'] !=
-                                    '') ...[
-                              Image.network(
-                                _memberController.memberInfo.value.vip!
-                                    .label!['img_label_uri_hans_static'],
-                                height: 20,
-                              ),
-                            ]
-                          ],
-                        ),
-                        if (_memberController
-                                .memberInfo.value.official!['title'] !=
-                            '') ...[
-                          const SizedBox(height: 6),
-                          Text.rich(
-                            maxLines: 2,
-                            TextSpan(
-                              text: _memberController
-                                          .memberInfo.value.official!['role'] ==
-                                      1
-                                  ? '个人认证：'
-                                  : '企业认证：',
-                              style: TextStyle(
-                                color: Theme.of(context).primaryColor,
-                              ),
-                              children: [
-                                TextSpan(
-                                  text: _memberController
-                                      .memberInfo.value.official!['title'],
-                                ),
-                              ],
-                            ),
-                            softWrap: true,
-                          ),
-                        ],
-                        const SizedBox(height: 6),
-                        if (_memberController.memberInfo.value.sign != '')
-                          SelectableText(
-                            _memberController.memberInfo.value.sign!,
-                          ),
-                      ],
-                    ),
-                  ],
-                ),
+                    alignment: AlignmentDirectional.center,
+                    children: [profilePanelAndDetailInfo(isHorizontal, false)]),
               );
             } else {
               return const SizedBox();
             }
           } else {
             // 骨架屏
-            return ProfilePanel(ctr: _memberController, loadingStatus: true);
+            return profilePanelAndDetailInfo(isHorizontal, true);
           }
         },
       ),
+    );
+  }
+
+  Widget profilePanelAndDetailInfo(bool isHorizontal, bool loadingStatus) {
+    if (isHorizontal) {
+      return Row(
+        children: [
+          Expanded(
+              child: ProfilePanel(
+                  ctr: _memberController, loadingStatus: loadingStatus)),
+          const SizedBox(width: 20),
+          Expanded(child: profileDetailInfo()),
+        ],
+      );
+    }
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        ProfilePanel(ctr: _memberController, loadingStatus: loadingStatus),
+        const SizedBox(height: 20),
+        profileDetailInfo(),
+      ],
+    );
+  }
+
+  Widget profileDetailInfo() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Flexible(
+                child: Text(
+              _memberController.memberInfo.value.name ?? '',
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: Theme.of(context)
+                  .textTheme
+                  .titleMedium!
+                  .copyWith(fontWeight: FontWeight.bold),
+            )),
+            const SizedBox(width: 2),
+            if (_memberController.memberInfo.value.sex == '女')
+              const Icon(
+                FontAwesomeIcons.venus,
+                size: 14,
+                color: Colors.pink,
+                semanticLabel: '女',
+              ),
+            if (_memberController.memberInfo.value.sex == '男')
+              const Icon(
+                FontAwesomeIcons.mars,
+                size: 14,
+                color: Colors.blue,
+                semanticLabel: '男',
+              ),
+            const SizedBox(width: 4),
+            if (_memberController.memberInfo.value.level != null)
+              Image.asset(
+                'assets/images/lv/lv${_memberController.memberInfo.value.level}.png',
+                height: 11,
+                semanticLabel: '等级${_memberController.memberInfo.value.level}',
+              ),
+            const SizedBox(width: 6),
+            if (_memberController.memberInfo.value.vip?.status == 1) ...[
+              if (_memberController
+                      .memberInfo.value.vip?.label?['img_label_uri_hans'] !=
+                  '')
+                Image.network(
+                  _memberController
+                      .memberInfo.value.vip!.label!['img_label_uri_hans'],
+                  height: 20,
+                  semanticLabel:
+                      _memberController.memberInfo.value.vip!.label!['text'],
+                ),
+              if (_memberController.memberInfo.value.vip
+                      ?.label?['img_label_uri_hans_static'] !=
+                  '')
+                Image.network(
+                  _memberController.memberInfo.value.vip!
+                      .label!['img_label_uri_hans_static'],
+                  height: 20,
+                  semanticLabel:
+                      _memberController.memberInfo.value.vip!.label!['text'],
+                ),
+            ],
+            TextButton(
+                child: Text("UID ${_memberController.mid}",
+                    style: TextStyle(
+                      color: Theme.of(context)
+                          .colorScheme
+                          .secondary
+                          .withOpacity(0.5),
+                      fontSize: 12,
+                      // fontWeight: FontWeight.w200,
+                    )),
+                onPressed: () {
+                  Clipboard.setData(
+                    ClipboardData(text: _memberController.mid.toString()),
+                  );
+                  SmartDialog.showToast('已复制${_memberController.mid}至剪贴板');
+                }),
+          ],
+        ),
+        if (_memberController.memberInfo.value.official != null &&
+            _memberController.memberInfo.value.official!['title'] != '') ...[
+          const SizedBox(height: 6),
+          Text.rich(
+            maxLines: 2,
+            TextSpan(
+              text: _memberController.memberInfo.value.official!['role'] == 1
+                  ? '个人认证：'
+                  : '企业认证：',
+              style: TextStyle(
+                color: Theme.of(context).primaryColor,
+              ),
+              children: [
+                TextSpan(
+                  text: _memberController.memberInfo.value.official!['title'],
+                ),
+              ],
+            ),
+            softWrap: true,
+          ),
+        ],
+        const SizedBox(height: 6),
+        SelectableText(
+          _memberController.memberInfo.value.sign ?? '',
+        ),
+      ],
     );
   }
 

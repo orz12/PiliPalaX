@@ -5,6 +5,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
+import 'package:PiliPalaX/utils/storage.dart';
 import 'package:crypto/crypto.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
@@ -13,10 +14,13 @@ import 'package:get/get.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:url_launcher/url_launcher.dart';
+import '../common/widgets/custom_toast.dart';
 import '../http/index.dart';
 import '../models/github/latest.dart';
 
 class Utils {
+  static final Random random = Random();
+
   static Future<String> getCookiePath() async {
     final Directory tempDir = await getApplicationSupportDirectory();
     final String tempPath = "${tempDir.path}/.plpl/";
@@ -30,7 +34,7 @@ class Utils {
 
   static String numFormat(dynamic number) {
     if (number == null) {
-      return '0';
+      return '00:00';
     }
     if (number is String) {
       return number;
@@ -43,25 +47,98 @@ class Utils {
     }
   }
 
+  static String durationReadFormat(String duration) {
+    List<String> durationParts = duration.split(':');
+
+    if (durationParts.length == 3) {
+      if (durationParts[0] != '00') {
+        return '${int.parse(durationParts[0])}小时${durationParts[1]}分钟${durationParts[2]}秒';
+      }
+      durationParts.removeAt(0);
+    }
+    if (durationParts.length == 2) {
+      if (durationParts[0] != '00') {
+        return '${int.parse(durationParts[0])}分钟${durationParts[1]}秒';
+      }
+      durationParts.removeAt(0);
+    }
+    return '${int.parse(durationParts[0])}秒';
+  }
+
+  static String videoItemSemantics(dynamic videoItem) {
+    String semanticsLabel = "";
+    bool emptyStatCheck(dynamic stat) {
+      return stat == null ||
+          stat == '' ||
+          stat == 0 ||
+          stat == '0' ||
+          stat == '-';
+    }
+
+    if (videoItem.runtimeType.toString() == "RecVideoItemAppModel") {
+      if (videoItem.goto == 'picture') {
+        semanticsLabel += '动态,';
+      } else if (videoItem.goto == 'bangumi') {
+        semanticsLabel += '番剧,';
+      }
+    }
+    if (videoItem.title is String) {
+      semanticsLabel += videoItem.title;
+    } else {
+      semanticsLabel +=
+          videoItem.title.map((e) => e['text'] as String).join('');
+    }
+
+    if (!emptyStatCheck(videoItem.stat.view)) {
+      semanticsLabel += ',${Utils.numFormat(videoItem.stat.view)}';
+      semanticsLabel +=
+          (videoItem.runtimeType.toString() == "RecVideoItemAppModel" &&
+                  videoItem.goto == 'picture')
+              ? '浏览'
+              : '播放';
+    }
+    if (!emptyStatCheck(videoItem.stat.danmu)) {
+      semanticsLabel += ',${Utils.numFormat(videoItem.stat.danmu)}弹幕';
+    }
+    if (videoItem.rcmdReason != null && videoItem.rcmdReason.content != '') {
+      semanticsLabel += ',${videoItem.rcmdReason.content}';
+    }
+    if (!emptyStatCheck(videoItem.duration) &&
+        (videoItem.duration is! int || videoItem.duration > 0)) {
+      semanticsLabel +=
+          ',时长${Utils.durationReadFormat(Utils.timeFormat(videoItem.duration))}';
+    }
+    if (videoItem.runtimeType.toString() != "RecVideoItemAppModel" &&
+        videoItem.pubdate != null) {
+      semanticsLabel +=
+          ',${Utils.dateFormat(videoItem.pubdate!, formatType: 'day')}';
+    }
+    if (videoItem.owner.name != '') {
+      semanticsLabel += ',Up主：${videoItem.owner.name}';
+    }
+    if ((videoItem.runtimeType.toString() == "RecVideoItemAppModel" ||
+            videoItem.runtimeType.toString() == "RecVideoItemModel") &&
+        videoItem.isFollowed == 1) {
+      semanticsLabel += ',已关注';
+    }
+    return semanticsLabel;
+  }
+
   static String timeFormat(dynamic time) {
-    // 1小时内
     if (time is String && time.contains(':')) {
       return time;
     }
-    if (time < 3600) {
-      final int minute = time ~/ 60;
-      final double res = time / 60;
-      if (minute != res) {
-        return '${minute < 10 ? '0$minute' : minute}:${(time - minute * 60) < 10 ? '0${(time - minute * 60)}' : (time - minute * 60)}';
-      } else {
-        return '$minute:00';
-      }
-    } else {
-      final int hour = time ~/ 3600;
-      final String hourStr = hour < 10 ? '0$hour' : hour.toString();
-      var a = timeFormat(time - hour * 3600);
-      return '$hourStr:$a';
+    if (time == null || time == 0) {
+      return '00:00';
     }
+    int hour = time ~/ 3600;
+    int minute = (time % 3600) ~/ 60;
+    int second = time % 60;
+    String paddingStr(int number) {
+      return number.toString().padLeft(2, '0');
+    }
+
+    return '${hour > 0 ? "${paddingStr(hour)}:" : ""}${paddingStr(minute)}:${paddingStr(second)}';
   }
 
   // 完全相对时间显示
@@ -86,6 +163,9 @@ class Utils {
 
   // 时间显示，刚刚，x分钟前
   static String dateFormat(timeStamp, {formatType = 'list'}) {
+    if (timeStamp == 0 || timeStamp == null || timeStamp == '') {
+      return '';
+    }
     // 当前时间
     int time = (DateTime.now().millisecondsSinceEpoch / 1000).round();
     // 对比
@@ -97,10 +177,20 @@ class Utils {
       currentYearStr = 'MM-DD hh:mm';
       lastYearStr = 'YY-MM-DD hh:mm';
       return CustomStamp_str(
+          timestamp: timeStamp, date: lastYearStr, toInt: false);
+    } else if (formatType == 'day') {
+      if (distance <= 43200) {
+        return CustomStamp_str(
           timestamp: timeStamp,
-          date: lastYearStr,
-          toInt: false,
-          formatType: formatType);
+          date: 'hh:mm',
+          toInt: true,
+        );
+      }
+      return CustomStamp_str(
+        timestamp: timeStamp,
+        date: 'YY-MM-DD',
+        toInt: true,
+      );
     }
     if (distance <= 60) {
       return '刚刚';
@@ -111,25 +201,19 @@ class Utils {
     } else if (DateTime.fromMillisecondsSinceEpoch(time * 1000).year ==
         DateTime.fromMillisecondsSinceEpoch(timeStamp * 1000).year) {
       return CustomStamp_str(
-          timestamp: timeStamp,
-          date: currentYearStr,
-          toInt: false,
-          formatType: formatType);
+          timestamp: timeStamp, date: currentYearStr, toInt: false);
     } else {
       return CustomStamp_str(
-          timestamp: timeStamp,
-          date: lastYearStr,
-          toInt: false,
-          formatType: formatType);
+          timestamp: timeStamp, date: lastYearStr, toInt: false);
     }
   }
 
   // 时间戳转时间
-  static String CustomStamp_str(
-      {int? timestamp, // 为空则显示当前时间
-      String? date, // 显示格式，比如：'YY年MM月DD日 hh:mm:ss'
-      bool toInt = true, // 去除0开头
-      String? formatType}) {
+  static String CustomStamp_str({
+    int? timestamp, // 为空则显示当前时间
+    String? date, // 显示格式，比如：'YY年MM月DD日 hh:mm:ss'
+    bool toInt = true, // 去除0开头
+  }) {
     timestamp ??= (DateTime.now().millisecondsSinceEpoch / 1000).round();
     String timeStr =
         (DateTime.fromMillisecondsSinceEpoch(timestamp * 1000)).toString();
@@ -159,10 +243,6 @@ class Utils {
       return timeStr;
     }
 
-    // if (formatType == 'list' && int.parse(DD) > DateTime.now().day - 2) {
-    //   return '昨天';
-    // }
-
     date = date
         .replaceAll('YY', YY)
         .replaceAll('MM', MM)
@@ -170,18 +250,18 @@ class Utils {
         .replaceAll('hh', hh)
         .replaceAll('mm', mm)
         .replaceAll('ss', ss);
-    if (int.parse(YY) == DateTime.now().year &&
-        int.parse(MM) == DateTime.now().month) {
-      // 当天
-      if (int.parse(DD) == DateTime.now().day) {
-        return '今天';
-      }
-    }
+    // if (int.parse(YY) == DateTime.now().year &&
+    //     int.parse(MM) == DateTime.now().month) {
+    //   // 当天
+    //   if (int.parse(DD) == DateTime.now().day) {
+    //     return '今天';
+    //   }
+    // }
     return date;
   }
 
   static String makeHeroTag(v) {
-    return v.toString() + Random().nextInt(9999).toString();
+    return v.toString() + random.nextInt(9999).toString();
   }
 
   static int duration(String duration) {
@@ -200,17 +280,22 @@ class Utils {
 
   static int findClosestNumber(int target, List<int> numbers) {
     int minDiff = 127;
-    late int closestNumber;
+    int? closestNumber;
     try {
       for (int number in numbers) {
-        int diff = (number - target).abs();
-
+        int diff = target - number;
+        if (diff < 0) {
+          continue;
+        }
         if (diff < minDiff) {
           minDiff = diff;
           closestNumber = number;
         }
       }
-    } catch (_) {}
+    } catch (_) {
+    } finally {
+      closestNumber ??= numbers.last;
+    }
     return closestNumber;
   }
 
@@ -224,12 +309,17 @@ class Utils {
     SmartDialog.dismiss();
     var currentInfo = await PackageInfo.fromPlatform();
     var result = await Request().get(Api.latestApp, extra: {'ua': 'mob'});
+    if (result.data.isEmpty) {
+      SmartDialog.showToast('检查更新失败，github接口未返回数据，请检查网络');
+      return false;
+    }
     LatestDataModel data = LatestDataModel.fromJson(result.data[0]);
     String buildNumber = currentInfo.buildNumber;
     if (Platform.isAndroid) {
       buildNumber = buildNumber.substring(0, buildNumber.length - 1);
     }
-    bool isUpdate = Utils.needUpdate("v${currentInfo.version}+$buildNumber", data.tagName!);
+    bool isUpdate =
+        Utils.needUpdate("${currentInfo.version}+$buildNumber", data.tagName!);
     if (isUpdate) {
       SmartDialog.show(
         animationType: SmartAnimationType.centerFade_otherSlide,
@@ -250,15 +340,39 @@ class Utils {
                     ),
                     const SizedBox(height: 8),
                     Text(data.body!),
+                    TextButton(
+                        onPressed: () {
+                          launchUrl(
+                            Uri.parse(
+                                "https://github.com/orz12/pilipala/commits/main/"),
+                            mode: LaunchMode.externalApplication,
+                          );
+                        },
+                        child: Text(
+                          "点此查看完整更新（即commit）内容",
+                          style: TextStyle(
+                              color: Theme.of(context).colorScheme.primary),
+                        )),
                   ],
                 ),
               ),
             ),
             actions: [
               TextButton(
+                onPressed: () {
+                  setting.put(SettingBoxKey.autoUpdate, false);
+                  SmartDialog.dismiss();
+                },
+                child: Text(
+                  '不再提醒',
+                  style:
+                      TextStyle(color: Theme.of(context).colorScheme.outline),
+                ),
+              ),
+              TextButton(
                 onPressed: () => SmartDialog.dismiss(),
                 child: Text(
-                  '稍后',
+                  '取消',
                   style:
                       TextStyle(color: Theme.of(context).colorScheme.outline),
                 ),
@@ -315,7 +429,15 @@ class Utils {
     double height = context.height.abs();
     double width = context.width.abs();
     if (height > width) {
-      return height * 0.7;
+      //return height * 0.7;
+      double paddingTop = MediaQueryData.fromView(
+              WidgetsBinding.instance.platformDispatcher.views.single)
+          .padding
+          .top;
+      print("paddingTop");
+      print(paddingTop);
+      paddingTop += width * 9 / 16;
+      return height - paddingTop;
     }
     //横屏状态
     return height;
@@ -335,16 +457,13 @@ class Utils {
     return md5String;
   }
 
-  static String generateRandomString(int minLength, int maxLength) {
-    const String printable = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!"#\$%&\'()*+,-./:;<=>?@[\\]^_`{|}~ ';
-
-    var random = Random();
-    int length = minLength + random.nextInt(maxLength - minLength + 1);
-    return List<String>.generate(length, (index) => printable[random.nextInt(printable.length)]).join();
+  static List<int> generateRandomBytes(int minLength, int maxLength) {
+    return List<int>.generate(random.nextInt(maxLength - minLength + 1),
+        (_) => random.nextInt(0x60) + 0x20);
   }
 
   static String base64EncodeRandomString(int minLength, int maxLength) {
-    String randomString = generateRandomString(minLength, maxLength);
-    return base64.encode(utf8.encode(randomString));
+    List<int> randomBytes = generateRandomBytes(minLength, maxLength);
+    return base64.encode(randomBytes);
   }
 }

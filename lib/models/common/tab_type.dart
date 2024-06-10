@@ -1,3 +1,4 @@
+import 'package:PiliPalaX/pages/rank/index.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:PiliPalaX/pages/bangumi/index.dart';
@@ -5,11 +6,11 @@ import 'package:PiliPalaX/pages/hot/index.dart';
 import 'package:PiliPalaX/pages/live/index.dart';
 import 'package:PiliPalaX/pages/rcmd/index.dart';
 
-enum TabType { live, rcmd, hot, bangumi }
+enum TabType { live, rcmd, hot, rank, bangumi }
 
 extension TabTypeDesc on TabType {
-  String get description => ['直播', '推荐', '热门', '番剧'][index];
-  String get id => ['live', 'rcmd', 'hot', 'bangumi'][index];
+  String get description => ['直播', '推荐', '热门', '分区', '番剧'][index];
+  String get id => ['live', 'rcmd', 'hot', 'rank', 'bangumi'][index];
 }
 
 List tabsConfig = [
@@ -42,6 +43,16 @@ List tabsConfig = [
     'type': TabType.hot,
     'ctr': Get.find<HotController>,
     'page': const HotPage(),
+  },
+  {
+    'icon': const Icon(
+      Icons.category_outlined,
+      size: 15,
+    ),
+    'label': '分区',
+    'type': TabType.rank,
+    'ctr': Get.find<RankController>,
+    'page': const RankPage(),
   },
   {
     'icon': const Icon(

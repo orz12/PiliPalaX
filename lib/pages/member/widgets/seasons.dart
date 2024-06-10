@@ -5,6 +5,8 @@ import 'package:PiliPalaX/common/widgets/badge.dart';
 import 'package:PiliPalaX/models/member/seasons.dart';
 import 'package:PiliPalaX/pages/member_seasons/widgets/item.dart';
 
+import '../../../utils/grid.dart';
+
 class MemberSeasonsPanel extends StatelessWidget {
   final MemberSeasonsDataModel? data;
   const MemberSeasonsPanel({super.key, this.data});
@@ -38,18 +40,18 @@ class MemberSeasonsPanel extends StatelessWidget {
                       size: 'small',
                       text: item.meta!.total.toString(),
                     ),
-                    const Spacer(),
                     SizedBox(
-                      width: 35,
-                      height: 35,
+                      width: 30,
+                      height: 30,
                       child: IconButton(
+                        tooltip: '前往',
                         onPressed: () => Get.toNamed(
                             '/memberSeasons?mid=${item.meta!.mid}&seasonId=${item.meta!.seasonId}'),
                         style: ButtonStyle(
                           padding: MaterialStateProperty.all(EdgeInsets.zero),
                         ),
                         icon: const Icon(
-                          Icons.arrow_forward,
+                          Icons.arrow_forward_ios,
                           size: 20,
                         ),
                       ),
@@ -60,12 +62,12 @@ class MemberSeasonsPanel extends StatelessWidget {
               LayoutBuilder(
                 builder: (context, boxConstraints) {
                   return GridView.builder(
-                    gridDelegate:
-                        const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2, // Use a fixed count for GridView
-                      crossAxisSpacing: StyleString.safeSpace,
-                      mainAxisSpacing: StyleString.safeSpace,
+                    gridDelegate: SliverGridDelegateWithExtentAndRatio(
+                      mainAxisSpacing: StyleString.cardSpace,
+                      crossAxisSpacing: StyleString.cardSpace,
+                      maxCrossAxisExtent: Grid.maxRowWidth,
                       childAspectRatio: 0.94,
+                      mainAxisExtent: 0,
                     ),
                     physics: const NeverScrollableScrollPhysics(),
                     shrinkWrap: true,

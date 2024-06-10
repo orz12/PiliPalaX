@@ -45,6 +45,7 @@ jobs:
         run: |
           version=$(yq e .version pubspec.yaml | cut -d "+" -f 1)
           last_tag=$(git tag --sort=committerdate | tail -1)
+
           if $(echo $last_tag | grep -v "+"); then
             echo "Tag格式不正确"
             exit 1
@@ -125,6 +126,15 @@ jobs:
             KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
             KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
             KEY_PASSWORD: ${{ secrets.KEY_PASSWORD}}
+
+      - name: flutter build apk
+        run: |
+          sed -i "s/version: .*/version: ${{ needs.update_version.outputs.new_version }}0/g" pubspec.yaml
+          flutter build apk --release
+        env:
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD}}
 
       - name: 重命名应用
         run: |

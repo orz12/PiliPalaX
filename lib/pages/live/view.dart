@@ -76,7 +76,7 @@ class _LivePageState extends State<LivePage>
     return Container(
       clipBehavior: Clip.hardEdge,
       margin: const EdgeInsets.only(
-          left: StyleString.safeSpace, right: StyleString.safeSpace),
+          left: StyleString.cardSpace, right: StyleString.cardSpace),
       decoration: const BoxDecoration(
         borderRadius: BorderRadius.all(StyleString.imgRadius),
       ),
@@ -85,6 +85,7 @@ class _LivePageState extends State<LivePage>
           return await _liveController.onRefresh();
         },
         child: CustomScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
           controller: _liveController.scrollController,
           slivers: [
             SliverPadding(
@@ -140,15 +141,12 @@ class _LivePageState extends State<LivePage>
 
   Widget contentGrid(ctr, liveList) {
     return SliverGrid(
-      gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
-        // 行间距
-        mainAxisSpacing: StyleString.safeSpace,
-        // 列间距
-        crossAxisSpacing: StyleString.safeSpace,
-        // 最大宽度
+      gridDelegate: SliverGridDelegateWithExtentAndRatio(
+        mainAxisSpacing: StyleString.cardSpace,
+        crossAxisSpacing: StyleString.cardSpace,
         maxCrossAxisExtent: Grid.maxRowWidth,
-        mainAxisExtent: Grid.calculateActualWidth(context, Grid.maxRowWidth, StyleString.safeSpace) / StyleString.aspectRatio+
-                MediaQuery.textScalerOf(context).scale(80),
+        childAspectRatio: StyleString.aspectRatio,
+        mainAxisExtent: MediaQuery.textScalerOf(context).scale(80),
       ),
       delegate: SliverChildBuilderDelegate(
         (BuildContext context, int index) {

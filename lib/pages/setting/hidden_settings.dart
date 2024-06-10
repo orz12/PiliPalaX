@@ -22,10 +22,6 @@ class _HiddenSettingState extends State<HiddenSetting> {
   @override
   Widget build(BuildContext context) {
     TextStyle titleStyle = Theme.of(context).textTheme.titleMedium!;
-    TextStyle subTitleStyle = Theme.of(context)
-        .textTheme
-        .labelMedium!
-        .copyWith(color: Theme.of(context).colorScheme.outline);
     return Scaffold(
       appBar: AppBar(
         centerTitle: false,

@@ -24,14 +24,23 @@ class MediaController extends GetxController {
       'onTap': () => Get.toNamed('/history'),
     },
     {
-      'icon': Icons.star_border,
-      'title': '我的收藏',
-      'onTap': () => Get.toNamed('/fav'),
+      'icon': Icons.subscriptions_outlined,
+      'title': '我的订阅',
+      'onTap': () => Get.toNamed('/subscription'),
     },
     {
       'icon': Icons.watch_later_outlined,
       'title': '稍后再看',
       'onTap': () => Get.toNamed('/later'),
+    },
+    {
+      'icon': Icons.create_outlined,
+      'title': '创作中心(web)',
+      'onTap': () => Get.toNamed('/webview', parameters: {
+        'url': 'https://member.bilibili.com/platform/home',
+        'type': 'url',
+        'pageTitle': "创作中心（建议浏览器打开）",
+      }),
     },
   ];
   var userInfo;

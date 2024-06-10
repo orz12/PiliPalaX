@@ -36,6 +36,7 @@ class _PlDanmakuState extends State<PlDanmaku> {
   late double fontSizeVal;
   late double danmakuDurationVal;
   late double strokeWidth;
+  late int fontWeight;
   int latestAddedPosition = -1;
 
   @override
@@ -43,7 +44,10 @@ class _PlDanmakuState extends State<PlDanmaku> {
     super.initState();
     enableShowDanmaku =
         setting.get(SettingBoxKey.enableShowDanmaku, defaultValue: false);
-    _plDanmakuController = PlDanmakuController(widget.cid);
+    _plDanmakuController = PlDanmakuController(
+        widget.cid,
+        widget.playerController.danmakuWeight,
+        widget.playerController.danmakuFilterRule);
     if (mounted) {
       playerController = widget.playerController;
       if (enableShowDanmaku || playerController.isOpenDanmu.value) {
@@ -67,16 +71,17 @@ class _PlDanmakuState extends State<PlDanmaku> {
     opacityVal = playerController.opacityVal;
     fontSizeVal = playerController.fontSizeVal;
     strokeWidth = playerController.strokeWidth;
+    fontWeight = playerController.fontWeight;
     danmakuDurationVal = playerController.danmakuDurationVal;
   }
 
   // 播放器状态监听
   void playerListener(PlayerStatus? status) {
     if (status == PlayerStatus.paused) {
-      _controller!.pause();
+      _controller?.pause();
     }
     if (status == PlayerStatus.playing) {
-      _controller!.onResume();
+      _controller?.onResume();
     }
   }
 
@@ -95,7 +100,7 @@ class _PlDanmakuState extends State<PlDanmaku> {
     List<DanmakuElem>? currentDanmakuList =
         _plDanmakuController.getCurrentDanmaku(currentPosition);
 
-    if (currentDanmakuList != null) {
+    if (currentDanmakuList != null && _controller != null) {
       Color? defaultColor = playerController.blockTypes.contains(6)
           ? DmUtils.decimalToColor(16777215)
           : null;
@@ -131,13 +136,13 @@ class _PlDanmakuState extends State<PlDanmaku> {
             },
             option: DanmakuOption(
               fontSize: 15 * fontSizeVal,
+              fontWeight: fontWeight,
               area: showArea,
               opacity: opacityVal,
               hideTop: blockTypes.contains(5),
               hideScroll: blockTypes.contains(2),
               hideBottom: blockTypes.contains(4),
-              duration:
-                  danmakuDurationVal / playerController.playbackSpeed,
+              duration: danmakuDurationVal / playerController.playbackSpeed,
               strokeWidth: strokeWidth,
               // initDuration /
               //     (danmakuSpeedVal * widget.playerController.playbackSpeed),

@@ -98,6 +98,8 @@ class HistoryItem extends StatelessWidget {
                 Get.toNamed('/video?bvid=$bvid&cid=$cid',
                     arguments: {'heroTag': heroTag, 'pic': videoItem.cover});
               }
+            } else {
+              SmartDialog.showToast(result['msg']);
             }
           } else {
             if (videoItem.history.epid != '') {
@@ -107,12 +109,18 @@ class HistoryItem extends StatelessWidget {
               SmartDialog.dismiss();
               if (res['status']) {
                 EpisodeItem episode = res['data'].episodes.first;
+                for (EpisodeItem i in res['data'].episodes) {
+                  if (i.epId == videoItem.history.epid) {
+                    episode = i;
+                    break;
+                  }
+                }
                 String bvid = episode.bvid!;
                 int cid = episode.cid!;
                 String pic = episode.cover!;
                 String heroTag = Utils.makeHeroTag(cid);
                 Get.toNamed(
-                  '/video?bvid=$bvid&cid=$cid&seasonId=${res['data'].seasonId}',
+                  '/video?bvid=$bvid&cid=$cid&seasonId=${res['data'].seasonId}&epid=${episode.epId}',
                   arguments: {
                     'pic': pic,
                     'heroTag': heroTag,
@@ -120,6 +128,8 @@ class HistoryItem extends StatelessWidget {
                     'bangumiItem': res['data'],
                   },
                 );
+              } else {
+                SmartDialog.showToast(res['msg']);
               }
             }
           }
@@ -146,7 +156,7 @@ class HistoryItem extends StatelessWidget {
         children: [
           Padding(
             padding: const EdgeInsets.fromLTRB(
-                StyleString.safeSpace, 5, StyleString.safeSpace, 5),
+                StyleString.safeSpace, 0, StyleString.safeSpace, 0),
             child: LayoutBuilder(
               builder: (context, boxConstraints) {
                 double width =
@@ -230,6 +240,7 @@ class HistoryItem extends StatelessWidget {
                                             const Duration(milliseconds: 250),
                                         curve: Curves.easeInOut,
                                         child: IconButton(
+                                          tooltip: '取消选择',
                                           style: ButtonStyle(
                                             padding: MaterialStateProperty.all(
                                                 EdgeInsets.zero),
@@ -296,10 +307,10 @@ class VideoContent extends StatelessWidget {
               maxLines: videoItem.videos > 1 ? 1 : 2,
               overflow: TextOverflow.ellipsis,
             ),
-            if (videoItem.showTitle != null) ...[
+            if (videoItem.isFullScreen != null) ...[
               const SizedBox(height: 2),
               Text(
-                videoItem.showTitle,
+                videoItem.isFullScreen,
                 textAlign: TextAlign.start,
                 style: TextStyle(
                     fontSize: Theme.of(context).textTheme.labelMedium!.fontSize,

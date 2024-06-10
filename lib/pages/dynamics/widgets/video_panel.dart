@@ -76,79 +76,88 @@ Widget videoSeasonWidget(item, context, type, {floor = 1}) {
         Text.rich(richNode(item, context)),
         const SizedBox(height: 6),
       ],
-      LayoutBuilder(builder: (context, box) {
-        double width = box.maxWidth;
-        return Stack(
-          children: [
-            Hero(
-              tag: content.bvid,
-              child: NetworkImgLayer(
-                type: floor == 1 ? 'emote' : null,
-                width: width,
-                height: width / StyleString.aspectRatio,
-                src: content.cover,
-              ),
-            ),
-            if (content.badge != null && type == 'pgc')
-              PBadge(
-                text: content.badge['text'],
-                top: 8.0,
-                right: 10.0,
-                bottom: null,
-                left: null,
-              ),
-            Positioned(
-              left: 0,
-              right: 0,
-              bottom: 0,
-              child: Container(
-                height: 80,
-                padding: const EdgeInsets.fromLTRB(12, 0, 10, 10),
-                clipBehavior: Clip.hardEdge,
-                decoration: BoxDecoration(
-                    gradient: const LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      colors: <Color>[
-                        Colors.transparent,
-                        Colors.black54,
+      Padding(
+          padding: EdgeInsets.symmetric(horizontal: StyleString.safeSpace),
+          child: LayoutBuilder(builder: (context, box) {
+            double width = box.maxWidth;
+            return Stack(
+              children: [
+                Hero(
+                  tag: content.bvid,
+                  child: NetworkImgLayer(
+                    type: null,
+                    width: width,
+                    height: width / StyleString.aspectRatio,
+                    src: content.cover,
+                    semanticsLabel: content.title,
+                  ),
+                ),
+                if (content.badge != null && type == 'pgc')
+                  PBadge(
+                    text: content.badge['text'],
+                    top: 8.0,
+                    right: 10.0,
+                    bottom: null,
+                    left: null,
+                  ),
+                Positioned(
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  child: Container(
+                    height: 70,
+                    padding: const EdgeInsets.fromLTRB(10, 0, 8, 8),
+                    clipBehavior: Clip.hardEdge,
+                    decoration: BoxDecoration(
+                        gradient: const LinearGradient(
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                          colors: <Color>[
+                            Colors.transparent,
+                            Colors.black54,
+                          ],
+                        ),
+                        borderRadius:
+                            BorderRadius.circular(StyleString.imgRadius.x)),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        DefaultTextStyle.merge(
+                          style: TextStyle(
+                              fontSize: Theme.of(context)
+                                  .textTheme
+                                  .labelMedium!
+                                  .fontSize,
+                              color: Colors.white),
+                          child: Row(
+                            children: [
+                              if (content.durationText != null)
+                                Text(
+                                  content.durationText,
+                                  semanticsLabel:
+                                      '时长${Utils.durationReadFormat(content.durationText)}',
+                                ),
+                              if (content.durationText != null)
+                                const SizedBox(width: 6),
+                              Text(content.stat.play + '次围观'),
+                              const SizedBox(width: 6),
+                              Text(content.stat.danmu + '条弹幕')
+                            ],
+                          ),
+                        ),
+                        Image.asset(
+                          'assets/images/play.png',
+                          width: 50,
+                          height: 50,
+                        ),
                       ],
                     ),
-                    borderRadius: floor == 1
-                        ? null
-                        : const BorderRadius.all(Radius.circular(6))),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    DefaultTextStyle.merge(
-                      style: TextStyle(
-                          fontSize:
-                              Theme.of(context).textTheme.labelMedium!.fontSize,
-                          color: Colors.white),
-                      child: Row(
-                        children: [
-                          Text(content.durationText ?? ''),
-                          if (content.durationText != null)
-                            const SizedBox(width: 10),
-                          Text(content.stat.play + '次围观'),
-                          const SizedBox(width: 10),
-                          Text(content.stat.danmaku + '条弹幕')
-                        ],
-                      ),
-                    ),
-                    Image.asset(
-                      'assets/images/play.png',
-                      width: 60,
-                      height: 60,
-                    ),
-                  ],
+                  ),
                 ),
-              ),
-            ),
-          ],
-        );
-      }),
+              ],
+            );
+          })),
       const SizedBox(height: 6),
       Padding(
         padding: floor == 1

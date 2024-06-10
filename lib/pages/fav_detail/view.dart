@@ -9,6 +9,8 @@ import 'package:PiliPalaX/common/widgets/network_img_layer.dart';
 import 'package:PiliPalaX/common/widgets/no_data.dart';
 import 'package:PiliPalaX/pages/fav_detail/index.dart';
 
+import '../../common/constants.dart';
+import '../../utils/grid.dart';
 import 'widget/fav_video_card.dart';
 
 class FavDetailPage extends StatefulWidget {
@@ -29,8 +31,8 @@ class _FavDetailPageState extends State<FavDetailPage> {
   @override
   void initState() {
     super.initState();
-    _futureBuilderFuture = _favDetailController.queryUserFavFolderDetail();
     mediaId = Get.parameters['mediaId']!;
+    _futureBuilderFuture = _favDetailController.queryUserFavFolderDetail();
     titleStreamC = StreamController<bool>();
     _controller.addListener(
       () {
@@ -60,10 +62,11 @@ class _FavDetailPageState extends State<FavDetailPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: CustomScrollView(
+        physics: const AlwaysScrollableScrollPhysics(),
         controller: _controller,
         slivers: [
           SliverAppBar(
-            expandedHeight: 260 - MediaQuery.of(context).padding.top,
+            expandedHeight: 220 - MediaQuery.of(context).padding.top,
             pinned: true,
             titleSpacing: 0,
             title: StreamBuilder(
@@ -96,6 +99,7 @@ class _FavDetailPageState extends State<FavDetailPage> {
             ),
             actions: [
               IconButton(
+                tooltip: '搜索',
                 onPressed: () =>
                     Get.toNamed('/favSearch?searchType=0&mediaId=$mediaId'),
                 icon: const Icon(Icons.search_outlined),
@@ -108,21 +112,21 @@ class _FavDetailPageState extends State<FavDetailPage> {
             ],
             flexibleSpace: FlexibleSpaceBar(
               background: Container(
-                decoration: BoxDecoration(
-                  border: Border(
-                    bottom: BorderSide(
-                      color: Theme.of(context).dividerColor.withOpacity(0.2),
-                    ),
-                  ),
-                ),
+                // decoration: BoxDecoration(
+                //   border: Border(
+                //     bottom: BorderSide(
+                //       color: Theme.of(context).dividerColor.withOpacity(0.2),
+                //     ),
+                //   ),
+                // ),
                 padding: EdgeInsets.only(
                     top: kTextTabBarHeight +
                         MediaQuery.of(context).padding.top +
-                        30,
-                    left: 20,
+                        10,
+                    left: 14,
                     right: 20),
                 child: SizedBox(
-                  height: 200,
+                  height: 110,
                   child: Row(
                     // mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -160,7 +164,18 @@ class _FavDetailPageState extends State<FavDetailPage> {
                                       .labelSmall!
                                       .fontSize,
                                   color: Theme.of(context).colorScheme.outline),
-                            )
+                            ),
+                            const Spacer(),
+                            Text(
+                              '共${_favDetailController.item!.mediaCount!}条视频',
+                              style: TextStyle(
+                                  fontSize: Theme.of(context)
+                                      .textTheme
+                                      .labelSmall!
+                                      .fontSize,
+                                  color: Theme.of(context).colorScheme.outline),
+                            ),
+                            const SizedBox(height: 20),
                           ],
                         ),
                       ),
@@ -170,21 +185,21 @@ class _FavDetailPageState extends State<FavDetailPage> {
               ),
             ),
           ),
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.only(top: 15, bottom: 8, left: 14),
-              child: Obx(
-                () => Text(
-                  '共${_favDetailController.favList.length}条视频',
-                  style: TextStyle(
-                      fontSize:
-                          Theme.of(context).textTheme.labelMedium!.fontSize,
-                      color: Theme.of(context).colorScheme.outline,
-                      letterSpacing: 1),
-                ),
-              ),
-            ),
-          ),
+          // SliverToBoxAdapter(
+          //   child: Padding(
+          //     padding: const EdgeInsets.only(top: 15, bottom: 8, left: 14),
+          //     child: Obx(
+          //       () => Text(
+          //         '共${_favDetailController.favList.length}条视频',
+          //         style: TextStyle(
+          //             fontSize:
+          //                 Theme.of(context).textTheme.labelMedium!.fontSize,
+          //             color: Theme.of(context).colorScheme.outline,
+          //             letterSpacing: 1),
+          //       ),
+          //     ),
+          //   ),
+          // ),
           FutureBuilder(
             future: _futureBuilderFuture,
             builder: (context, snapshot) {
@@ -198,7 +213,15 @@ class _FavDetailPageState extends State<FavDetailPage> {
                     return Obx(
                       () => favList.isEmpty
                           ? const SliverToBoxAdapter(child: SizedBox())
-                          : SliverList(
+                          : SliverGrid(
+                              gridDelegate:
+                                  SliverGridDelegateWithExtentAndRatio(
+                                      mainAxisSpacing: StyleString.cardSpace,
+                                      crossAxisSpacing: StyleString.safeSpace,
+                                      maxCrossAxisExtent: Grid.maxRowWidth * 2,
+                                      childAspectRatio:
+                                          StyleString.aspectRatio * 2.3,
+                                      mainAxisExtent: 0),
                               delegate:
                                   SliverChildBuilderDelegate((context, index) {
                                 return FavVideoCardH(
@@ -218,7 +241,13 @@ class _FavDetailPageState extends State<FavDetailPage> {
                 }
               } else {
                 // 骨架屏
-                return SliverList(
+                return SliverGrid(
+                  gridDelegate: SliverGridDelegateWithExtentAndRatio(
+                      mainAxisSpacing: StyleString.cardSpace,
+                      crossAxisSpacing: StyleString.safeSpace,
+                      maxCrossAxisExtent: Grid.maxRowWidth * 2,
+                      childAspectRatio: StyleString.aspectRatio * 2.3,
+                      mainAxisExtent: 0),
                   delegate: SliverChildBuilderDelegate((context, index) {
                     return const VideoCardHSkeleton();
                   }, childCount: 10),

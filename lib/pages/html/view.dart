@@ -6,7 +6,6 @@ import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:PiliPalaX/common/skeleton/video_reply.dart';
 import 'package:PiliPalaX/common/widgets/html_render.dart';
-import 'package:PiliPalaX/common/widgets/http_error.dart';
 import 'package:PiliPalaX/common/widgets/network_img_layer.dart';
 import 'package:PiliPalaX/models/common/reply_type.dart';
 import 'package:PiliPalaX/pages/video/detail/reply/widgets/reply_item.dart';
@@ -32,7 +31,7 @@ class _HtmlRenderPageState extends State<HtmlRenderPage>
   late String dynamicType;
   late int type;
   bool _isFabVisible = true;
-  late Future _futureBuilderFuture;
+  late final Future _futureBuilderFuture;
   late ScrollController scrollController;
   late AnimationController fabAnimationCtr;
 
@@ -136,6 +135,7 @@ class _HtmlRenderPageState extends State<HtmlRenderPage>
         actions: [
           const SizedBox(width: 4),
           IconButton(
+            tooltip: '用内置浏览器打开',
             onPressed: () {
               Get.toNamed('/webview', parameters: {
                 'url': url.startsWith('http') ? url : 'https:$url',
@@ -148,6 +148,36 @@ class _HtmlRenderPageState extends State<HtmlRenderPage>
           PopupMenuButton(
             icon: const Icon(Icons.more_vert),
             itemBuilder: (BuildContext context) => <PopupMenuEntry>[
+              PopupMenuItem(
+                onTap: () => {
+                  _htmlRenderCtr.reqHtml(id),
+                },
+                child: const Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.refresh, size: 19),
+                    SizedBox(width: 10),
+                    Text('刷新'),
+                  ],
+                ),
+              ),
+              PopupMenuItem(
+                onTap: () => {
+                  Get.toNamed('/webview', parameters: {
+                    'url': url.startsWith('http') ? url : 'https:$url',
+                    'type': 'url',
+                    'pageTitle': title,
+                  }),
+                },
+                child: const Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.open_in_new, size: 19),
+                    SizedBox(width: 10),
+                    Text('内置浏览器打开'),
+                  ],
+                ),
+              ),
               PopupMenuItem(
                 onTap: () => {
                   Clipboard.setData(ClipboardData(text: url)),
@@ -182,89 +212,73 @@ class _HtmlRenderPageState extends State<HtmlRenderPage>
         children: [
           SingleChildScrollView(
             controller: scrollController,
-            child: Column(
-              children: [
-                FutureBuilder(
-                  future: _futureBuilderFuture,
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.done) {
-                      var data = snapshot.data;
-                      fabAnimationCtr.forward();
-                      if (data['status']) {
-                        return Column(
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.fromLTRB(12, 12, 12, 8),
-                              child: Row(
+            child: FutureBuilder(
+              future: _futureBuilderFuture,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.done &&
+                    snapshot.hasData) {
+                  var data = snapshot.data;
+                  // fabAnimationCtr.forward();
+                  if (data != null && data['status']) {
+                    return Column(
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.fromLTRB(12, 12, 12, 8),
+                          child: Row(
+                            children: [
+                              NetworkImgLayer(
+                                width: 40,
+                                height: 40,
+                                type: 'avatar',
+                                src: _htmlRenderCtr.response['avatar']!,
+                              ),
+                              const SizedBox(width: 10),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  NetworkImgLayer(
-                                    width: 40,
-                                    height: 40,
-                                    type: 'avatar',
-                                    src: _htmlRenderCtr.response['avatar']!,
+                                  Text(_htmlRenderCtr.response['uname'],
+                                      style: TextStyle(
+                                        fontSize: Theme.of(context)
+                                            .textTheme
+                                            .titleSmall!
+                                            .fontSize,
+                                      )),
+                                  Text(
+                                    _htmlRenderCtr.response['updateTime'],
+                                    style: TextStyle(
+                                      color:
+                                          Theme.of(context).colorScheme.outline,
+                                      fontSize: Theme.of(context)
+                                          .textTheme
+                                          .labelSmall!
+                                          .fontSize,
+                                    ),
                                   ),
-                                  const SizedBox(width: 10),
-                                  Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(_htmlRenderCtr.response['uname'],
-                                          style: TextStyle(
-                                            fontSize: Theme.of(context)
-                                                .textTheme
-                                                .titleSmall!
-                                                .fontSize,
-                                          )),
-                                      Text(
-                                        _htmlRenderCtr.response['updateTime'],
-                                        style: TextStyle(
-                                          color: Theme.of(context)
-                                              .colorScheme
-                                              .outline,
-                                          fontSize: Theme.of(context)
-                                              .textTheme
-                                              .labelSmall!
-                                              .fontSize,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  const Spacer(),
                                 ],
                               ),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.fromLTRB(12, 8, 12, 8),
-                              child: HtmlRender(
-                                htmlContent: _htmlRenderCtr.response['content'],
+                              const Spacer(),
+                            ],
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.fromLTRB(12, 8, 12, 8),
+                          child: HtmlRender(
+                            htmlContent: _htmlRenderCtr.response['content'],
+                          ),
+                        ),
+                        Container(
+                          decoration: BoxDecoration(
+                            border: Border(
+                              bottom: BorderSide(
+                                width: 8,
+                                color: Theme.of(context)
+                                    .dividerColor
+                                    .withOpacity(0.05),
                               ),
                             ),
-                            Container(
-                              decoration: BoxDecoration(
-                                border: Border(
-                                  bottom: BorderSide(
-                                    width: 8,
-                                    color: Theme.of(context)
-                                        .dividerColor
-                                        .withOpacity(0.05),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
-                        );
-                      } else {
-                        return const Text('error');
-                      }
-                    } else {
-                      // 骨架屏
-                      return const SizedBox();
-                    }
-                  },
-                ),
-                Obx(
-                  () => _htmlRenderCtr.oid.value != -1
-                      ? Container(
+                          ),
+                        ),
+                        Container(
                           decoration: BoxDecoration(
                             color: Theme.of(context).colorScheme.surface,
                             border: Border(
@@ -297,114 +311,78 @@ class _HtmlRenderPageState extends State<HtmlRenderPage>
                               )
                             ],
                           ),
-                        )
-                      : const SizedBox(),
-                ),
-                Obx(
-                  () => _htmlRenderCtr.oid.value != -1
-                      ? FutureBuilder(
-                          future: _htmlRenderCtr.queryReplyList(),
-                          builder: (context, snapshot) {
-                            if (snapshot.connectionState ==
-                                ConnectionState.done) {
-                              Map data = snapshot.data as Map;
-                              if (snapshot.data['status']) {
-                                // 请求成功
-                                return Obx(
-                                  () => _htmlRenderCtr.replyList.isEmpty &&
-                                          _htmlRenderCtr.isLoadingMore
-                                      ? ListView.builder(
-                                          itemCount: 5,
-                                          shrinkWrap: true,
-                                          physics:
-                                              const NeverScrollableScrollPhysics(),
-                                          itemBuilder: (context, index) {
-                                            return const VideoReplySkeleton();
-                                          },
-                                        )
-                                      : ListView.builder(
-                                          shrinkWrap: true,
-                                          physics:
-                                              const NeverScrollableScrollPhysics(),
-                                          itemCount:
-                                              _htmlRenderCtr.replyList.length +
-                                                  1,
-                                          itemBuilder: (context, index) {
-                                            if (index ==
-                                                _htmlRenderCtr
-                                                    .replyList.length) {
-                                              return Container(
-                                                padding: EdgeInsets.only(
-                                                    bottom:
-                                                        MediaQuery.of(context)
-                                                            .padding
-                                                            .bottom),
-                                                height: MediaQuery.of(context)
-                                                        .padding
-                                                        .bottom +
-                                                    100,
-                                                child: Center(
-                                                  child: Obx(
-                                                    () => Text(
-                                                      _htmlRenderCtr
-                                                          .noMore.value,
-                                                      style: TextStyle(
-                                                        fontSize: 12,
-                                                        color: Theme.of(context)
-                                                            .colorScheme
-                                                            .outline,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ),
-                                              );
-                                            } else {
-                                              return ReplyItem(
-                                                replyItem: _htmlRenderCtr
-                                                    .replyList[index],
-                                                showReplyRow: true,
-                                                replyLevel: '1',
-                                                replyReply: (replyItem) =>
-                                                    replyReply(replyItem),
-                                                replyType:
-                                                    ReplyType.values[type],
-                                                addReply: (replyItem) {
-                                                  _htmlRenderCtr
-                                                      .replyList[index].replies!
-                                                      .add(replyItem);
-                                                },
-                                              );
-                                            }
-                                          },
+                        ),
+                        Obx(
+                          () => _htmlRenderCtr.replyList.isEmpty &&
+                                  _htmlRenderCtr.isLoadingMore
+                              ? ListView.builder(
+                                  itemCount: 5,
+                                  shrinkWrap: true,
+                                  physics: const NeverScrollableScrollPhysics(),
+                                  itemBuilder: (context, index) {
+                                    return const VideoReplySkeleton();
+                                  },
+                                )
+                              : ListView.builder(
+                                  shrinkWrap: true,
+                                  physics: const NeverScrollableScrollPhysics(),
+                                  itemCount:
+                                      _htmlRenderCtr.replyList.length + 1,
+                                  itemBuilder: (context, index) {
+                                    if (index ==
+                                        _htmlRenderCtr.replyList.length) {
+                                      return Container(
+                                        padding: EdgeInsets.only(
+                                            bottom: MediaQuery.of(context)
+                                                .padding
+                                                .bottom),
+                                        height: MediaQuery.of(context)
+                                                .padding
+                                                .bottom +
+                                            100,
+                                        child: Center(
+                                          child: Obx(
+                                            () => Text(
+                                              _htmlRenderCtr.noMore.value,
+                                              style: TextStyle(
+                                                fontSize: 12,
+                                                color: Theme.of(context)
+                                                    .colorScheme
+                                                    .outline,
+                                              ),
+                                            ),
+                                          ),
                                         ),
-                                );
-                              } else {
-                                // 请求错误
-                                return CustomScrollView(
-                                  slivers: [
-                                    HttpError(
-                                      errMsg: data['msg'],
-                                      fn: () => setState(() {}),
-                                    )
-                                  ],
-                                );
-                              }
-                            } else {
-                              // 骨架屏
-                              return ListView.builder(
-                                shrinkWrap: true,
-                                physics: const NeverScrollableScrollPhysics(),
-                                itemCount: 5,
-                                itemBuilder: (context, index) {
-                                  return const VideoReplySkeleton();
-                                },
-                              );
-                            }
-                          },
-                        )
-                      : const SizedBox(),
-                )
-              ],
+                                      );
+                                    } else {
+                                      return ReplyItem(
+                                        replyItem:
+                                            _htmlRenderCtr.replyList[index],
+                                        showReplyRow: true,
+                                        replyLevel: '1',
+                                        replyReply: (replyItem) =>
+                                            replyReply(replyItem),
+                                        replyType: ReplyType.values[type],
+                                        addReply: (replyItem) {
+                                          _htmlRenderCtr
+                                              .replyList[index].replies!
+                                              .add(replyItem);
+                                        },
+                                      );
+                                    }
+                                  },
+                                ),
+                        ),
+                      ],
+                    );
+                  } else {
+                    return const Text('error');
+                  }
+                } else {
+                  // 骨架屏
+                  return const SizedBox();
+                }
+              },
             ),
           ),
           Positioned(
@@ -425,6 +403,7 @@ class _HtmlRenderPageState extends State<HtmlRenderPage>
                   showModalBottomSheet(
                     context: context,
                     isScrollControlled: true,
+                    isDismissible: false,
                     builder: (BuildContext context) {
                       return VideoReplyNewDialog(
                         oid: _htmlRenderCtr.oid.value,
@@ -438,7 +417,7 @@ class _HtmlRenderPageState extends State<HtmlRenderPage>
                       // 完成评论，数据添加
                       if (value != null && value['data'] != null)
                         {
-                          _htmlRenderCtr.replyList.add(value['data']),
+                          _htmlRenderCtr.replyList.insert(0, value['data']),
                           _htmlRenderCtr.acount.value++
                         }
                     },

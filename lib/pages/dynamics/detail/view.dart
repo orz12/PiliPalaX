@@ -214,6 +214,7 @@ class _DynamicDetailPageState extends State<DynamicDetailPage>
           children: [
             CustomScrollView(
               controller: scrollController,
+              physics: const AlwaysScrollableScrollPhysics(),
               slivers: [
                 if (action != 'comment')
                   SliverToBoxAdapter(
@@ -249,13 +250,12 @@ class _DynamicDetailPageState extends State<DynamicDetailPage>
                                     scale: animation, child: child);
                               },
                               child: Text(
-                                '${_dynamicDetailController.acount.value}',
+                                '${_dynamicDetailController.acount.value}条回复',
                                 key: ValueKey<int>(
                                     _dynamicDetailController.acount.value),
                               ),
                             ),
                           ),
-                          const Text('条回复'),
                           const Spacer(),
                           SizedBox(
                             height: 35,
@@ -383,6 +383,7 @@ class _DynamicDetailPageState extends State<DynamicDetailPage>
                     showModalBottomSheet(
                       context: context,
                       isScrollControlled: true,
+                      isDismissible: false,
                       builder: (BuildContext context) {
                         return VideoReplyNewDialog(
                           oid: _dynamicDetailController.oid ??

@@ -25,12 +25,15 @@ class _ActionPanelState extends State<ActionPanel> {
   late ModuleStatModel stat;
   bool isProcessing = false;
   void Function()? handleState(Future Function() action) {
-    return isProcessing ? null : () async {
-      setState(() => isProcessing = true);
-      await action();
-      setState(() => isProcessing = false);
-    };
+    return isProcessing
+        ? null
+        : () async {
+            setState(() => isProcessing = true);
+            await action();
+            setState(() => isProcessing = false);
+          };
   }
+
   @override
   void initState() {
     super.initState();
@@ -83,12 +86,13 @@ class _ActionPanelState extends State<ActionPanel> {
             icon: const Icon(
               FontAwesomeIcons.shareFromSquare,
               size: 16,
+              semanticLabel: "转发",
             ),
             style: TextButton.styleFrom(
               padding: const EdgeInsets.fromLTRB(15, 0, 15, 0),
               foregroundColor: Theme.of(context).colorScheme.outline,
             ),
-            label: Text(stat.forward!.count ?? '转发'),
+            label: Text(stat.forward!.count ?? ''),
           ),
         ),
         Expanded(
@@ -99,12 +103,13 @@ class _ActionPanelState extends State<ActionPanel> {
             icon: const Icon(
               FontAwesomeIcons.comment,
               size: 16,
+              semanticLabel: "评论",
             ),
             style: TextButton.styleFrom(
               padding: const EdgeInsets.fromLTRB(15, 0, 15, 0),
               foregroundColor: Theme.of(context).colorScheme.outline,
             ),
-            label: Text(stat.comment!.count ?? '评论'),
+            label: Text(stat.comment!.count ?? ''),
           ),
         ),
         Expanded(
@@ -117,6 +122,7 @@ class _ActionPanelState extends State<ActionPanel> {
                   : FontAwesomeIcons.thumbsUp,
               size: 16,
               color: stat.like!.status! ? primary : color,
+              semanticLabel: stat.like!.status! ? "已赞": "点赞",
             ),
             style: TextButton.styleFrom(
               padding: const EdgeInsets.fromLTRB(15, 0, 15, 0),
@@ -128,7 +134,7 @@ class _ActionPanelState extends State<ActionPanel> {
                 return ScaleTransition(scale: animation, child: child);
               },
               child: Text(
-                stat.like!.count ?? '点赞',
+                stat.like!.count ?? '',
                 key: ValueKey<String>(stat.like!.count ?? '点赞'),
                 style: TextStyle(
                   color: stat.like!.status! ? primary : color,

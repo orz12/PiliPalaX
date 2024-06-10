@@ -111,6 +111,7 @@ class LoginPageController extends GetxController {
   Future getCaptcha(oncall) async {
     SmartDialog.showLoading(msg: '请求中...');
     var result = await LoginHttp.queryCaptcha();
+    SmartDialog.dismiss();
     if (result['status']) {
       CaptchaDataModel captchaData = result['data'];
       var registerData = Gt3RegisterData(
@@ -119,7 +120,6 @@ class LoginPageController extends GetxController {
         success: true,
       );
       captcha.addEventHandler(onShow: (Map<String, dynamic> message) async {
-        SmartDialog.dismiss();
       }, onClose: (Map<String, dynamic> message) async {
         SmartDialog.showToast('关闭验证');
       }, onResult: (Map<String, dynamic> message) async {

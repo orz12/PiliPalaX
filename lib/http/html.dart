@@ -41,11 +41,10 @@ class HtmlHttp {
       String opusContent =
           opusDetail.querySelector('.opus-module-content')!.innerHtml;
       String? test;
-      try {
-        test = opusDetail
-            .querySelector('.horizontal-scroll-album__pic__img')!
-            .innerHtml;
-      } catch (_) {}
+      test = opusDetail
+              .querySelector('.horizontal-scroll-album__pic__img')
+              ?.innerHtml ??
+          '';
 
       String commentId = opusDetail
           .querySelector('.bili-comment-container')!
@@ -79,8 +78,13 @@ class HtmlHttp {
     // 头像
     // String avatar =
     //     authorHeader.querySelector('.bili-avatar-img')!.attributes['data-src']!;
+    // 正则寻找形如"author":{"mid":\d+,"name":".*","face":"xxxx"的匹配项
+    String avatar = RegExp(r'"author":\{"mid":\d+?,"name":".+?","face":"(.+?)"')
+        .firstMatch(response.data)!
+        .group(1)!
+        .replaceAll(r'\u002F', '/')
+        .split('@')[0];
     // print(avatar);
-    // avatar = 'https:${avatar.split('@')[0]}';
     String uname = authorHeader.querySelector('.up-name')!.text.trim();
     // 动态详情
     Element opusDetail = appDom.querySelector('.article-content')!;
@@ -91,13 +95,13 @@ class HtmlHttp {
 
     //
     String opusContent =
-        opusDetail.querySelector('#read-article-holder')!.innerHtml;
+        opusDetail.querySelector('#read-article-holder')?.innerHtml ?? '';
     RegExp digitRegExp = RegExp(r'\d+');
     Iterable<Match> matches = digitRegExp.allMatches(id);
     String number = matches.first.group(0)!;
     return {
       'status': true,
-      'avatar': '',
+      'avatar': avatar,
       'uname': uname,
       'updateTime': '',
       'content': opusContent,

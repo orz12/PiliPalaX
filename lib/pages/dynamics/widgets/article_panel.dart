@@ -1,15 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:PiliPalaX/utils/utils.dart';
 
+import '../../../common/constants.dart';
 import 'pic_panel.dart';
 
 Widget articlePanel(item, context, {floor = 1}) {
   TextStyle authorStyle =
       TextStyle(color: Theme.of(context).colorScheme.primary);
   return Padding(
-    padding: floor == 2
-        ? EdgeInsets.zero
-        : const EdgeInsets.only(left: 12, right: 12),
+    padding: const EdgeInsets.symmetric(horizontal: StyleString.safeSpace),
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [

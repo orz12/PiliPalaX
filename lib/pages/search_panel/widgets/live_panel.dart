@@ -4,6 +4,8 @@ import 'package:PiliPalaX/common/constants.dart';
 import 'package:PiliPalaX/common/widgets/network_img_layer.dart';
 import 'package:PiliPalaX/utils/utils.dart';
 
+import '../../../utils/grid.dart';
+
 Widget searchLivePanel(BuildContext context, ctr, list) {
   return Padding(
     padding: const EdgeInsets.only(
@@ -11,13 +13,13 @@ Widget searchLivePanel(BuildContext context, ctr, list) {
     child: GridView.builder(
       primary: false,
       controller: ctr!.scrollController,
-      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 2,
-          crossAxisSpacing: StyleString.cardSpace + 2,
-          mainAxisSpacing: StyleString.cardSpace + 3,
-          mainAxisExtent:
-              MediaQuery.sizeOf(context).width / 2 / StyleString.aspectRatio +
-                  MediaQuery.textScalerOf(context).scale(66.0)),
+      gridDelegate: SliverGridDelegateWithExtentAndRatio(
+        maxCrossAxisExtent: Grid.maxRowWidth,
+        crossAxisSpacing: StyleString.safeSpace,
+        mainAxisSpacing: StyleString.safeSpace,
+        childAspectRatio: StyleString.aspectRatio,
+        mainAxisExtent: MediaQuery.textScalerOf(context).scale(80),
+      ),
       itemCount: list.length,
       itemBuilder: (context, index) {
         return LiveItem(liveItem: list![index]);

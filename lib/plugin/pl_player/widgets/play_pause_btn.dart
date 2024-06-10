@@ -64,15 +64,18 @@ class PlayOrPauseButtonState extends State<PlayOrPauseButton>
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      width: 34,
+      width: 42,
       height: 34,
       child: IconButton(
+        tooltip: widget.controller!.videoPlayerController!.state.playing
+            ? '暂停'
+            : '播放',
         style: ButtonStyle(
           padding: MaterialStateProperty.all(EdgeInsets.zero),
         ),
         onPressed: player.playOrPause,
         color: Colors.white,
-        iconSize: 20,
+        iconSize: 25,
         // iconSize: widget.iconSize ?? _theme(context).buttonBarButtonSize,
         // color: widget.iconColor ?? _theme(context).buttonBarButtonColor,
         icon: AnimatedIcon(

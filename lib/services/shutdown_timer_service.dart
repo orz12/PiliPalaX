@@ -1,6 +1,7 @@
 // 定时关闭服务
 import 'dart:async';
 import 'dart:io';
+import 'package:PiliPalaX/plugin/pl_player/index.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 
@@ -29,8 +30,8 @@ class ShutdownTimerService {
       return;
     }
     SmartDialog.showToast("设置 $scheduledExitInMinutes 分钟后定时关闭");
-    _shutdownTimer = Timer(Duration(minutes: scheduledExitInMinutes),
-        () => _shutdownDecider());
+    _shutdownTimer = Timer(
+        Duration(minutes: scheduledExitInMinutes), () => _shutdownDecider());
   }
 
   void _showTimeUpButPauseDialog() {
@@ -59,7 +60,7 @@ class ShutdownTimerService {
         // Start the 10-second timer to auto close the dialog
         _autoCloseDialogTimer?.cancel();
         _autoCloseDialogTimer = Timer(const Duration(seconds: 10), () {
-          SmartDialog.dismiss();// Close the dialog
+          SmartDialog.dismiss(); // Close the dialog
           _executeShutdown();
         });
         return AlertDialog(
@@ -88,9 +89,12 @@ class ShutdownTimerService {
       _showShutdownDialog();
       return;
     }
-    PlPlayerController plPlayerController = PlPlayerController.getInstance();
+    // PlPlayerController plPlayerController = PlPlayerController.getInstance();
+    PlayerStatus? playerStatus = PlPlayerController.getPlayerStatusIfExists();
     if (!exitApp && !waitForPlayingCompleted) {
-      if (!plPlayerController.playerStatus.playing) {
+      // if (!plPlayerController.playerStatus.playing) {
+      if (playerStatus == PlayerStatus.paused ||
+          playerStatus == PlayerStatus.completed) {
         //仅提示用户
         _showTimeUpButPauseDialog();
       } else {
@@ -99,7 +103,9 @@ class ShutdownTimerService {
       return;
     }
     //waitForPlayingCompleted
-    if (!plPlayerController.playerStatus.playing) {
+    if (playerStatus == PlayerStatus.paused ||
+        playerStatus == PlayerStatus.completed) {
+      // if (!plPlayerController.playerStatus.playing) {
       _showShutdownDialog();
       return;
     }
@@ -108,26 +114,36 @@ class ShutdownTimerService {
     //该方法依赖耦合实现，不够优雅
     isWaiting = true;
   }
-  void handleWaitingFinished(){
-    if(isWaiting){
+
+  void handleWaitingFinished() {
+    if (isWaiting) {
       _showShutdownDialog();
       isWaiting = false;
     }
   }
+
   void _executeShutdown() {
     if (exitApp) {
       //退出app
       exit(0);
     } else {
       //暂停播放
-      PlPlayerController plPlayerController = PlPlayerController.getInstance();
-      if (plPlayerController.playerStatus.playing) {
-        plPlayerController.pause();
+      PlayerStatus? playerStatus = PlPlayerController.getPlayerStatusIfExists();
+      if (playerStatus == PlayerStatus.playing) {
+        PlPlayerController.pauseIfExists();
         waitForPlayingCompleted = true;
         SmartDialog.showToast("已暂停播放");
       } else {
         SmartDialog.showToast("当前未播放");
       }
+      // PlPlayerController plPlayerController = PlPlayerController.getInstance();
+      // if (plPlayerController.playerStatus.playing) {
+      //   plPlayerController.pause();
+      //   waitForPlayingCompleted = true;
+      //   SmartDialog.showToast("已暂停播放");
+      // } else {
+      //   SmartDialog.showToast("当前未播放");
+      // }
     }
   }
 

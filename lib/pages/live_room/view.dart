@@ -34,6 +34,7 @@ class _LiveRoomPageState extends State<LiveRoomPage> {
     }
     videoSourceInit();
     _futureBuilderFuture = _liveRoomController.queryLiveInfo();
+    plPlayerController!.autoEnterFullscreen();
   }
 
   Future<void> videoSourceInit() async {
@@ -43,10 +44,8 @@ class _LiveRoomPageState extends State<LiveRoomPage> {
 
   @override
   void dispose() {
+    floating?.dispose();
     plPlayerController!.dispose();
-    if (floating != null) {
-      floating!.dispose();
-    }
     super.dispose();
   }
 
@@ -75,39 +74,43 @@ class _LiveRoomPageState extends State<LiveRoomPage> {
       backgroundColor: Colors.black,
       body: Stack(
         children: [
-          // Obx(
-          //   () => Positioned.fill(
-          //     child: Opacity(
-          //       opacity: 0.8,
-          //       child: _liveRoomController
-          //                       .roomInfoH5.value.roomInfo?.appBackground !=
-          //                   '' &&
-          //               _liveRoomController
-          //                       .roomInfoH5.value.roomInfo?.appBackground !=
-          //                   null
-          //           ? NetworkImgLayer(
-          //               width: Get.width,
-          //               height: Get.height,
-          //               src: _liveRoomController
-          //                       .roomInfoH5.value.roomInfo?.appBackground ??
-          //                   '',
-          //             )
-          //           : Image.asset(
-          //               'assets/images/live/default_bg.webp',
-          //               width: Get.width,
-          //               height: Get.height,
-          //             ),
-          //     ),
-          //   ),
-          // ),
-          Positioned.fill(
+          Positioned(
+            left: 0,
+            right: 0,
+            bottom: 0,
             child: Opacity(
               opacity: 0.8,
               child: Image.asset(
                 'assets/images/live/default_bg.webp',
-                width: Get.width,
-                height: Get.height,
+                fit: BoxFit.cover,
+                // width: Get.width,
+                // height: Get.height,
               ),
+            ),
+          ),
+          Obx(
+            () => Positioned(
+              left: 0,
+              right: 0,
+              bottom: 0,
+              child: _liveRoomController
+                              .roomInfoH5.value.roomInfo?.appBackground !=
+                          '' &&
+                      _liveRoomController
+                              .roomInfoH5.value.roomInfo?.appBackground !=
+                          null
+                  ? Opacity(
+                      opacity: 0.8,
+                      child: NetworkImgLayer(
+                        width: Get.width,
+                        height: Get.height,
+                        type: 'bg',
+                        src: _liveRoomController
+                                .roomInfoH5.value.roomInfo?.appBackground ??
+                            '',
+                      ),
+                    )
+                  : const SizedBox(),
             ),
           ),
           Column(
@@ -160,6 +163,37 @@ class _LiveRoomPageState extends State<LiveRoomPage> {
                                   ),
                               ],
                             ),
+                            const Spacer(),
+                            //刷新
+                            IconButton(
+                              tooltip: '刷新',
+                              onPressed: () {
+                                _futureBuilderFuture =
+                                    _liveRoomController.queryLiveInfo();
+                                // videoSourceInit();
+                              },
+                              icon: const Icon(Icons.refresh),
+                            ),
+                            //内置浏览器打开
+                            IconButton(
+                              tooltip: '内置浏览器打开',
+                                onPressed: () {
+                                  Get.offNamed(
+                                    '/webview',
+                                    parameters: {
+                                      'url':
+                                          'https://live.bilibili.com/h5/${_liveRoomController.roomId}',
+                                      'type': 'liveRoom',
+                                      'pageTitle': _liveRoomController
+                                          .roomInfoH5
+                                          .value
+                                          .anchorInfo!
+                                          .baseInfo!
+                                          .uname!,
+                                    },
+                                  );
+                                },
+                                icon: const Icon(Icons.open_in_browser)),
                           ],
                         ),
                       );
@@ -177,7 +211,7 @@ class _LiveRoomPageState extends State<LiveRoomPage> {
                   }
                   if (MediaQuery.of(context).orientation ==
                       Orientation.landscape) {
-                    verticalScreen();
+                    verticalScreenForTwoSeconds();
                   }
                 },
                 child: SizedBox(

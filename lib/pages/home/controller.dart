@@ -26,6 +26,7 @@ class HomeController extends GetxController with GetTickerProviderStateMixin {
   late List defaultTabs;
   late List<String> tabbarSort;
   RxString defaultSearch = ''.obs;
+  late bool enableGradientBg;
 
   @override
   void onInit() {
@@ -33,13 +34,15 @@ class HomeController extends GetxController with GetTickerProviderStateMixin {
     userInfo = userInfoCache.get('userInfoCache');
     userLogin.value = userInfo != null;
     userFace.value = userInfo != null ? userInfo.face : '';
-    // 进行tabs配置
-    setTabConfig();
     hideSearchBar =
-        setting.get(SettingBoxKey.hideSearchBar, defaultValue: true);
+        setting.get(SettingBoxKey.hideSearchBar, defaultValue: false);
     if (setting.get(SettingBoxKey.enableSearchWord, defaultValue: true)) {
       searchDefault();
     }
+    enableGradientBg =
+        setting.get(SettingBoxKey.enableGradientBg, defaultValue: true);
+    // 进行tabs配置
+    setTabConfig();
   }
 
   void onRefresh() {
@@ -64,8 +67,11 @@ class HomeController extends GetxController with GetTickerProviderStateMixin {
 
   void setTabConfig() async {
     defaultTabs = [...tabsConfig];
-    tabbarSort = settingStorage.get(SettingBoxKey.tabbarSort,
-        defaultValue: ['live', 'rcmd', 'hot', 'bangumi']);
+    tabbarSort = settingStorage
+        .get(SettingBoxKey.tabbarSort,
+            defaultValue: ['live', 'rcmd', 'hot', 'rank', 'bangumi'])
+        .map<String>((i) => i.toString())
+        .toList();
     defaultTabs.retainWhere(
         (item) => tabbarSort.contains((item['type'] as TabType).id));
     defaultTabs.sort((a, b) => tabbarSort
@@ -88,19 +94,21 @@ class HomeController extends GetxController with GetTickerProviderStateMixin {
       vsync: this,
     );
     // 监听 tabController 切换
-    tabController.animation!.addListener(() {
-      if (tabController.indexIsChanging) {
-        if (initialIndex.value != tabController.index) {
-          initialIndex.value = tabController.index;
+    if (enableGradientBg) {
+      tabController.animation!.addListener(() {
+        if (tabController.indexIsChanging) {
+          if (initialIndex.value != tabController.index) {
+            initialIndex.value = tabController.index;
+          }
+        } else {
+          final int temp = tabController.animation!.value.round();
+          if (initialIndex.value != temp) {
+            initialIndex.value = temp;
+            tabController.index = initialIndex.value;
+          }
         }
-      } else {
-        final int temp = tabController.animation!.value.round();
-        if (initialIndex.value != temp) {
-          initialIndex.value = temp;
-          tabController.index = initialIndex.value;
-        }
-      }
-    });
+      });
+    }
   }
 
   void searchDefault() async {

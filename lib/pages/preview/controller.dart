@@ -36,7 +36,7 @@ class PreviewController extends GetxController {
     final temp = await getTemporaryDirectory();
     SmartDialog.dismiss();
     String imgName =
-        "plpl_pic_${DateTime.now().toString().split('-').join()}.jpg";
+        "PiliPalaX_pic_${DateTime.now().toString().replaceAll(' ', '_').replaceAll(':', '-').split('.').first}.jpg";
     var path = '${temp.path}/$imgName';
     File(path).writeAsBytesSync(response.data);
     Share.shareXFiles([XFile(path)], subject: imgList[initialPage.value]);

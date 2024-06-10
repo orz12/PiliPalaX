@@ -94,71 +94,99 @@ class MineController extends GetxController {
   static onChangeAnonymity(BuildContext context) {
     anonymity = !anonymity;
     if (anonymity) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Column(children: <Widget>[
-            const Row(
-              children: <Widget>[
-                Icon(
-                  Icons.check,
-                  color: Colors.green,
-                ),
-                SizedBox(width: 10),
-                Text('已进入无痕模式', style: TextStyle(fontSize: 15, height: 1.5))
-              ],
-            ),
-            const SizedBox(height: 10),
-            const Text(
-                '搜索、观看视频/直播不携带Cookie与CSRF\n'
-                '不产生查询或播放记录\n'
-                '点赞等其它操作不受影响\n'
-                '（前往隐私设置了解详情）',
-                style: TextStyle(fontSize: 12.5, height: 1.5)),
-            Row(children: [
-              TextButton(
-                  style: ButtonStyle(
-                    foregroundColor: MaterialStateProperty.resolveWith((states) {
-                      return Theme.of(context).snackBarTheme.actionTextColor;
-                    }),
-                  ),
-                  onPressed: () {
-                    GStrorage.setting.put(SettingBoxKey.anonymity, true);
-                    anonymity = true;
-                    SmartDialog.showToast('已设为永久无痕模式');
-                  },
-                  child: const Text('保存为永久')),
-              const SizedBox(width: 10),
-              TextButton(
-                  style: ButtonStyle(
-                    foregroundColor: MaterialStateProperty.resolveWith((states) {
-                      return Theme.of(context).snackBarTheme.actionTextColor;
-                    }),
-                  ),
-                  onPressed: () {
-                    GStrorage.setting.put(SettingBoxKey.anonymity, false);
-                    anonymity = true;
-                    SmartDialog.showToast('已设为临时无痕模式');
-                  },
-                  child: const Text('仅本次（默认）'))
-            ])
-          ]),
-          duration: const Duration(seconds: 2),
-          showCloseIcon: true,
-        ),
-      );
+      SmartDialog.show(
+          clickMaskDismiss: false,
+          usePenetrate: true,
+          displayTime: const Duration(seconds: 2),
+          alignment: Alignment.bottomCenter,
+          builder: (context) {
+            return ColoredBox(
+              color: Theme.of(context).colorScheme.secondaryContainer,
+              child: Padding(
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 15, horizontal: 20),
+                  child:
+                      Column(mainAxisSize: MainAxisSize.min, children: <Widget>[
+                    const Row(
+                      children: <Widget>[
+                        Icon(
+                          Icons.check,
+                          color: Colors.green,
+                        ),
+                        SizedBox(width: 10),
+                        Text('已进入无痕模式',
+                            style: TextStyle(fontSize: 15, height: 1.5))
+                      ],
+                    ),
+                    const SizedBox(height: 10),
+                    const Text(
+                        '搜索、观看视频/直播不携带Cookie与CSRF\n'
+                        '不产生查询或播放记录\n'
+                        '点赞等其它操作不受影响\n'
+                        '（前往隐私设置了解详情）',
+                        style: TextStyle(fontSize: 12.5, height: 1.5)),
+                    Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          TextButton(
+                              onPressed: () {
+                                SmartDialog.dismiss();
+                                GStrorage.setting
+                                    .put(SettingBoxKey.anonymity, true);
+                                anonymity = true;
+                                SmartDialog.showToast('已设为永久无痕模式');
+                              },
+                              child: Text(
+                                '保存为永久',
+                                style: TextStyle(
+                                  color: Theme.of(context).colorScheme.primary,
+                                ),
+                              )),
+                          const SizedBox(width: 10),
+                          TextButton(
+                              onPressed: () {
+                                SmartDialog.dismiss();
+                                GStrorage.setting
+                                    .put(SettingBoxKey.anonymity, false);
+                                anonymity = true;
+                                SmartDialog.showToast('已设为临时无痕模式');
+                              },
+                              child: Text(
+                                '仅本次（默认）',
+                                style: TextStyle(
+                                  color: Theme.of(context).colorScheme.primary,
+                                ),
+                              )),
+                        ]),
+                  ])),
+              // duration: const Duration(seconds: 2),
+              // showCloseIcon: true,
+            );
+          });
     } else {
       GStrorage.setting.put(SettingBoxKey.anonymity, false);
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('已退出无痕模式'),
-          duration: Duration(seconds: 1),
-          // action: SnackBarAction(
-          //   label: '确认',
-          //   onPressed: () {},
-          // ),
-          showCloseIcon: true,
-        ),
-      );
+      SmartDialog.show(
+          clickMaskDismiss: false,
+          usePenetrate: true,
+          displayTime: const Duration(seconds: 1),
+          alignment: Alignment.bottomCenter,
+          builder: (context) {
+            return ColoredBox(
+                color: Theme.of(context).colorScheme.secondaryContainer,
+                child: const Padding(
+                    padding: EdgeInsets.symmetric(vertical: 15, horizontal: 20),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        Icon(
+                          Icons.check,
+                          color: Colors.green,
+                        ),
+                        SizedBox(width: 10),
+                        Text('已退出无痕模式'),
+                      ],
+                    )));
+          });
     }
   }
 

@@ -37,7 +37,7 @@ class _LogsPageState extends State<LogsPage> {
       return item
           .replaceAll(
               '============================== CATCHER 2 LOG ==============================',
-              'PiliPalaX错误日志 \n ********************')
+              'PiliPalaX错误日志\n********************')
           .replaceAll('DEVICE INFO', '设备信息')
           .replaceAll('APP INFO', '应用信息')
           .replaceAll('ERROR', '错误信息')
@@ -52,10 +52,10 @@ class _LogsPageState extends State<LogsPage> {
             if (l.startsWith("Crash occurred on")) {
               try {
                 date = DateTime.parse(
-                  l.split("Crash occurred on")[1].trim().split('.')[0],
+                  l.split("Crash occurred on")[1].trim(),//.split('.')[0],
                 );
               } catch (e) {
-                print(e.toString());
+                debugPrint(e.toString());
                 date = l.toString();
               }
               return "";

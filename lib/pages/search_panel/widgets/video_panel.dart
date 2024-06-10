@@ -5,53 +5,31 @@ import 'package:PiliPalaX/common/widgets/video_card_h.dart';
 import 'package:PiliPalaX/models/common/search_type.dart';
 import 'package:PiliPalaX/pages/search_panel/index.dart';
 
+import '../../../common/constants.dart';
+import '../../../utils/grid.dart';
+
 class SearchVideoPanel extends StatelessWidget {
   SearchVideoPanel({
-    this.ctr,
-    this.list,
+    required this.ctr,
+    required this.list,
     Key? key,
   }) : super(key: key);
 
-  final SearchPanelController? ctr;
-  final List? list;
+  final SearchPanelController ctr;
+  final List list;
 
   final VideoPanelController controller = Get.put(VideoPanelController());
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      alignment: Alignment.topCenter,
+    return Column(
       children: [
-        Padding(
-          padding: const EdgeInsets.only(top: 36),
-          child: ListView.builder(
-            controller: ctr!.scrollController,
-            addAutomaticKeepAlives: false,
-            addRepaintBoundaries: false,
-            itemCount: list!.length,
-            itemBuilder: (context, index) {
-              var i = list![index];
-              return Padding(
-                padding: index == 0
-                    ? const EdgeInsets.only(top: 2)
-                    : EdgeInsets.zero,
-                child: VideoCardH(videoItem: i, showPubdate: true),
-              );
-            },
-          ),
-        ),
         // 分类筛选
         Container(
-          width: double.infinity,
-          height: 36,
-          padding: const EdgeInsets.only(left: 8, top: 0, right: 12),
-          // decoration: BoxDecoration(
-          //   border: Border(
-          //     bottom: BorderSide(
-          //       color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
-          //     ),
-          //   ),
-          // ),
+          width: context.width,
+          height: 34,
+          padding: const EdgeInsets.only(
+              left: StyleString.safeSpace, top: 0, right: 12),
           child: Row(
             children: [
               Expanded(
@@ -67,11 +45,12 @@ class SearchVideoPanel extends StatelessWidget {
                             type: i['type'],
                             selectedType: controller.selectedType.value,
                             callFn: (bool selected) async {
+                              print('selected: $selected');
                               controller.selectedType.value = i['type'];
-                              ctr!.order.value =
+                              ctr.order.value =
                                   i['type'].toString().split('.').last;
                               SmartDialog.showLoading(msg: 'loading');
-                              await ctr!.onRefresh();
+                              await ctr.onRefresh();
                               SmartDialog.dismiss();
                             },
                           ),
@@ -87,10 +66,11 @@ class SearchVideoPanel extends StatelessWidget {
                 width: 32,
                 height: 32,
                 child: IconButton(
+                  tooltip: '筛选',
                   style: ButtonStyle(
                     padding: MaterialStateProperty.all(EdgeInsets.zero),
                   ),
-                  onPressed: () => controller.onShowFilterDialog(ctr),
+                  onPressed: () => controller.onShowFilterDialog(context, ctr),
                   icon: Icon(
                     Icons.filter_list_outlined,
                     size: 18,
@@ -100,7 +80,30 @@ class SearchVideoPanel extends StatelessWidget {
               ),
             ],
           ),
-        ), // 放置在ListView.builder()上方的组件
+        ),
+        Expanded(
+            child: CustomScrollView(
+          controller: ctr.scrollController,
+          slivers: [
+            SliverPadding(
+                padding: const EdgeInsets.all(StyleString.safeSpace),
+                sliver: SliverGrid(
+                  gridDelegate: SliverGridDelegateWithExtentAndRatio(
+                      mainAxisSpacing: StyleString.safeSpace,
+                      crossAxisSpacing: StyleString.safeSpace,
+                      maxCrossAxisExtent: Grid.maxRowWidth * 2,
+                      childAspectRatio: StyleString.aspectRatio * 2.3,
+                      mainAxisExtent: 0),
+                  delegate: SliverChildBuilderDelegate(
+                    (BuildContext context, int index) {
+                      return VideoCardH(
+                          videoItem: list[index], showPubdate: true);
+                    },
+                    childCount: list.length,
+                  ),
+                )),
+          ],
+        )),
       ],
     );
   }
@@ -125,7 +128,7 @@ class CustomFilterChip extends StatelessWidget {
     return SizedBox(
       height: 34,
       child: FilterChip(
-        padding: const EdgeInsets.only(left: 11, right: 11),
+        padding: const EdgeInsets.only(left: 8, right: 8),
         labelPadding: EdgeInsets.zero,
         label: Text(
           label!,
@@ -175,10 +178,10 @@ class VideoPanelController extends GetxController {
     super.onInit();
   }
 
-  onShowFilterDialog(searchPanelCtr) {
-    SmartDialog.show(
-      animationType: SmartAnimationType.centerFade_otherSlide,
-      builder: (BuildContext context) {
+  onShowFilterDialog(BuildContext context, SearchPanelController searchPanelCtr) {
+    showDialog(
+    context: context,
+    builder: (context) {
         TextStyle textStyle = Theme.of(context).textTheme.titleMedium!;
         return AlertDialog(
           title: const Text('时长筛选'),

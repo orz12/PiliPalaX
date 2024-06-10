@@ -1,4 +1,5 @@
-PiliPala is a third-party Bilibili client developed in Flutter.
+PiliPalaX is a third-party Bilibili client developed in Flutter, 
+fork from PiliPala (https://github.com/guozhigq/pilipala).
 
 Top Features:
 

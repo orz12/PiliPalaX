@@ -90,7 +90,7 @@ class Stat {
   Stat({
     this.aid,
     this.view,
-    this.danmaku,
+    this.danmu,
     this.reply,
     this.favorite,
     this.coin,
@@ -105,7 +105,7 @@ class Stat {
 
   int? aid;
   int? view;
-  int? danmaku;
+  int? danmu;
   int? reply;
   int? favorite;
   int? coin;
@@ -120,7 +120,7 @@ class Stat {
   Stat.fromJson(Map<String, dynamic> json) {
     aid = json["aid"];
     view = json["view"];
-    danmaku = json['danmaku'];
+    danmu = json['danmaku'];
     reply = json["reply"];
     favorite = json["favorite"];
     coin = json['coin'];

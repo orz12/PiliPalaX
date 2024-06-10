@@ -41,6 +41,7 @@ class _FollowPageState extends State<FollowPage> {
           IconButton(
             onPressed: () => Get.toNamed('/followSearch?mid=$mid'),
             icon: const Icon(Icons.search_outlined),
+            tooltip: '搜索'
           ),
           PopupMenuButton(
             icon: const Icon(Icons.more_vert),

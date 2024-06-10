@@ -51,18 +51,17 @@ class HistoryController extends GetxController {
   }
 
   // 暂停观看历史
-  Future onPauseHistory() async {
-    SmartDialog.show(
-      useSystem: true,
-      animationType: SmartAnimationType.centerFade_otherSlide,
-      builder: (BuildContext context) {
+  Future onPauseHistory(BuildContext context) async {
+    await showDialog(
+      context: context,
+      builder: (context) {
         return AlertDialog(
           title: const Text('提示'),
           content:
               Text(!pauseStatus.value ? '啊叻？你要暂停历史记录功能吗？' : '啊叻？要恢复历史记录功能吗？'),
           actions: [
             TextButton(
-                onPressed: () => SmartDialog.dismiss(),
+                onPressed: () => Get.back(),
                 child: const Text('取消')),
             TextButton(
               onPressed: () async {
@@ -75,7 +74,7 @@ class HistoryController extends GetxController {
                   pauseStatus.value = !pauseStatus.value;
                   localCache.put(LocalCacheKey.historyPause, pauseStatus.value);
                 }
-                SmartDialog.dismiss();
+                Get.back();
               },
               child: Text(!pauseStatus.value ? '确认暂停' : '确认恢复'),
             )
@@ -88,22 +87,25 @@ class HistoryController extends GetxController {
   // 观看历史暂停状态
   Future historyStatus() async {
     var res = await UserHttp.historyStatus();
-    pauseStatus.value = res.data['data'];
-    localCache.put(LocalCacheKey.historyPause, res.data['data']);
+    if (res['status']) {
+      pauseStatus.value = res['data'];
+      localCache.put(LocalCacheKey.historyPause, res['data']);
+    } else {
+      SmartDialog.showToast(res['msg']);
+    }
   }
 
   // 清空观看历史
-  Future onClearHistory() async {
-    SmartDialog.show(
-      useSystem: true,
-      animationType: SmartAnimationType.centerFade_otherSlide,
-      builder: (BuildContext context) {
+  Future onClearHistory(BuildContext context) async {
+    await showDialog(
+      context: context,
+      builder: (context) {
         return AlertDialog(
           title: const Text('提示'),
           content: const Text('啊叻？你要清空历史记录功能吗？'),
           actions: [
             TextButton(
-                onPressed: () => SmartDialog.dismiss(),
+                onPressed: () => Get.back(),
                 child: const Text('取消')),
             TextButton(
               onPressed: () async {
@@ -113,7 +115,7 @@ class HistoryController extends GetxController {
                 if (res.data['code'] == 0) {
                   SmartDialog.showToast('清空观看历史');
                 }
-                SmartDialog.dismiss();
+                Get.back();
                 historyList.clear();
               },
               child: const Text('确认清空'),
@@ -154,17 +156,16 @@ class HistoryController extends GetxController {
   }
 
   // 删除选中的记录
-  Future onDelCheckedHistory() async {
-    SmartDialog.show(
-      useSystem: true,
-      animationType: SmartAnimationType.centerFade_otherSlide,
-      builder: (BuildContext context) {
+  Future onDelCheckedHistory(BuildContext context) async {
+    await showDialog(
+      context: context,
+      builder: (context) {
         return AlertDialog(
           title: const Text('提示'),
           content: const Text('确认删除所选历史记录吗？'),
           actions: [
             TextButton(
-              onPressed: () => SmartDialog.dismiss(),
+              onPressed: () => Get.back(),
               child: Text(
                 '取消',
                 style: TextStyle(
@@ -175,7 +176,7 @@ class HistoryController extends GetxController {
             TextButton(
               onPressed: () async {
                 /// TODO 优化
-                await SmartDialog.dismiss();
+                Get.back();
                 SmartDialog.showLoading(msg: '请求中');
                 List<HisListItem> result =
                     historyList.where((e) => e.checked!).toList();

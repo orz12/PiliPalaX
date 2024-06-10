@@ -8,6 +8,7 @@ import 'package:PiliPalaX/utils/feed_back.dart';
 import 'package:PiliPalaX/utils/login.dart';
 import 'package:PiliPalaX/utils/storage.dart';
 import '../../models/common/dynamic_badge_mode.dart';
+import '../../models/common/nav_bar_config.dart';
 import '../main/index.dart';
 import 'widgets/select_dialog.dart';
 
@@ -24,6 +25,7 @@ class SettingController extends GetxController {
   Rx<ThemeType> themeType = ThemeType.system.obs;
   var userInfo;
   Rx<DynamicBadgeMode> dynamicBadgeType = DynamicBadgeMode.number.obs;
+  RxInt defaultHomePage = 0.obs;
 
   @override
   void onInit() {
@@ -42,19 +44,20 @@ class SettingController extends GetxController {
     dynamicBadgeType.value = DynamicBadgeMode.values[setting.get(
         SettingBoxKey.dynamicBadgeMode,
         defaultValue: DynamicBadgeMode.number.code)];
+    defaultHomePage.value =
+        setting.get(SettingBoxKey.defaultHomePage, defaultValue: 0);
   }
 
-  loginOut() async {
-    SmartDialog.show(
-      useSystem: true,
-      animationType: SmartAnimationType.centerFade_otherSlide,
-      builder: (BuildContext context) {
+  loginOut(BuildContext context) async {
+    await showDialog(
+      context: context,
+      builder: (context) {
         return AlertDialog(
           title: const Text('提示'),
           content: const Text('确认要退出登录吗'),
           actions: [
             TextButton(
-              onPressed: () => SmartDialog.dismiss(),
+              onPressed: () => Get.back(),
               child: const Text('点错了'),
             ),
             TextButton(
@@ -69,7 +72,7 @@ class SettingController extends GetxController {
                     .put(LocalCacheKey.accessKey, {'mid': -1, 'value': ''});
 
                 await LoginUtils.refreshLoginStatus(false);
-                SmartDialog.dismiss().then((value) => Get.back());
+                Get.back();
               },
               child: const Text('确认'),
             )
@@ -104,12 +107,32 @@ class SettingController extends GetxController {
       dynamicBadgeType.value = result;
       setting.put(SettingBoxKey.dynamicBadgeMode, result.code);
       MainController mainController = Get.put(MainController());
-      mainController.dynamicBadgeType.value =
+      mainController.dynamicBadgeType =
           DynamicBadgeMode.values[result.code];
-      if (mainController.dynamicBadgeType.value != DynamicBadgeMode.hidden) {
+      if (mainController.dynamicBadgeType != DynamicBadgeMode.hidden) {
         mainController.getUnreadDynamic();
       }
       SmartDialog.showToast('设置成功');
+    }
+  }
+
+  // 设置默认启动页
+  seteDefaultHomePage(BuildContext context) async {
+    int? result = await showDialog(
+      context: context,
+      builder: (context) {
+        return SelectDialog<int>(
+            title: '首页启动页',
+            value: defaultHomePage.value,
+            values: defaultNavigationBars.map((e) {
+              return {'title': e['label'], 'value': e['id']};
+            }).toList());
+      },
+    );
+    if (result != null) {
+      defaultHomePage.value = result;
+      setting.put(SettingBoxKey.defaultHomePage, result);
+      SmartDialog.showToast('设置成功，重启生效');
     }
   }
 }

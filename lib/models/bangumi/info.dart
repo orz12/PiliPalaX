@@ -78,7 +78,7 @@ class BangumiInfoModel {
   String? title;
   int? total;
   int? type;
-  Map? userStatus;
+  UserStatus? userStatus;
   String? staff;
 
   BangumiInfoModel.fromJson(Map<String, dynamic> json) {
@@ -121,7 +121,9 @@ class BangumiInfoModel {
     title = json['title'];
     total = json['total'];
     type = json['type'];
-    userStatus = json['user_status'];
+    if (json['user_status'] != null) {
+      userStatus = UserStatus.fromJson(json['user_status']);
+    }
     staff = json['staff'];
   }
 }
@@ -138,6 +140,7 @@ class EpisodeItem {
     this.dimension,
     this.duration,
     this.enableVt,
+    this.epId,
     this.from,
     this.id,
     this.isViewHide,
@@ -167,6 +170,7 @@ class EpisodeItem {
   Map? dimension;
   int? duration;
   bool? enableVt;
+  int? epId;
   String? from;
   int? id;
   bool? isViewHide;
@@ -196,6 +200,7 @@ class EpisodeItem {
     dimension = json['dimension'];
     duration = json['duration'];
     enableVt = json['enable_vt'];
+    epId = json['ep_id'];
     from = json['from'];
     id = json['id'];
     isViewHide = json['is_view_hide'];
@@ -213,5 +218,78 @@ class EpisodeItem {
     subtitle = json['subtitle'];
     title = json['title'];
     vid = json['vid'];
+  }
+}
+
+class UserStatus {
+  UserStatus({
+    this.areaLimit,
+    this.banAreaShow,
+    this.follow,
+    this.followStatus,
+    this.login,
+    this.pay,
+    this.payPackPaid,
+    this.progress,
+    this.sponsor,
+    this.vipInfo,
+  });
+  int? areaLimit;
+  int? banAreaShow;
+  int? follow;
+  int? followStatus;
+  int? login;
+  int? pay;
+  int? payPackPaid;
+  UserProgress? progress;
+  int? sponsor;
+  VipInfo? vipInfo;
+  UserStatus.fromJson(Map<String, dynamic> json) {
+    areaLimit = json['area_limit'];
+    banAreaShow = json['ban_area_show'];
+    follow = json['follow'];
+    followStatus = json['follow_status'];
+    login = json['login'];
+    pay = json['pay'];
+    payPackPaid = json['pay_pack_paid'];
+    if (json['progress'] != null) {
+      progress = UserProgress.fromJson(json['progress']);
+    }
+    sponsor = json['sponsor'];
+    if (json['vip_info'] != null) {
+      vipInfo = VipInfo.fromJson(json['vip_info']);
+    }
+  }
+}
+
+class UserProgress {
+  UserProgress({
+    this.lastEpId,
+    this.lastEpIndex,
+    this.lastTime,
+  });
+  int? lastEpId;
+  String? lastEpIndex;
+  int? lastTime;
+  UserProgress.fromJson(Map<String, dynamic> json) {
+    lastEpId = json['last_ep_id'];
+    lastEpIndex = json['last_ep_index'];
+    lastTime = json['last_time'];
+  }
+}
+
+class VipInfo {
+  VipInfo({
+    this.dueDate,
+    this.status,
+    this.type,
+  });
+  int? dueDate;
+  int? status;
+  int? type;
+  VipInfo.fromJson(Map<String, dynamic> json) {
+    dueDate = json['due_date'];
+    status = json['status'];
+    type = json['type'];
   }
 }

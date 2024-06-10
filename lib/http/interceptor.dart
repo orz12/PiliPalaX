@@ -45,10 +45,15 @@ class ApiInterceptor extends Interceptor {
   void onError(DioException err, ErrorInterceptorHandler handler) async {
     // 处理网络请求错误
     // handler.next(err);
-    SmartDialog.showToast(
-      await dioError(err),
-      displayType: SmartToastType.onlyRefresh,
-    );
+    String url = err.requestOptions.uri.toString();
+    print('🌹🌹ApiInterceptor: $url');
+    if (!url.contains('heartbeat')) {
+      SmartDialog.showToast(
+        await dioError(err),
+        displayType: SmartToastType.onlyRefresh,
+        displayTime: const Duration(milliseconds: 1500),
+      );
+    }
     super.onError(err, handler);
   }
 

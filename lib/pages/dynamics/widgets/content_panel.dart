@@ -45,7 +45,9 @@ class _ContentState extends State<Content> {
     if (len == 1) {
       OpusPicsModel pictureItem = pics.first;
       picList.add(pictureItem.url!);
-      spanChilds.add(const TextSpan(text: '\n'));
+
+      /// 图片上方的空白间隔
+      // spanChilds.add(const TextSpan(text: '\n'));
       spanChilds.add(
         WidgetSpan(
           child: LayoutBuilder(
@@ -57,40 +59,42 @@ class _ContentState extends State<Content> {
                   (pictureItem.height != null && pictureItem.width != null
                       ? pictureItem.height! / pictureItem.width!
                       : 1);
-              return GestureDetector(
-                onTap: () {
-                  showDialog(
-                    useSafeArea: false,
-                    context: context,
-                    builder: (context) {
-                      return ImagePreview(initialPage: 0, imgList: picList);
+              return Semantics(
+                  label: '图片1,共1张',
+                  child: GestureDetector(
+                    onTap: () {
+                      showDialog(
+                        useSafeArea: false,
+                        context: context,
+                        builder: (context) {
+                          return ImagePreview(initialPage: 0, imgList: picList);
+                        },
+                      );
                     },
-                  );
-                },
-                child: Container(
-                    padding: const EdgeInsets.only(top: 4),
-                    constraints: BoxConstraints(maxHeight: maxHeight),
-                    width: box.maxWidth / 2,
-                    height: height,
-                    child: Stack(
-                      children: [
-                        Positioned.fill(
-                          child: NetworkImgLayer(
-                            src: pictureItem.url,
-                            width: maxWidth / 2,
-                            height: height,
-                          ),
-                        ),
-                        height > Get.size.height * 0.9
-                            ? const PBadge(
-                                text: '长图',
-                                right: 8,
-                                bottom: 8,
-                              )
-                            : const SizedBox(),
-                      ],
-                    )),
-              );
+                    child: Container(
+                        padding: const EdgeInsets.only(top: 4),
+                        constraints: BoxConstraints(maxHeight: maxHeight),
+                        width: box.maxWidth / 2,
+                        height: height,
+                        child: Stack(
+                          children: [
+                            Positioned.fill(
+                              child: NetworkImgLayer(
+                                src: pictureItem.url,
+                                width: maxWidth / 2,
+                                height: height,
+                              ),
+                            ),
+                            height > Get.size.height * 0.9
+                                ? const PBadge(
+                                    text: '长图',
+                                    right: 8,
+                                    bottom: 8,
+                                  )
+                                : const SizedBox(),
+                          ],
+                        )),
+                  ));
             },
           ),
         ),
@@ -104,24 +108,26 @@ class _ContentState extends State<Content> {
           LayoutBuilder(
             builder: (context, BoxConstraints box) {
               double maxWidth = box.maxWidth.truncateToDouble();
-              return GestureDetector(
-                onTap: () {
-                  showDialog(
-                    useSafeArea: false,
-                    context: context,
-                    builder: (context) {
-                      return ImagePreview(initialPage: i, imgList: picList);
+              return Semantics(
+                  label: '图片${i + 1},共$len张',
+                  child: GestureDetector(
+                    onTap: () {
+                      showDialog(
+                        useSafeArea: false,
+                        context: context,
+                        builder: (context) {
+                          return ImagePreview(initialPage: i, imgList: picList);
+                        },
+                      );
                     },
-                  );
-                },
-                child: NetworkImgLayer(
-                  src: pics[i].url,
-                  width: maxWidth,
-                  height: maxWidth,
-                  origAspectRatio:
-                      pics[i].width!.toInt() / pics[i].height!.toInt(),
-                ),
-              );
+                    child: NetworkImgLayer(
+                      src: pics[i].url,
+                      width: maxWidth,
+                      height: maxWidth,
+                      origAspectRatio:
+                          pics[i].width!.toInt() / pics[i].height!.toInt(),
+                    ),
+                  ));
             },
           ),
         );
@@ -191,13 +197,16 @@ class _ContentState extends State<Content> {
                 /// fix 默认20px高度
                 style: const TextStyle(height: 0),
                 richNode(widget.item, context),
-                maxLines: widget.source == 'detail' ? 999 : 3,
+                maxLines: 999,
                 overflow: TextOverflow.ellipsis,
               ),
             ),
           ),
           if (hasPics) ...[
-            Text.rich(picsNodes()),
+            Text.rich(
+              picsNodes(),
+              // semanticsLabel: '动态图片',
+            ),
           ]
         ],
       ),

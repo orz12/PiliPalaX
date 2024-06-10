@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import '../http/search.dart';
 import '../models/common/search_type.dart';
 import 'id_utils.dart';
+import 'url_utils.dart';
 import 'utils.dart';
 
 class PiliSchame {
@@ -13,48 +14,41 @@ class PiliSchame {
     ///
     final SchemeEntity? value = await appScheme.getInitScheme();
     if (value != null) {
-      _routePush(value);
+      routePush(value);
     }
 
     /// 完整链接进入 b23.无效
     appScheme.getLatestScheme().then((SchemeEntity? value) {
       if (value != null) {
-        _fullPathPush(value);
+        routePush(value);
       }
     });
 
     /// 注册从外部打开的Scheme监听信息 #
     appScheme.registerSchemeListener().listen((SchemeEntity? event) {
       if (event != null) {
-        _routePush(event);
+        routePush(event);
       }
     });
   }
 
   /// 路由跳转
-  static void _routePush(value) async {
-    final String scheme = value.scheme;
-    final String host = value.host;
-    final String path = value.path;
+  static void routePush(SchemeEntity value) async {
+    final String scheme = value.scheme!;
+    final String host = value.host!;
+    final String path = value.path!;
 
     if (scheme == 'bilibili') {
-      // bilibili://root
       if (host == 'root') {
         Navigator.popUntil(
             Get.context!, (Route<dynamic> route) => route.isFirst);
-      }
-
-      // bilibili://space/{uid}
-      else if (host == 'space') {
+      } else if (host == 'space') {
         final String mid = path.split('/').last;
         Get.toNamed<dynamic>(
           '/member?mid=$mid',
           arguments: <String, dynamic>{'face': null},
         );
-      }
-
-      // bilibili://video/{aid}
-      else if (host == 'video') {
+      } else if (host == 'video') {
         String pathQuery = path.split('/').last;
         final numericRegex = RegExp(r'^[0-9]+$');
         if (numericRegex.hasMatch(pathQuery)) {
@@ -62,30 +56,22 @@ class PiliSchame {
         }
         Map map = IdUtils.matchAvorBv(input: pathQuery);
         if (map.containsKey('AV')) {
-          _videoPush(map['AV'], null);
+          videoPush(map['AV'], null);
         } else if (map.containsKey('BV')) {
-          _videoPush(null, map['BV']);
+          videoPush(null, map['BV']);
         } else {
           SmartDialog.showToast('投稿匹配失败');
         }
-      }
-
-      // bilibili://live/{roomid}
-      else if (host == 'live') {
+      } else if (host == 'live') {
         final String roomId = path.split('/').last;
         Get.toNamed<dynamic>('/liveRoom?roomid=$roomId',
             arguments: <String, String?>{'liveItem': null, 'heroTag': roomId});
-      }
-
-      // bilibili://bangumi/season/${ssid}
-      else if (host == 'bangumi') {
+      } else if (host == 'bangumi') {
         if (path.startsWith('/season')) {
           final String seasonId = path.split('/').last;
-          _bangumiPush(int.parse(seasonId));
+          bangumiPush(int.parse(seasonId), null);
         }
-      }
-      // 专栏 bilibili://opus/detail/883089655985078289
-      else if (host == 'opus') {
+      } else if (host == 'opus') {
         if (path.startsWith('/detail')) {
           var opusId = path.split('/').last;
           Get.toNamed(
@@ -99,12 +85,36 @@ class PiliSchame {
         }
       } else if (host == 'search') {
         Get.toNamed('/searchResult', parameters: {'keyword': ''});
+      } else if (host == 'article') {
+        final String id = path.split('/').last.split('?').first;
+        Get.toNamed(
+          '/htmlRender',
+          parameters: {
+            'url': 'www.bilibili.com/read/cv$id',
+            'title': '',
+            'id': 'cv$id',
+            'dynamicType': 'read'
+          },
+        );
+      } else {
+        print(value.dataString);
+        SmartDialog.showToast('未知路径:${value.dataString}，请截图反馈给开发者');
+        // Get.toNamed(
+        //   '/webview',
+        //   parameters: {
+        //     'url': value.dataString ?? "",
+        //     'type': 'url',
+        //     'pageTitle': ''
+        //   },
+        // );
       }
+    } else if (scheme == 'https') {
+      fullPathPush(value);
     }
   }
 
   // 投稿跳转
-  static Future<void> _videoPush(int? aidVal, String? bvidVal) async {
+  static Future<void> videoPush(int? aidVal, String? bvidVal) async {
     SmartDialog.showLoading<dynamic>(msg: '获取中...');
     try {
       int? aid = aidVal;
@@ -131,10 +141,11 @@ class PiliSchame {
   }
 
   // 番剧跳转
-  static Future<void> _bangumiPush(int seasonId) async {
+  static Future<void> bangumiPush(int? seasonId, int? epId) async {
+    print('seasonId: $seasonId, epId: $epId');
     SmartDialog.showLoading<dynamic>(msg: '获取中...');
     try {
-      var result = await SearchHttp.bangumiInfo(seasonId: seasonId, epId: null);
+      var result = await SearchHttp.bangumiInfo(seasonId: seasonId, epId: epId);
       if (result['status']) {
         var bangumiDetail = result['data'];
         final int cid = bangumiDetail.episodes!.first.cid;
@@ -151,56 +162,135 @@ class PiliSchame {
             },
           ),
         );
+      } else {
+        SmartDialog.showToast(result['msg']);
       }
     } catch (e) {
       SmartDialog.showToast('番剧获取失败：$e');
     }
   }
 
-  static Future<void> _fullPathPush(SchemeEntity value) async {
+  static Future<void> fullPathPush(SchemeEntity value) async {
     // https://m.bilibili.com/bangumi/play/ss39708
     // https | m.bilibili.com | /bangumi/play/ss39708
     // final String scheme = value.scheme!;
     final String host = value.host!;
     final String? path = value.path;
-    // Map<String, String> query = value.query!;
-    if (host.startsWith('live.bilibili')) {
+    Map<String, String>? query = value.query;
+    RegExp regExp = RegExp(r'^((www\.)|(m\.))?bilibili\.com$');
+    if (regExp.hasMatch(host)) {
+      print('bilibili.com');
+    } else if (host.contains('live')) {
       int roomId = int.parse(path!.split('/').last);
-      // print('直播');
-      Get.toNamed('/liveRoom?roomid=$roomId',
-          arguments: {'liveItem': null, 'heroTag': roomId.toString()});
+      Get.toNamed(
+        '/liveRoom?roomid=$roomId',
+        arguments: {'liveItem': null, 'heroTag': roomId.toString()},
+      );
       return;
-    }
-    if (host.startsWith('space.bilibili')) {
-      print('个人空间');
+    } else if (host.contains('space')) {
+      var mid = path!.split('/').last;
+      Get.toNamed('/member?mid=$mid', arguments: {'face': ''});
+      return;
+    } else if (host == 'b23.tv') {
+      final String fullPath = 'https://$host$path';
+      final String redirectUrl = await UrlUtils.parseRedirectUrl(fullPath);
+      final String pathSegment = Uri.parse(redirectUrl).path;
+      final String lastPathSegment = pathSegment.split('/').last;
+      final RegExp avRegex = RegExp(r'^[aA][vV]\d+', caseSensitive: false);
+      if (avRegex.hasMatch(lastPathSegment)) {
+        final Map<String, dynamic> map =
+            IdUtils.matchAvorBv(input: lastPathSegment);
+        if (map.containsKey('AV')) {
+          videoPush(map['AV']! as int, null);
+        } else if (map.containsKey('BV')) {
+          videoPush(null, map['BV'] as String);
+        } else {
+          SmartDialog.showToast('投稿匹配失败');
+        }
+      } else if (lastPathSegment.startsWith('ep')) {
+        handleEpisodePath(lastPathSegment, redirectUrl);
+      } else if (lastPathSegment.startsWith('ss')) {
+        handleSeasonPath(lastPathSegment, redirectUrl);
+      } else if (lastPathSegment.startsWith('BV')) {
+        UrlUtils.matchUrlPush(
+          lastPathSegment,
+          '',
+          redirectUrl,
+        );
+      } else {
+        Get.toNamed(
+          '/webview',
+          parameters: {'url': redirectUrl, 'type': 'url', 'pageTitle': ''},
+        );
+      }
       return;
     }
 
     if (path != null) {
-      final String area = path.split('/')[1];
+      List<String> pathPart = path.split('/');
+      final String area = pathPart[1] == 'mobile' ? pathPart[2] : pathPart[1];
       switch (area) {
         case 'bangumi':
-          // print('番剧');
-          final String seasonId = path.split('/').last;
-          _bangumiPush(matchNum(seasonId).first);
+          print('番剧');
+          for (var pathSegment in pathPart) {
+            if (pathSegment.startsWith('ss')) {
+              print(pathSegment);
+              bangumiPush(matchNum(pathSegment).first, null);
+              break;
+            } else if (pathSegment.startsWith('ep')) {
+              print(pathSegment);
+              bangumiPush(null, matchNum(pathSegment).first);
+              break;
+            }
+          }
           break;
         case 'video':
-          // print('投稿');
+          print('投稿');
           final Map<String, dynamic> map = IdUtils.matchAvorBv(input: path);
           if (map.containsKey('AV')) {
-            _videoPush(map['AV']! as int, null);
+            videoPush(map['AV']! as int, null);
           } else if (map.containsKey('BV')) {
-            _videoPush(null, map['BV'] as String);
+            videoPush(null, map['BV'] as String);
           } else {
             SmartDialog.showToast('投稿匹配失败');
           }
           break;
         case 'read':
           print('专栏');
+          late String id;
+          if (query != null && query!['id'] != null) {
+            id = 'cv${matchNum(query!['id']!).first}';
+          } else {
+            id = 'cv${matchNum(path).first}';
+          }
+          Get.toNamed('/htmlRender', parameters: {
+            'url': value.dataString!,
+            'title': '',
+            'id': id,
+            'dynamicType': 'read'
+          });
           break;
         case 'space':
           print('个人空间');
+          Get.toNamed('/member?mid=$area', arguments: {'face': ''});
           break;
+        default:
+          var res = IdUtils.matchAvorBv(input: area.split('?').first);
+          if (res.containsKey('AV')) {
+            videoPush(res['AV']! as int, null);
+          } else if (res.containsKey('BV')) {
+            videoPush(null, res['BV'] as String);
+          } else {
+            SmartDialog.showToast('未知路径或匹配错误:${value.dataString}，先采用浏览器打开');
+            Get.toNamed(
+              '/webview',
+              parameters: {
+                'url': value.dataString ?? "",
+                'type': 'url',
+                'pageTitle': ''
+              },
+            );
+          }
       }
     }
   }
@@ -210,5 +300,19 @@ class PiliSchame {
     final Iterable<Match> matches = regExp.allMatches(str);
 
     return matches.map((Match match) => int.parse(match.group(0)!)).toList();
+  }
+
+  static void handleEpisodePath(String lastPathSegment, String redirectUrl) {
+    final String seasonId = extractIdFromPath(lastPathSegment);
+    bangumiPush(null, matchNum(seasonId).first);
+  }
+
+  static void handleSeasonPath(String lastPathSegment, String redirectUrl) {
+    final String seasonId = extractIdFromPath(lastPathSegment);
+    bangumiPush(matchNum(seasonId).first, null);
+  }
+
+  static String extractIdFromPath(String lastPathSegment) {
+    return lastPathSegment.split('/').last;
   }
 }

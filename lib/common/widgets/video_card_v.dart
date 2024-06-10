@@ -43,20 +43,21 @@ class VideoCardV extends StatelessWidget {
         int epId = videoItem.param;
         SmartDialog.showLoading(msg: '资源获取中');
         var result = await SearchHttp.bangumiInfo(seasonId: null, epId: epId);
+        SmartDialog.dismiss();
         if (result['status']) {
           var bangumiDetail = result['data'];
           int cid = bangumiDetail.episodes!.first.cid;
           String bvid = IdUtils.av2bv(bangumiDetail.episodes!.first.aid);
-          SmartDialog.dismiss().then(
-            (value) => Get.toNamed(
-              '/video?bvid=$bvid&cid=$cid&epId=$epId',
-              arguments: {
-                'pic': videoItem.pic,
-                'heroTag': heroTag,
-                'videoType': SearchType.media_bangumi,
-              },
-            ),
+          Get.toNamed(
+            '/video?bvid=$bvid&cid=$cid&epId=$epId',
+            arguments: {
+              'pic': videoItem.pic,
+              'heroTag': heroTag,
+              'videoType': SearchType.media_bangumi,
+            },
           );
+        } else {
+          SmartDialog.showToast(result['msg']);
         }
         break;
       case 'av':
@@ -94,6 +95,8 @@ class VideoCardV extends StatelessWidget {
                   'floor': 1,
                   'action': 'detail'
                 });
+              } else {
+                SmartDialog.showToast(res['msg']);
               }
               return;
             }
@@ -124,71 +127,85 @@ class VideoCardV extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     String heroTag = Utils.makeHeroTag(videoItem.id);
-    return Card(
-      elevation: 0,
-      clipBehavior: Clip.hardEdge,
-      margin: EdgeInsets.zero,
-      child: GestureDetector(
-        onLongPress: () {
-          if (longPress != null) {
-            longPress!();
-          }
-        },
-        // onLongPressEnd: (details) {
-        //   if (longPressEnd != null) {
-        //     longPressEnd!();
-        //   }
-        // },
-        child: InkWell(
-          onTap: () async => onPushDetail(heroTag),
-          child: Column(
-            children: [
-              AspectRatio(
-                aspectRatio: StyleString.aspectRatio,
-                child: LayoutBuilder(builder: (context, boxConstraints) {
-                  double maxWidth = boxConstraints.maxWidth;
-                  double maxHeight = boxConstraints.maxHeight;
-                  return Stack(
-                    children: [
-                      Hero(
-                        tag: heroTag,
-                        child: NetworkImgLayer(
-                          src: videoItem.pic,
-                          width: maxWidth,
-                          height: maxHeight,
-                        ),
-                      ),
-                      if (videoItem.duration > 0)
-                          PBadge(
-                            bottom: 6,
-                            right: 7,
-                            size: 'small',
-                            type: 'gray',
-                            text: Utils.timeFormat(videoItem.duration),
-                          )
-                    ],
-                  );
-                }),
+    return Stack(children: [
+      Semantics(
+        label: Utils.videoItemSemantics(videoItem),
+        excludeSemantics: true,
+        child: Card(
+            elevation: 0,
+            clipBehavior: Clip.hardEdge,
+            margin: EdgeInsets.zero,
+            child: GestureDetector(
+              onLongPress: () {
+                if (longPress != null) {
+                  longPress!();
+                }
+              },
+              // onLongPressEnd: (details) {
+              //   if (longPressEnd != null) {
+              //     longPressEnd!();
+              //   }
+              // },
+              child: InkWell(
+                onTap: () async => onPushDetail(heroTag),
+                child: Column(
+                  children: [
+                    AspectRatio(
+                      aspectRatio: StyleString.aspectRatio,
+                      child: LayoutBuilder(builder: (context, boxConstraints) {
+                        double maxWidth = boxConstraints.maxWidth;
+                        double maxHeight = boxConstraints.maxHeight;
+                        return Stack(
+                          children: [
+                            Hero(
+                              tag: heroTag,
+                              child: NetworkImgLayer(
+                                src: videoItem.pic,
+                                width: maxWidth,
+                                height: maxHeight,
+                              ),
+                            ),
+                            if (videoItem.duration > 0)
+                              PBadge(
+                                bottom: 6,
+                                right: 7,
+                                size: 'small',
+                                type: 'gray',
+                                text: Utils.timeFormat(videoItem.duration),
+                                // semanticsLabel:
+                                //     '时长${Utils.durationReadFormat(Utils.timeFormat(videoItem.duration))}',
+                              )
+                          ],
+                        );
+                      }),
+                    ),
+                    VideoContent(videoItem: videoItem)
+                  ],
+                ),
               ),
-              VideoContent(videoItem: videoItem)
-            ],
-          ),
-        ),
+            )),
       ),
-    );
+      if (videoItem.goto == 'av')
+        Positioned(
+            right: 0,
+            bottom: 0,
+            child: VideoPopupMenu(
+              size: 29,
+              iconSize: 17,
+              videoItem: videoItem,
+            )),
+    ]);
   }
 }
 
 class VideoContent extends StatelessWidget {
   final dynamic videoItem;
-  const VideoContent(
-      {Key? key, required this.videoItem})
-      : super(key: key);
+  const VideoContent({Key? key, required this.videoItem}) : super(key: key);
   @override
   Widget build(BuildContext context) {
     return Expanded(
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(5, 8, 5, 4),
+        padding: const EdgeInsets.fromLTRB(6, 5, 6, 5),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           // mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -196,18 +213,21 @@ class VideoContent extends StatelessWidget {
             Row(
               children: [
                 Expanded(
-                  child: Text(
-                    videoItem.title,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
+                  child: Text(videoItem.title + "\n",
+                      // semanticsLabel: "${videoItem.title}",
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        height: 1.38,
+                      )),
                 ),
               ],
             ),
-              const SizedBox(height: 2),
-              VideoStat(
-                videoItem: videoItem,
-              ),
+            const Spacer(),
+            // const SizedBox(height: 2),
+            VideoStat(
+              videoItem: videoItem,
+            ),
             Row(
               children: [
                 if (videoItem.goto == 'bangumi') ...[
@@ -248,24 +268,19 @@ class VideoContent extends StatelessWidget {
                 Expanded(
                   flex: 1,
                   child: Text(
-                    videoItem.owner.name,
+                    videoItem.owner.name.toString(),
+                    // semanticsLabel: "Up主：${videoItem.owner.name}",
                     maxLines: 1,
+                    overflow: TextOverflow.clip,
                     style: TextStyle(
+                      height: 1.5,
                       fontSize:
                           Theme.of(context).textTheme.labelMedium!.fontSize,
                       color: Theme.of(context).colorScheme.outline,
                     ),
                   ),
                 ),
-                if (videoItem.goto == 'av') ...[
-                  VideoPopupMenu(
-                    size: 24,
-                    iconSize: 14,
-                    videoItem: videoItem,
-                  ),
-                ] else ...[
-                  const SizedBox(height: 24)
-                ]
+                if (videoItem.goto == 'av') const SizedBox(width: 24)
               ],
             ),
           ],
@@ -290,12 +305,14 @@ class VideoStat extends StatelessWidget {
         StatView(
           theme: 'gray',
           view: videoItem.stat.view,
+          goto: videoItem.goto,
         ),
         const SizedBox(width: 8),
-        StatDanMu(
-          theme: 'gray',
-          danmu: videoItem.stat.danmu,
-        ),
+        if (videoItem.goto != 'picture')
+          StatDanMu(
+            theme: 'gray',
+            danmu: videoItem.stat.danmu,
+          ),
         if (videoItem is RecVideoItemModel) ...<Widget>[
           const Spacer(),
           RichText(
@@ -303,7 +320,7 @@ class VideoStat extends StatelessWidget {
             text: TextSpan(
                 style: TextStyle(
                   fontSize: Theme.of(context).textTheme.labelSmall!.fontSize,
-                  color: Theme.of(context).colorScheme.outline,
+                  color: Theme.of(context).colorScheme.outline.withOpacity(0.8),
                 ),
                 text: Utils.formatTimestampToRelativeTime(videoItem.pubdate)),
           ),

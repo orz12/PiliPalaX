@@ -11,125 +11,110 @@ import 'package:PiliPalaX/utils/utils.dart';
 
 class UpPanel extends StatefulWidget {
   final FollowUpModel? upData;
-  const UpPanel(this.upData, {Key? key}) : super(key: key);
+  final ScrollController scrollController;
+  const UpPanel(this.upData, this.scrollController, {Key? key}) : super(key: key);
 
   @override
   State<UpPanel> createState() => _UpPanelState();
 }
 
 class _UpPanelState extends State<UpPanel> {
-  final ScrollController scrollController = ScrollController();
   int currentMid = -1;
-  late double contentWidth = 56;
   List<UpItem> upList = [];
   List<LiveUserItem> liveList = [];
-  static const itemPadding = EdgeInsets.symmetric(horizontal: 5, vertical: 0);
   Box userInfoCache = GStrorage.userInfo;
   var userInfo;
+  bool _showLiveItems = false;
+  late DynamicsController dynamicsController;
 
   @override
   void initState() {
     super.initState();
-    upList = widget.upData!.upList!;
-    if (widget.upData!.liveUsers != null) {
-      liveList = widget.upData!.liveUsers!.items!;
-    }
-    upList.insert(
-      0,
-      UpItem(face: '', uname: '全部动态', mid: -1),
-    );
     userInfo = userInfoCache.get('userInfoCache');
-    upList.insert(
-      1,
-      UpItem(
-        face: userInfo.face,
-        uname: '我',
-        mid: userInfo.mid,
-      ),
-    );
+    dynamicsController = Get.find<DynamicsController>();
   }
 
   @override
   Widget build(BuildContext context) {
-    return SliverPersistentHeader(
-      floating: true,
-      pinned: false,
-      delegate: _SliverHeaderDelegate(
-          height: 126,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Container(
-                color: Theme.of(context).colorScheme.background,
-                padding: const EdgeInsets.only(left: 16, right: 16),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  crossAxisAlignment: CrossAxisAlignment.center,
+    upList = widget.upData!.upList!;
+    if (widget.upData!.liveUsers != null) {
+      liveList = widget.upData!.liveUsers!.items!;
+    }
+    // return const SizedBox();
+    return CustomScrollView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        controller: widget.scrollController,
+        slivers: [
+          SliverToBoxAdapter(
+            child: SizedBox(
+              height: 45,
+              child: TextButton(
+                style: ButtonStyle(
+                  padding: MaterialStateProperty.all(const EdgeInsets.only()),
+                ),
+                child: Column(
                   children: [
-                    const Text('最新关注'),
-                    GestureDetector(
-                      onTap: () {
-                        feedBack();
-                        Get.toNamed('/follow?mid=${userInfo.mid}');
-                      },
-                      child: Container(
-                        padding: const EdgeInsets.only(top: 5, bottom: 5),
-                        child: Text(
-                          '查看全部',
-                          style: TextStyle(
-                              color: Theme.of(context).colorScheme.outline),
-                        ),
+                    const Spacer(),
+                    const SizedBox(height: 12),
+                    Text(
+                      'Live(${liveList.length})',
+                      style: const TextStyle(
+                        fontSize: 13,
                       ),
+                      semanticsLabel:
+                          '${_showLiveItems ? '展开' : '收起'}直播中的${liveList.length}个Up',
                     ),
+                    Icon(_showLiveItems ? Icons.expand_less : Icons.expand_more,
+                        size: 12),
+                    const Spacer(),
                   ],
                 ),
+                onPressed: () {
+                  setState(() {
+                    _showLiveItems = !_showLiveItems;
+                  });
+                },
               ),
-              Container(
-                height: 90,
-                color: Theme.of(context).colorScheme.background,
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: ListView(
-                        scrollDirection: Axis.horizontal,
-                        controller: scrollController,
-                        children: [
-                          const SizedBox(width: 10),
-                          if (liveList.isNotEmpty) ...[
-                            for (int i = 0; i < liveList.length; i++) ...[
-                              upItemBuild(liveList[i], i)
-                            ],
-                            VerticalDivider(
-                              indent: 20,
-                              endIndent: 40,
-                              width: 26,
-                              color: Theme.of(context)
-                                  .colorScheme
-                                  .primary
-                                  .withOpacity(0.5),
-                            ),
-                          ],
-                          for (int i = 0; i < upList.length; i++) ...[
-                            upItemBuild(upList[i], i)
-                          ],
-                          const SizedBox(width: 10),
-                        ],
-                      ),
-                    ),
+            ),
+          ),
+          const SliverToBoxAdapter(
+            child: SizedBox(
+              height: 10,
+            ),
+          ),
+          SliverGrid(
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 1,
+                mainAxisExtent: 76,
+                crossAxisSpacing: 0,
+                mainAxisSpacing: 0,
+              ),
+              delegate: SliverChildListDelegate(
+                [
+                  if (_showLiveItems && liveList.isNotEmpty) ...[
+                    for (int i = 0; i < liveList.length; i++) ...[
+                      upItemBuild(liveList[i], i)
+                    ],
                   ],
-                ),
-              ),
-              Container(
-                height: 6,
-                color: Theme.of(context)
-                    .colorScheme
-                    .onInverseSurface
-                    .withOpacity(0.5),
-              ),
-            ],
-          )),
-    );
+                  upItemBuild(UpItem(face: '', uname: '全部动态', mid: -1), 0),
+                  upItemBuild(
+                      UpItem(
+                        face: userInfo.face,
+                        uname: '我',
+                        mid: userInfo.mid,
+                      ),
+                      1),
+                  for (int i = 0; i < upList.length; i++) ...[
+                    upItemBuild(upList[i], i + 2)
+                  ],
+                ],
+              )),
+          const SliverToBoxAdapter(
+            child: SizedBox(
+              height: 200,
+            ),
+          ),
+        ]);
   }
 
   Widget upItemBuild(data, i) {
@@ -139,28 +124,27 @@ class _UpPanelState extends State<UpPanel> {
         feedBack();
         if (data.type == 'up') {
           currentMid = data.mid;
-          Get.find<DynamicsController>().mid.value = data.mid;
-          Get.find<DynamicsController>().upInfo.value = data;
-          Get.find<DynamicsController>().onSelectUp(data.mid);
-          int liveLen = liveList.length;
-          int upLen = upList.length;
-          double itemWidth = contentWidth + itemPadding.horizontal;
-          double screenWidth = MediaQuery.sizeOf(context).width;
-          double moveDistance = 0.0;
-          if (itemWidth * (upList.length + liveList.length) <= screenWidth) {
-          } else if ((upLen - i - 0.5) * itemWidth > screenWidth / 2) {
-            moveDistance =
-                (i + liveLen + 0.5) * itemWidth + 46 - screenWidth / 2;
-          } else {
-            moveDistance = (upLen + liveLen) * itemWidth + 46 - screenWidth;
-          }
+          // dynamicsController.mid.value = data.mid;
+          dynamicsController.upInfo.value = data;
+          dynamicsController.onSelectUp(data.mid);
+          // int liveLen = liveList.length;
+          // int upLen = upList.length;
+          // double itemWidth = contentWidth + itemPadding.horizontal;
+          // double screenWidth = MediaQuery.sizeOf(context).width;
+          // double moveDistance = 0.0;
+          // if (itemWidth * (upList.length + liveList.length) <= screenWidth) {
+          // } else if ((upLen - i - 0.5) * itemWidth > screenWidth / 2) {
+          //   moveDistance =
+          //       (i + liveLen + 0.5) * itemWidth + 46 - screenWidth / 2;
+          // } else {
+          //   moveDistance = (upLen + liveLen) * itemWidth + 46 - screenWidth;
+          // }
           data.hasUpdate = false;
-          scrollController.animateTo(
-            moveDistance,
-            duration: const Duration(milliseconds: 500),
-            curve: Curves.easeInOut,
-          );
-
+          // scrollController.animateTo(
+          //   moveDistance,
+          //   duration: const Duration(milliseconds: 500),
+          //   curve: Curves.easeInOut,
+          // );
           setState(() {});
         } else if (data.type == 'live') {
           LiveItemModel liveItem = LiveItemModel.fromJson({
@@ -184,63 +168,59 @@ class _UpPanelState extends State<UpPanel> {
         Get.toNamed('/member?mid=${data.mid}',
             arguments: {'face': data.face, 'heroTag': heroTag});
       },
-      child: Padding(
-        padding: itemPadding,
-        child: AnimatedOpacity(
-          opacity: isCurrent ? 1 : 0.3,
-          duration: const Duration(milliseconds: 200),
-          curve: Curves.easeInOut,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Badge(
-                smallSize: 8,
-                label: data.type == 'live' ? const Text('Live') : null,
-                textColor: Theme.of(context).colorScheme.onSecondaryContainer,
-                alignment: data.type == 'live'
-                    ? AlignmentDirectional.topCenter
-                    : AlignmentDirectional.topEnd,
-                padding: const EdgeInsets.only(left: 6, right: 6),
-                isLabelVisible: data.type == 'live' ||
-                    (data.type == 'up' && (data.hasUpdate ?? false)),
-                backgroundColor: data.type == 'live'
-                    ? Theme.of(context).colorScheme.secondaryContainer
-                    : Theme.of(context).colorScheme.primary,
-                child: data.face != ''
-                    ? NetworkImgLayer(
-                        width: 50,
-                        height: 50,
-                        src: data.face,
-                        type: 'avatar',
-                      )
-                    : const CircleAvatar(
-                        radius: 25,
-                        backgroundImage: AssetImage(
-                          'assets/images/noface.jpeg',
-                        ),
+      child: AnimatedOpacity(
+        opacity: isCurrent ? 1 : 0.6,
+        duration: const Duration(milliseconds: 200),
+        curve: Curves.easeInOut,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Badge(
+              smallSize: 8,
+              label: data.type == 'live' ? const Text('Live') : null,
+              textColor: Theme.of(context).colorScheme.onSecondaryContainer,
+              alignment: data.type == 'live'
+                  ? AlignmentDirectional.topCenter
+                  : AlignmentDirectional.topEnd,
+              padding: const EdgeInsets.only(left: 6, right: 6),
+              isLabelVisible: data.type == 'live' ||
+                  (data.type == 'up' && (data.hasUpdate ?? false)),
+              backgroundColor: data.type == 'live'
+                  ? Theme.of(context)
+                      .colorScheme
+                      .secondaryContainer
+                      .withOpacity(0.7)
+                  : Theme.of(context).colorScheme.primary,
+              child: data.face != ''
+                  ? NetworkImgLayer(
+                      width: 38,
+                      height: 38,
+                      src: data.face,
+                      type: 'avatar',
+                    )
+                  : const CircleAvatar(
+                      radius: 19,
+                      backgroundImage: AssetImage(
+                        'assets/images/logo/logo_android_2.png',
                       ),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(top: 4),
-                child: SizedBox(
-                  width: contentWidth,
-                  child: Text(
-                    data.uname,
-                    overflow: TextOverflow.ellipsis,
-                    softWrap: false,
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                        color: currentMid == data.mid
-                            ? Theme.of(context).colorScheme.primary
-                            : Theme.of(context).colorScheme.outline,
-                        fontSize:
-                            Theme.of(context).textTheme.labelMedium!.fontSize),
-                  ),
-                ),
-              ),
-            ],
-          ),
+                    ),
+            ),
+            const SizedBox(height: 3),
+            Text(
+              data.uname,
+              overflow: TextOverflow.clip,
+              maxLines: 2,
+              softWrap: true,
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                  color: currentMid == data.mid
+                      ? Theme.of(context).colorScheme.primary
+                      : Theme.of(context).colorScheme.outline,
+                  height: 1.1,
+                  fontSize: 12.5),
+            ),
+          ],
         ),
       ),
     );
@@ -275,35 +255,25 @@ class UpPanelSkeleton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListView.builder(
-      scrollDirection: Axis.horizontal,
-      physics: const NeverScrollableScrollPhysics(),
-      itemCount: 10,
-      itemBuilder: ((context, index) {
-        return Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 0),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Container(
-                width: 50,
-                height: 50,
-                decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.onInverseSurface,
-                  borderRadius: BorderRadius.circular(50),
-                ),
-              ),
-              Container(
-                margin: const EdgeInsets.only(top: 6),
-                width: 45,
-                height: 12,
-                color: Theme.of(context).colorScheme.onInverseSurface,
-              ),
-            ],
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Container(
+          width: 50,
+          height: 50,
+          decoration: BoxDecoration(
+            color: Theme.of(context).colorScheme.onInverseSurface,
+            borderRadius: BorderRadius.circular(50),
           ),
-        );
-      }),
+        ),
+        Container(
+          margin: const EdgeInsets.only(top: 6),
+          width: 45,
+          height: 12,
+          color: Theme.of(context).colorScheme.onInverseSurface,
+        ),
+      ],
     );
   }
 }

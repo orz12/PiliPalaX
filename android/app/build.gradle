@@ -37,7 +37,9 @@ def _keyAlias = System.getenv("KEY_ALIAS") ?: keystoreProperties["keyAlias"]
 def _keyPassword = System.getenv("KEY_PASSWORD") ?: keystoreProperties["keyPassword"]
 
 android {
-    compileSdkVersion flutter.compileSdkVersion
+    compileSdkVersion 34
+
+    namespace 'com.orz12.PiliPalaX'
     ndkVersion flutter.ndkVersion
 
     compileOptions {
@@ -83,6 +85,10 @@ android {
             // TODO: Add your own signing config for the release build.
             // Signing with the debug keys for now, so `flutter run --release` works.
             signingConfig signingConfigs.release
+        }
+        debug {
+            //applicationId "com.orz12.PiliPalaX.debug"
+            applicationIdSuffix ".debug"
         }
     }
 }

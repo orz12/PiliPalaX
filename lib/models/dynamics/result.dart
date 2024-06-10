@@ -826,15 +826,15 @@ class Like {
 
 class Stat {
   Stat({
-    this.danmaku,
+    this.danmu,
     this.play,
   });
 
-  String? danmaku;
+  String? danmu;
   String? play;
 
   Stat.fromJson(Map<String, dynamic> json) {
-    danmaku = json['danmaku'];
+    danmu = json['danmaku'];
     play = json['play'];
   }
 }

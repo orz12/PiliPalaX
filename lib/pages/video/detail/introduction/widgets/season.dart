@@ -1,40 +1,40 @@
+import 'package:PiliPalaX/common/widgets/list_sheet.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:PiliPalaX/models/video_detail_res.dart';
 import 'package:PiliPalaX/pages/video/detail/index.dart';
-import 'package:PiliPalaX/utils/id_utils.dart';
-import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
-
-import '../../../../../utils/utils.dart';
 
 class SeasonPanel extends StatefulWidget {
   const SeasonPanel({
     super.key,
     required this.ugcSeason,
     this.cid,
-    this.changeFuc,
+    required this.changeFuc,
+    required this.heroTag,
   });
   final UgcSeason ugcSeason;
   final int? cid;
-  final Function? changeFuc;
+  final Function changeFuc;
+  final String heroTag;
 
   @override
   State<SeasonPanel> createState() => _SeasonPanelState();
 }
 
 class _SeasonPanelState extends State<SeasonPanel> {
-  late List<EpisodeItem> episodes;
+  List<EpisodeItem>? episodes;
   late int cid;
-  late int currentIndex;
-  final String heroTag = Get.arguments['heroTag'];
+  int currentIndex = 0;
+  // final String heroTag = Get.arguments['heroTag'];
+  late final String heroTag;
   late VideoDetailController _videoDetailController;
   final ScrollController _scrollController = ScrollController();
-  final ItemScrollController itemScrollController = ItemScrollController();
 
   @override
   void initState() {
     super.initState();
     cid = widget.cid!;
+    heroTag = widget.heroTag;
     _videoDetailController = Get.find<VideoDetailController>(tag: heroTag);
 
     /// 根据 cid 找到对应集，找到对应 episodes
@@ -50,29 +50,33 @@ class _SeasonPanelState extends State<SeasonPanel> {
         }
       }
     }
+    if (episodes == null) {
+      return;
+    }
 
     /// 取对应 season_id 的 episodes
     // episodes = widget.ugcSeason.sections!
     //     .firstWhere((e) => e.seasonId == widget.ugcSeason.id)
     //     .episodes!;
-    currentIndex = episodes.indexWhere((EpisodeItem e) => e.cid == cid);
+    currentIndex = episodes!.indexWhere((EpisodeItem e) => e.cid == cid);
     _videoDetailController.cid.listen((int p0) {
       cid = p0;
+      currentIndex = episodes!.indexWhere((EpisodeItem e) => e.cid == cid);
+      if (!mounted) return;
       setState(() {});
-      currentIndex = episodes.indexWhere((EpisodeItem e) => e.cid == cid);
     });
   }
 
-  void changeFucCall(item, int i) async {
-    await widget.changeFuc!(
-      IdUtils.av2bv(item.aid),
-      item.cid,
-      item.aid,
-    );
-    currentIndex = i;
-    Get.back();
-    setState(() {});
-  }
+  // void changeFucCall(item, int i) async {
+  //   await widget.changeFuc!(
+  //     IdUtils.av2bv(item.aid),
+  //     item.cid,
+  //     item.aid,
+  //   );
+  //   currentIndex = i;
+  //   Get.back();
+  //   setState(() {});
+  // }
 
   @override
   void dispose() {
@@ -82,6 +86,9 @@ class _SeasonPanelState extends State<SeasonPanel> {
 
   @override
   Widget build(BuildContext context) {
+    if (episodes == null) {
+      return const SizedBox();
+    }
     return Builder(builder: (BuildContext context) {
       return Container(
         margin: const EdgeInsets.only(
@@ -95,84 +102,16 @@ class _SeasonPanelState extends State<SeasonPanel> {
           borderRadius: BorderRadius.circular(6),
           clipBehavior: Clip.hardEdge,
           child: InkWell(
-            onTap: () => showBottomSheet(
-              context: context,
-              builder: (BuildContext context) {
-                return StatefulBuilder(
-                    builder: (BuildContext context, StateSetter setState) {
-                  WidgetsBinding.instance.addPostFrameCallback((_) async {
-                    itemScrollController.jumpTo(index: currentIndex);
-                  });
-                  return Container(
-                    height: Utils.getSheetHeight(context),
-                    color: Theme.of(context).colorScheme.background,
-                    child: Column(
-                      children: [
-                        Container(
-                          height: 45,
-                          padding: const EdgeInsets.only(left: 14, right: 14),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                '合集（${episodes.length}）',
-                                style: Theme.of(context).textTheme.titleMedium,
-                              ),
-                              IconButton(
-                                icon: const Icon(Icons.close),
-                                onPressed: () => Navigator.pop(context),
-                              ),
-                            ],
-                          ),
-                        ),
-                        Divider(
-                          height: 1,
-                          color:
-                              Theme.of(context).dividerColor.withOpacity(0.1),
-                        ),
-                        Expanded(
-                            child: Padding(
-                          padding: EdgeInsets.only(
-                              bottom: MediaQuery.of(context).padding.bottom),
-                          child: Material(
-                            child: ScrollablePositionedList.builder(
-                              itemCount: episodes.length,
-                              itemBuilder: (BuildContext context, int index) =>
-                                  ListTile(
-                                onTap: () =>
-                                    changeFucCall(episodes[index], index),
-                                dense: false,
-                                leading: index == currentIndex
-                                    ? Image.asset(
-                                        'assets/images/live.gif',
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .primary,
-                                        height: 12,
-                                      )
-                                    : null,
-                                title: Text(
-                                  episodes[index].title!,
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    color: index == currentIndex
-                                        ? Theme.of(context).colorScheme.primary
-                                        : Theme.of(context)
-                                            .colorScheme
-                                            .onSurface,
-                                  ),
-                                ),
-                              ),
-                              itemScrollController: itemScrollController,
-                            ),
-                          ),
-                        )),
-                      ],
-                    ),
-                  );
-                });
-              },
-            ),
+            onTap: () {
+              ListSheet(
+                      episodes: episodes,
+                      // bvid: IdUtils.av2bv(episodes!.first.aid!),
+                      // aid: episodes!.first.aid!,
+                      currentCid: cid,
+                      changeFucCall: widget.changeFuc,
+                      context: context)
+                  .buildShowBottomSheet();
+            },
             child: Padding(
               padding: const EdgeInsets.fromLTRB(8, 12, 8, 12),
               child: Row(
@@ -186,19 +125,23 @@ class _SeasonPanelState extends State<SeasonPanel> {
                   ),
                   const SizedBox(width: 15),
                   Image.asset(
-                    'assets/images/live.gif',
+                    'assets/images/live.png',
                     color: Theme.of(context).colorScheme.primary,
                     height: 12,
+                    semanticLabel: "正在播放：",
                   ),
                   const SizedBox(width: 10),
                   Text(
-                    '${currentIndex + 1}/${episodes.length}',
+                    '${currentIndex + 1}/${episodes!.length}',
                     style: Theme.of(context).textTheme.labelMedium,
+                    semanticsLabel:
+                        '第${currentIndex + 1}集，共${episodes!.length}集',
                   ),
                   const SizedBox(width: 6),
                   const Icon(
                     Icons.arrow_forward_ios_outlined,
                     size: 13,
+                    semanticLabel: '查看',
                   )
                 ],
               ),

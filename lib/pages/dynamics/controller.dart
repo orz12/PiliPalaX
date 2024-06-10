@@ -17,39 +17,17 @@ import 'package:PiliPalaX/utils/id_utils.dart';
 import 'package:PiliPalaX/utils/storage.dart';
 import 'package:PiliPalaX/utils/utils.dart';
 
-class DynamicsController extends GetxController {
-  int page = 1;
+class DynamicsController extends GetxController
+    with GetTickerProviderStateMixin {
   String? offset = '';
-  RxList<DynamicItemModel> dynamicsList = [DynamicItemModel()].obs;
-  Rx<DynamicsType> dynamicsType = DynamicsType.values[0].obs;
-  RxString dynamicsTypeLabel = '全部'.obs;
   final ScrollController scrollController = ScrollController();
   Rx<FollowUpModel> upData = FollowUpModel().obs;
   // 默认获取全部动态
   RxInt mid = (-1).obs;
   Rx<UpItem> upInfo = UpItem().obs;
-  List filterTypeList = [
-    {
-      'label': DynamicsType.all.labels,
-      'value': DynamicsType.all,
-      'enabled': true
-    },
-    {
-      'label': DynamicsType.video.labels,
-      'value': DynamicsType.video,
-      'enabled': true
-    },
-    {
-      'label': DynamicsType.pgc.labels,
-      'value': DynamicsType.pgc,
-      'enabled': true
-    },
-    {
-      'label': DynamicsType.article.labels,
-      'value': DynamicsType.article,
-      'enabled': true
-    },
-  ];
+  late TabController tabController;
+  RxList<int> tempBannedList = <int>[].obs;
+  late List<Widget> tabsPageList;
   bool flag = false;
   RxInt initialValue = 0.obs;
   Box userInfoCache = GStrorage.userInfo;
@@ -63,53 +41,23 @@ class DynamicsController extends GetxController {
     userInfo = userInfoCache.get('userInfoCache');
     userLogin.value = userInfo != null;
     super.onInit();
-    initialValue.value =
-        setting.get(SettingBoxKey.defaultDynamicType, defaultValue: 0);
-    dynamicsType = DynamicsType.values[initialValue.value].obs;
+
+    tabController = TabController(
+        length: tabsConfig.length,
+        vsync: this,
+        initialIndex:
+            setting.get(SettingBoxKey.defaultDynamicType, defaultValue: 0));
+    tabsPageList = tabsConfig.map((e) {
+      return e['page'] as Widget;
+    }).toList();
   }
 
-  Future queryFollowDynamic({type = 'init'}) async {
-    if (!userLogin.value) {
-      return {'status': false, 'msg': '账号未登录'};
-    }
-    if (type == 'init') {
-      dynamicsList.clear();
-    }
-    // 下拉刷新数据渲染时会触发onLoad
-    if (type == 'onLoad' && page == 1) {
-      return;
-    }
-    isLoadingDynamic.value = true;
-    var res = await DynamicsHttp.followDynamic(
-      page: type == 'init' ? 1 : page,
-      type: dynamicsType.value.values,
-      offset: offset,
-      mid: mid.value,
-    );
-    isLoadingDynamic.value = false;
-    if (res['status']) {
-      if (type == 'onLoad' && res['data'].items.isEmpty) {
-        SmartDialog.showToast('没有更多了');
-        return;
-      }
-      if (type == 'init') {
-        dynamicsList.value = res['data'].items;
-      } else {
-        dynamicsList.addAll(res['data'].items);
-      }
-      offset = res['data'].offset;
-      page++;
-    }
-    return res;
+  void refreshNotifier() {
+    queryFollowUp();
   }
 
   onSelectType(value) async {
-    dynamicsType.value = filterTypeList[value]['value'];
-    dynamicsList.value = [DynamicItemModel()];
-    page = 1;
     initialValue.value = value;
-    await queryFollowDynamic();
-    scrollController.jumpTo(0);
   }
 
   pushDetail(item, floor, {action = 'all'}) async {
@@ -225,12 +173,23 @@ class DynamicsController extends GetxController {
           SmartDialog.dismiss();
           if (res['status']) {
             EpisodeItem episode = res['data'].episodes.first;
+            int? epId = res['data'].userStatus?.progress?.lastEpId;
+            if (epId == null) {
+              epId = episode.epId;
+            } else {
+              for (var item in res['data'].episodes) {
+                if (item.epId == epId) {
+                  episode = item;
+                  break;
+                }
+              }
+            }
             String bvid = episode.bvid!;
             int cid = episode.cid!;
             String pic = episode.cover!;
             String heroTag = Utils.makeHeroTag(cid);
             Get.toNamed(
-              '/video?bvid=$bvid&cid=$cid&seasonId=${res['data'].seasonId}',
+              '/video?bvid=$bvid&cid=$cid&seasonId=${res['data'].seasonId}&epid=$epId',
               arguments: {
                 'pic': pic,
                 'heroTag': heroTag,
@@ -238,6 +197,8 @@ class DynamicsController extends GetxController {
                 'bangumiItem': res['data'],
               },
             );
+          } else {
+            SmartDialog.showToast(res['msg']);
           }
         }
         break;
@@ -263,21 +224,27 @@ class DynamicsController extends GetxController {
   }
 
   onSelectUp(mid) async {
-    dynamicsType.value = DynamicsType.values[0];
-    dynamicsList.value = [DynamicItemModel()];
-    page = 1;
-    queryFollowDynamic();
+    if (mid == this.mid.value) {
+      this.mid.refresh();
+      return;
+    }
+    this.mid.value = mid;
+    tabController.index = (mid == -1 ? 0 : 4);
   }
 
   onRefresh() async {
-    page = 1;
     print('onRefresh');
-    await queryFollowUp();
-    await queryFollowDynamic();
+    print(tabsConfig[tabController.index]['ctr']);
+    await Future.wait(<Future>[
+      queryFollowUp(),
+      tabsConfig[tabController.index]['ctr'].onRefresh()
+    ]);
   }
 
   // 返回顶部并刷新
   void animateToTop() async {
+    tabsConfig[tabController.index]['ctr'].animateToTop();
+    if (!scrollController.hasClients) return;
     if (scrollController.offset >=
         MediaQuery.of(Get.context!).size.height * 5) {
       scrollController.jumpTo(0);
@@ -285,15 +252,5 @@ class DynamicsController extends GetxController {
       await scrollController.animateTo(0,
           duration: const Duration(milliseconds: 500), curve: Curves.easeInOut);
     }
-  }
-
-  // 重置搜索
-  void resetSearch() {
-    mid.value = -1;
-    dynamicsType.value = DynamicsType.values[0];
-    initialValue.value = 0;
-    SmartDialog.showToast('还原默认加载');
-    dynamicsList.value = [DynamicItemModel()];
-    queryFollowDynamic();
   }
 }

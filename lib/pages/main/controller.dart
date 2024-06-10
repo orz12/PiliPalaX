@@ -9,54 +9,21 @@ import 'package:PiliPalaX/http/common.dart';
 import 'package:PiliPalaX/pages/dynamics/index.dart';
 import 'package:PiliPalaX/pages/home/view.dart';
 import 'package:PiliPalaX/pages/media/index.dart';
+import 'package:PiliPalaX/pages/rank/index.dart';
 import 'package:PiliPalaX/utils/storage.dart';
 import 'package:PiliPalaX/utils/utils.dart';
+import 'package:path/path.dart';
 import '../../models/common/dynamic_badge_mode.dart';
+import '../../models/common/nav_bar_config.dart';
 
 class MainController extends GetxController {
   List<Widget> pages = <Widget>[
     const HomePage(),
+    // const RankPage(),
     const DynamicsPage(),
     const MediaPage(),
   ];
-  RxList navigationBars = [
-    {
-      'icon': const Icon(
-        Icons.home_outlined,
-        size: 21,
-      ),
-      'selectIcon': const Icon(
-        Icons.home,
-        size: 21,
-      ),
-      'label': "首页",
-      'count': 0,
-    },
-    {
-      'icon': const Icon(
-        Icons.motion_photos_on_outlined,
-        size: 21,
-      ),
-      'selectIcon': const Icon(
-        Icons.motion_photos_on,
-        size: 21,
-      ),
-      'label': "动态",
-      'count': 0,
-    },
-    {
-      'icon': const Icon(
-        Icons.video_collection_outlined,
-        size: 20,
-      ),
-      'selectIcon': const Icon(
-        Icons.video_collection,
-        size: 21,
-      ),
-      'label': "媒体库",
-      'count': 0,
-    }
-  ].obs;
+  RxList navigationBars = defaultNavigationBars.obs;
   final StreamController<bool> bottomBarStream =
       StreamController<bool>.broadcast();
   Box setting = GStrorage.setting;
@@ -66,7 +33,7 @@ class MainController extends GetxController {
   int selectedIndex = 0;
   Box userInfoCache = GStrorage.userInfo;
   RxBool userLogin = false.obs;
-  late Rx<DynamicBadgeMode> dynamicBadgeType = DynamicBadgeMode.number.obs;
+  late DynamicBadgeMode dynamicBadgeType;
 
   @override
   void onInit() {
@@ -74,13 +41,17 @@ class MainController extends GetxController {
     if (setting.get(SettingBoxKey.autoUpdate, defaultValue: false)) {
       Utils.checkUpdate();
     }
-    hideTabBar = setting.get(SettingBoxKey.hideTabBar, defaultValue: true);
+    hideTabBar = setting.get(SettingBoxKey.hideTabBar, defaultValue: false);
+    int defaultHomePage =
+        setting.get(SettingBoxKey.defaultHomePage, defaultValue: 0) as int;
+    selectedIndex = defaultNavigationBars
+        .indexWhere((item) => item['id'] == defaultHomePage);
     var userInfo = userInfoCache.get('userInfoCache');
     userLogin.value = userInfo != null;
-    dynamicBadgeType.value = DynamicBadgeMode.values[setting.get(
+    dynamicBadgeType = DynamicBadgeMode.values[setting.get(
         SettingBoxKey.dynamicBadgeMode,
         defaultValue: DynamicBadgeMode.number.code)];
-    if (dynamicBadgeType.value != DynamicBadgeMode.hidden) {
+    if (dynamicBadgeType != DynamicBadgeMode.hidden) {
       getUnreadDynamic();
     }
   }

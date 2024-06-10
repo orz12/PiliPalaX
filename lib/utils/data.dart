@@ -15,6 +15,8 @@ class Data {
       return;
     }
     var res = await UserHttp.historyStatus();
-    localCache.put(LocalCacheKey.historyPause, res.data['data']);
+    if (res['status']) {
+      localCache.put(LocalCacheKey.historyPause, res['data']);
+    }
   }
 }

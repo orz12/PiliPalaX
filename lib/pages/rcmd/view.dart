@@ -90,11 +90,12 @@ class _RcmdPageState extends State<RcmdPage>
           slivers: [
             SliverPadding(
               padding:
-                  const EdgeInsets.fromLTRB(0, StyleString.safeSpace, 0, 0),
+                  const EdgeInsets.fromLTRB(0, StyleString.cardSpace, 0, 0),
               sliver: FutureBuilder(
                 future: _futureBuilderFuture,
                 builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.done) {
+                  if (snapshot.connectionState == ConnectionState.done &&
+                      snapshot.data != null) {
                     Map data = snapshot.data as Map;
                     if (data['status']) {
                       return Obx(
@@ -111,7 +112,7 @@ class _RcmdPageState extends State<RcmdPage>
                       );
                     } else {
                       return HttpError(
-                        errMsg: data['msg'],
+                        errMsg: data == null ? "" : data['msg'],
                         fn: () {
                           setState(() {
                             _rcmdController.isLoadingMore = true;
@@ -144,17 +145,16 @@ class _RcmdPageState extends State<RcmdPage>
   }
 
   Widget contentGrid(ctr, videoList) {
-
     return SliverGrid(
-      gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+      gridDelegate: SliverGridDelegateWithExtentAndRatio(
         // 行间距
-        mainAxisSpacing: StyleString.safeSpace,
+        mainAxisSpacing: StyleString.cardSpace,
         // 列间距
-        crossAxisSpacing: StyleString.safeSpace,
+        crossAxisSpacing: StyleString.cardSpace,
         // 最大宽度
         maxCrossAxisExtent: Grid.maxRowWidth,
-        mainAxisExtent: Grid.calculateActualWidth(context, Grid.maxRowWidth, StyleString.safeSpace) / StyleString.aspectRatio+
-            MediaQuery.textScalerOf(context).scale(96),
+        childAspectRatio: StyleString.aspectRatio,
+        mainAxisExtent: MediaQuery.textScalerOf(context).scale(90),
       ),
       delegate: SliverChildBuilderDelegate(
         (BuildContext context, int index) {

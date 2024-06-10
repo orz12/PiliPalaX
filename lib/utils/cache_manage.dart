@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
+import 'package:get/get.dart';
 
 class CacheManage {
   CacheManage._internal();
@@ -76,17 +77,16 @@ class CacheManage {
   }
 
   // 清除缓存
-  Future<bool> clearCacheAll() async {
-    bool cleanStatus = await SmartDialog.show(
-      useSystem: true,
-      animationType: SmartAnimationType.centerFade_otherSlide,
-      builder: (BuildContext context) {
+  Future<bool> clearCacheAll(BuildContext context) async {
+    bool cleanStatus = await showDialog(
+      context: context,
+      builder: (context) {
         return AlertDialog(
           title: const Text('提示'),
           content: const Text('该操作将清除图片及网络请求缓存数据，确认清除？'),
           actions: [
             TextButton(
-              onPressed: (() => {SmartDialog.dismiss()}),
+              onPressed: () => Get.back(),
               child: Text(
                 '取消',
                 style: TextStyle(color: Theme.of(context).colorScheme.outline),
@@ -94,14 +94,14 @@ class CacheManage {
             ),
             TextButton(
               onPressed: () async {
-                SmartDialog.dismiss();
+                Get.back();
                 SmartDialog.showLoading(msg: '正在清除...');
                 try {
                   // 清除缓存 图片缓存
                   await clearLibraryCache();
                   Timer(const Duration(milliseconds: 500), () {
                     SmartDialog.dismiss().then((res) {
-                      SmartDialog.showToast('清除完成');
+                      SmartDialog.showToast('清除成功');
                     });
                   });
                 } catch (err) {
@@ -134,7 +134,7 @@ class CacheManage {
   }
 
   // 清除 Library/Caches 目录及文件缓存
-  Future clearLibraryCache() async {
+  static Future clearLibraryCache() async {
     var appDocDir = await getTemporaryDirectory();
     if (appDocDir.existsSync()) {
       await appDocDir.delete(recursive: true);

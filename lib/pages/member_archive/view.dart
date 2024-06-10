@@ -3,6 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:PiliPalaX/common/widgets/video_card_h.dart';
 import 'package:PiliPalaX/utils/utils.dart';
+import '../../common/constants.dart';
+import '../../common/widgets/http_error.dart';
+import '../../utils/grid.dart';
 import 'controller.dart';
 
 class MemberArchivePage extends StatefulWidget {
@@ -46,7 +49,7 @@ class _MemberArchivePageState extends State<MemberArchivePage> {
       appBar: AppBar(
         titleSpacing: 0,
         centerTitle: false,
-        title: Text('他的投稿', style: Theme.of(context).textTheme.titleMedium),
+        title: Text('Ta的投稿', style: Theme.of(context).textTheme.titleMedium),
         actions: [
           Obx(
             () => TextButton.icon(
@@ -59,43 +62,63 @@ class _MemberArchivePageState extends State<MemberArchivePage> {
         ],
       ),
       body: CustomScrollView(
+        physics: const AlwaysScrollableScrollPhysics(),
         controller: _memberArchivesController.scrollController,
         slivers: [
-          FutureBuilder(
-            future: _futureBuilderFuture,
-            builder: (BuildContext context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.done) {
-                if (snapshot.data != null) {
-                  Map data = snapshot.data as Map;
-                  List list = _memberArchivesController.archivesList;
-                  if (data['status']) {
-                    return Obx(
-                      () => list.isNotEmpty
-                          ? SliverList(
-                              delegate: SliverChildBuilderDelegate(
-                                (BuildContext context, index) {
-                                  return VideoCardH(
-                                    videoItem: list[index],
-                                    showOwner: false,
-                                    showPubdate: true,
-                                  );
-                                },
-                                childCount: list.length,
-                              ),
-                            )
-                          : const SliverToBoxAdapter(),
-                    );
+          SliverPadding(
+            padding:
+                const EdgeInsets.symmetric(horizontal: StyleString.safeSpace),
+            sliver: FutureBuilder(
+              future: _futureBuilderFuture,
+              builder: (BuildContext context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.done) {
+                  if (snapshot.data != null) {
+                    Map data = snapshot.data as Map;
+                    List list = _memberArchivesController.archivesList;
+                    if (data['status']) {
+                      return Obx(
+                        () => list.isNotEmpty
+                            ? SliverGrid(
+                                gridDelegate:
+                                    SliverGridDelegateWithExtentAndRatio(
+                                        mainAxisSpacing: StyleString.safeSpace,
+                                        crossAxisSpacing: StyleString.safeSpace,
+                                        maxCrossAxisExtent:
+                                            Grid.maxRowWidth * 2,
+                                        childAspectRatio:
+                                            StyleString.aspectRatio * 2.3,
+                                        mainAxisExtent: 0),
+                                delegate: SliverChildBuilderDelegate(
+                                  (BuildContext context, index) {
+                                    return VideoCardH(
+                                      videoItem: list[index],
+                                      showOwner: false,
+                                      showPubdate: true,
+                                    );
+                                  },
+                                  childCount: list.length,
+                                ),
+                              )
+                            : const SliverToBoxAdapter(),
+                      );
+                    } else {
+                      return HttpError(
+                        errMsg: snapshot.data['msg'],
+                        fn: () {},
+                      );
+                    }
                   } else {
-                    return const SliverToBoxAdapter();
+                    return HttpError(
+                      errMsg: "投稿页出现错误",
+                      fn: () {},
+                    );
                   }
                 } else {
                   return const SliverToBoxAdapter();
                 }
-              } else {
-                return const SliverToBoxAdapter();
-              }
-            },
-          ),
+              },
+            ),
+          )
         ],
       ),
     );

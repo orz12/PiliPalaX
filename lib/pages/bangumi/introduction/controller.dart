@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
@@ -102,6 +103,8 @@ class BangumiIntroController extends GetxController {
     if (result['status']) {
       bangumiDetail.value = result['data'];
       epId = bangumiDetail.value.episodes!.first.id;
+    } else {
+      SmartDialog.showToast(result['msg']);
     }
     return result;
   }
@@ -133,7 +136,7 @@ class BangumiIntroController extends GetxController {
   Future actionLikeVideo() async {
     var result = await VideoHttp.likeVideo(bvid: bvid, type: !hasLike.value);
     if (result['status']) {
-      SmartDialog.showToast(!hasLike.value ? '点赞成功 👍' : '取消赞');
+      SmartDialog.showToast(!hasLike.value ? '点赞成功' : '取消赞');
       hasLike.value = !hasLike.value;
       bangumiDetail.value.stat!['likes'] =
           bangumiDetail.value.stat!['likes'] + (!hasLike.value ? 1 : -1);
@@ -187,7 +190,7 @@ class BangumiIntroController extends GetxController {
                     var res = await VideoHttp.coinVideo(
                         bvid: bvid, multiply: _tempThemeValue);
                     if (res['status']) {
-                      SmartDialog.showToast('投币成功 👏');
+                      SmartDialog.showToast('投币成功');
                       hasCoin.value = true;
                       bangumiDetail.value.stat!['coins'] =
                           bangumiDetail.value.stat!['coins'] + _tempThemeValue;
@@ -218,22 +221,40 @@ class BangumiIntroController extends GetxController {
         addIds: addMediaIdsNew.join(','),
         delIds: delMediaIdsNew.join(','));
     if (result['status']) {
-      if (result['data']['prompt']) {
-        addMediaIdsNew = [];
-        delMediaIdsNew = [];
-        Get.back();
-        // 重新获取收藏状态
-        queryHasFavVideo();
-        SmartDialog.showToast('✅ 操作成功');
-      }
+      addMediaIdsNew = [];
+      delMediaIdsNew = [];
+      // 重新获取收藏状态
+      queryHasFavVideo();
+      SmartDialog.showToast('操作成功');
+      Get.back();
     }
   }
 
   // 分享视频
   Future actionShareVideo() async {
-    var result = await Share.share('${HttpString.baseUrl}/video/$bvid')
-        .whenComplete(() {});
-    return result;
+    showDialog(
+        context: Get.context!,
+        builder: (context) {
+          String videoUrl = '${HttpString.baseUrl}/video/$bvid';
+          return AlertDialog(
+            title: const Text('分享方式'),
+            actions: [
+              TextButton(
+                  onPressed: () {
+                    Clipboard.setData(ClipboardData(text: videoUrl));
+                    SmartDialog.showToast('已复制');
+                  },
+                  child: const Text('复制链接到剪贴板')),
+              TextButton(
+                  onPressed: () async {
+                    var result =
+                        await Share.share(videoUrl).whenComplete(() {});
+                    return result;
+                  },
+                  child: const Text('分享视频')),
+            ],
+          );
+        });
   }
 
   // 选择文件夹
@@ -295,7 +316,7 @@ class BangumiIntroController extends GetxController {
   }
 
   /// 列表循环或者顺序播放时，自动播放下一个
-  void nextPlay() {
+  bool nextPlay() {
     late List episodes;
     if (bangumiDetail.value.episodes != null) {
       episodes = bangumiDetail.value.episodes!;
@@ -312,12 +333,15 @@ class BangumiIntroController extends GetxController {
         nextIndex = 0;
       }
     }
-    if (nextIndex <= episodes.length - 1 &&
-        platRepeat == PlayRepeat.listOrder) {}
+    if (nextIndex == episodes.length - 1 &&
+        platRepeat == PlayRepeat.listOrder) {
+      return false;
+    }
 
     int cid = episodes[nextIndex].cid!;
     String bvid = episodes[nextIndex].bvid!;
     int aid = episodes[nextIndex].aid!;
     changeSeasonOrbangu(bvid, cid, aid);
+    return true;
   }
 }

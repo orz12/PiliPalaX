@@ -113,6 +113,7 @@ class HisListItem {
   String? tagName;
   int? liveStatus;
   bool? checked;
+  void isFullScreen;
 
   HisListItem.fromJson(Map<String, dynamic> json) {
     title = json['title'];

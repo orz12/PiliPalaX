@@ -1,7 +1,9 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:hive/hive.dart';
 import 'package:PiliPalaX/utils/extension.dart';
+import 'package:PiliPalaX/utils/global_data.dart';
 import '../../utils/storage.dart';
 import '../constants.dart';
 
@@ -19,6 +21,8 @@ class NetworkImgLayer extends StatelessWidget {
     // 图片质量 默认1%
     this.quality,
     this.origAspectRatio,
+    this.semanticsLabel,
+    this.ignoreHeight,
   });
 
   final String? src;
@@ -29,11 +33,14 @@ class NetworkImgLayer extends StatelessWidget {
   final Duration? fadeInDuration;
   final int? quality;
   final double? origAspectRatio;
+  final String? semanticsLabel;
+  final bool? ignoreHeight;
 
   @override
   Widget build(BuildContext context) {
+    final int defaultImgQuality = GlobalData().imgQuality;
     final String imageUrl =
-        '${src!.startsWith('//') ? 'https:${src!}' : src!}@${quality ?? 100}q.webp';
+        '${src!.startsWith('//') ? 'https:${src!}' : src!}@${quality ?? defaultImgQuality}q.webp';
     int? memCacheWidth, memCacheHeight;
 
     if (width > height || (origAspectRatio != null && origAspectRatio! > 1)) {
@@ -46,8 +53,7 @@ class NetworkImgLayer extends StatelessWidget {
       memCacheWidth = width.cacheSize(context);
       // memCacheHeight = height.cacheSize(context);
     }
-
-    return src != '' && src != null
+    Widget res = src != '' && src != null
         ? ClipRRect(
             clipBehavior: Clip.antiAlias,
             borderRadius: BorderRadius.circular(
@@ -60,7 +66,7 @@ class NetworkImgLayer extends StatelessWidget {
             child: CachedNetworkImage(
               imageUrl: imageUrl,
               width: width,
-              height: height,
+              height: ignoreHeight == null || ignoreHeight == false? height:null,
               memCacheWidth: memCacheWidth,
               memCacheHeight: memCacheHeight,
               fit: BoxFit.cover,
@@ -68,7 +74,7 @@ class NetworkImgLayer extends StatelessWidget {
                   fadeOutDuration ?? const Duration(milliseconds: 120),
               fadeInDuration:
                   fadeInDuration ?? const Duration(milliseconds: 120),
-              filterQuality: FilterQuality.high,
+              filterQuality: FilterQuality.low,
               errorWidget: (BuildContext context, String url, Object error) =>
                   placeholder(context),
               placeholder: (BuildContext context, String url) =>
@@ -76,6 +82,13 @@ class NetworkImgLayer extends StatelessWidget {
             ),
           )
         : placeholder(context);
+    if (semanticsLabel != null) {
+      return Semantics(
+        label: semanticsLabel,
+        child: res,
+      );
+    }
+    return res;
   }
 
   Widget placeholder(BuildContext context) {
@@ -91,17 +104,19 @@ class NetworkImgLayer extends StatelessWidget {
                 ? 0
                 : StyleString.imgRadius.x),
       ),
-      child: Center(
-        child: Image.asset(
-          type == 'avatar'
-              ? 'assets/images/noface.jpeg'
-              : 'assets/images/loading.png',
-          width: width,
-          height: height,
-          cacheWidth: width.cacheSize(context),
-          cacheHeight: height.cacheSize(context),
-        ),
-      ),
+      child: type == 'bg'
+          ? const SizedBox()
+          : Center(
+              child: Image.asset(
+                type == 'avatar'
+                    ? 'assets/images/noface.jpeg'
+                    : 'assets/images/loading.png',
+                width: width,
+                height: height,
+                cacheWidth: width.cacheSize(context),
+                cacheHeight: height.cacheSize(context),
+              ),
+            ),
     );
   }
 }

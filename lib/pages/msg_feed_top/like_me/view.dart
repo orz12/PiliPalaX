@@ -115,45 +115,61 @@ class LikeMeList extends StatelessWidget {
             String nativeUri = msgFeedLikeMeList[i].item?.nativeUri ?? "";
             SmartDialog.showToast("跳转至：$nativeUri（暂未实现）");
           },
-          leading: SizedBox(
-              width: 50,
-              height: 50,
-              child: Stack(
-                children: [
-                  for (var j = 0;
-                      j < msgFeedLikeMeList[i].users!.length && j < 4;
-                      j++) ...<Widget>[
-                    Positioned(
-                        left: 15 * (j % 2).toDouble(),
-                        top: 15 * (j ~/ 2).toDouble(),
-                        child: NetworkImgLayer(
-                          width:
-                              msgFeedLikeMeList[i].users!.length > 1 ? 30 : 45,
-                          height:
-                              msgFeedLikeMeList[i].users!.length > 1 ? 30 : 45,
-                          type: 'avatar',
-                          src: msgFeedLikeMeList[i].users![j].avatar,
-                        )),
-                  ]
-                ],
-              )),
+          leading: Column(
+            children: [
+              const Spacer(),
+              SizedBox(
+                  width: 50,
+                  height: 50,
+                  child: Stack(
+                    children: [
+                      for (var j = 0;
+                          j < msgFeedLikeMeList[i].users!.length && j < 4;
+                          j++) ...<Widget>[
+                        Positioned(
+                            left: 15 * (j % 2).toDouble(),
+                            top: 15 * (j ~/ 2).toDouble(),
+                            child: NetworkImgLayer(
+                              width: msgFeedLikeMeList[i].users!.length > 1
+                                  ? 30
+                                  : 45,
+                              height: msgFeedLikeMeList[i].users!.length > 1
+                                  ? 30
+                                  : 45,
+                              type: 'avatar',
+                              src: msgFeedLikeMeList[i].users![j].avatar,
+                            )),
+                      ]
+                    ],
+                  )),
+              const Spacer(),
+            ],
+          ),
           title: Text(
-            "${msgFeedLikeMeList[i].users!.map((e) => e.nickname).join("/")}"
-            "等共 ${msgFeedLikeMeList[i].counts} 人"
+            // "${msgFeedLikeMeList[i].users!.map((e) => e.nickname).join("/")}"
+            "${msgFeedLikeMeList[i].users?[0].nickname}"
+            "${msgFeedLikeMeList[i].users!.length > 1 ? '、' + msgFeedLikeMeList[i].users![1].nickname.toString() + ' 等' : ''} "
+            "${msgFeedLikeMeList[i].counts! > 1 ? '共 ' + msgFeedLikeMeList[i].counts.toString() + ' 人' : ''}"
             "赞了我的${msgFeedLikeMeList[i].item?.business}",
-            style:
-                Theme.of(context).textTheme.labelMedium!.copyWith(height: 1.5),
+            style: Theme.of(context).textTheme.titleSmall!.copyWith(
+                height: 1.5, color: Theme.of(context).colorScheme.primary),
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
           ),
           subtitle: msgFeedLikeMeList[i].item?.title != null &&
                   msgFeedLikeMeList[i].item?.title != ""
-              ? Text(msgFeedLikeMeList[i].item?.title ?? "",
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: Theme.of(context).textTheme.labelMedium!.copyWith(
-                      color: Theme.of(context).colorScheme.outline,
-                      height: 1.5))
+              ? Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const SizedBox(height: 4),
+                    Text(msgFeedLikeMeList[i].item?.title ?? "",
+                        maxLines: 3,
+                        overflow: TextOverflow.ellipsis,
+                        style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                            color: Theme.of(context).colorScheme.outline,
+                            height: 1.5))
+                  ],
+                )
               : null,
           trailing: msgFeedLikeMeList[i].item?.image != null &&
                   msgFeedLikeMeList[i].item?.image != ""

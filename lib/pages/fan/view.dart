@@ -5,6 +5,8 @@ import 'package:PiliPalaX/common/widgets/http_error.dart';
 import 'package:PiliPalaX/common/widgets/no_data.dart';
 import 'package:PiliPalaX/models/fans/result.dart';
 
+import '../../common/constants.dart';
+import '../../utils/grid.dart';
 import 'controller.dart';
 import 'widgets/fan_item.dart';
 
@@ -60,60 +62,56 @@ class _FansPageState extends State<FansPage> {
       ),
       body: RefreshIndicator(
         onRefresh: () async => await _fansController.queryFans('init'),
-        child: FutureBuilder(
-          future: _futureBuilderFuture,
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.done) {
-              var data = snapshot.data;
-              if (data['status']) {
-                List<FansItemModel> list = _fansController.fansList;
-                return Obx(
-                  () => list.isNotEmpty
-                      ? ListView.builder(
-                          controller: scrollController,
-                          itemCount: list.length + 1,
-                          itemBuilder: (BuildContext context, int index) {
-                            if (index == list.length) {
-                              return Container(
-                                height:
-                                    MediaQuery.of(context).padding.bottom + 60,
-                                padding: EdgeInsets.only(
-                                    bottom:
-                                        MediaQuery.of(context).padding.bottom),
-                                child: Center(
-                                  child: Obx(
-                                    () => Text(
-                                      _fansController.loadingText.value,
-                                      style: TextStyle(
-                                          color: Theme.of(context)
-                                              .colorScheme
-                                              .outline,
-                                          fontSize: 13),
-                                    ),
-                                  ),
-                                ),
-                              );
-                            } else {
-                              return fanItem(item: list[index]);
-                            }
-                          },
-                        )
-                      : const CustomScrollView(
-                          slivers: [NoData()],
+        child: CustomScrollView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            controller: scrollController,
+            slivers: [
+              FutureBuilder(
+                future: _futureBuilderFuture,
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.done &&
+                      snapshot.data != null) {
+                    var data = snapshot.data;
+                    if (data['status']) {
+                      return Obx(() {
+                        List<FansItemModel> list = _fansController.fansList;
+                        return list.isNotEmpty
+                            ? SliverGrid(
+                                gridDelegate:
+                                    SliverGridDelegateWithMaxCrossAxisExtent(
+                                        mainAxisSpacing: StyleString.cardSpace,
+                                        crossAxisSpacing: StyleString.safeSpace,
+                                        maxCrossAxisExtent:
+                                            Grid.maxRowWidth * 2,
+                                        mainAxisExtent: 56),
+                                delegate: SliverChildBuilderDelegate(
+                                  (BuildContext context, int index) {
+                                    return fanItem(item: list[index]);
+                                  },
+                                  childCount: list.length,
+                                ))
+                            : const NoData();
+                      });
+                    } else {
+                      return HttpError(
+                        errMsg: data['msg'],
+                        fn: () => _fansController.queryFans('init'),
+                      );
+                    }
+                  } else {
+                    // 骨架屏
+                    return const SliverToBoxAdapter(
+                      child: SizedBox(
+                        height: 200,
+                        child: Center(
+                          child: CircularProgressIndicator(),
                         ),
-                );
-              } else {
-                return HttpError(
-                  errMsg: data['msg'],
-                  fn: () => _fansController.queryFans('init'),
-                );
-              }
-            } else {
-              // 骨架屏
-              return const SizedBox();
-            }
-          },
-        ),
+                      ),
+                    );
+                  }
+                },
+              ),
+            ]),
       ),
     );
   }

@@ -50,7 +50,7 @@ class AppBarAni extends StatelessWidget implements PreferredSizeWidget {
                   tileMode: TileMode.mirror,
                 ),
         ),
-        child: child,
+        child: SafeArea(bottom: false, child: child),
       ),
     );
   }

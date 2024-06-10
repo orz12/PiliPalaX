@@ -10,6 +10,7 @@ class PBadge extends StatelessWidget {
   final String? size;
   final String? stack;
   final double? fs;
+  final String? semanticsLabel;
 
   const PBadge({
     super.key,
@@ -22,6 +23,7 @@ class PBadge extends StatelessWidget {
     this.size = 'medium',
     this.stack = 'position',
     this.fs = 11,
+    this.semanticsLabel,
   });
 
   @override
@@ -38,7 +40,7 @@ class PBadge extends StatelessWidget {
       color = Colors.white;
     }
     if (type == 'color') {
-      bgColor = t.primaryContainer.withOpacity(0.6);
+      bgColor = t.primaryContainer.withOpacity(0.5);
       color = t.primary;
     }
     if (type == 'line') {
@@ -68,6 +70,7 @@ class PBadge extends StatelessWidget {
       child: Text(
         text!,
         style: TextStyle(fontSize: fs ?? fontSize, color: color),
+        semanticsLabel: semanticsLabel,
       ),
     );
     if (stack == 'position') {

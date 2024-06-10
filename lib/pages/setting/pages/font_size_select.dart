@@ -12,7 +12,8 @@ class FontSizeSelectPage extends StatefulWidget {
 
 class _FontSizeSelectPageState extends State<FontSizeSelectPage> {
   Box setting = GStrorage.setting;
-  List<double> list = [0.9, 0.95, 1.0, 1.05, 1.1, 1.15, 1.2, 1.25, 1.3];
+  List<double> list = List.generate(12, (index) => 0.85 + index * 0.05);
+  //[0.85, 0.9, 0.95, 1.0, 1.05, 1.1, 1.15, 1.2, 1.25, 1.3, 1.35];
   late double minsize;
   late double maxSize;
   late double currentSize;

@@ -89,7 +89,11 @@ Widget forWard(item, context, ctr, source, {floor = 1}) {
       return videoSeasonWidget(item, context, 'archive', floor: floor);
     // 文章
     case 'DYNAMIC_TYPE_ARTICLE':
-      return articlePanel(item, context, floor: floor);
+      return Container(
+          padding:
+              const EdgeInsets.only(left: 10, top: 12, right: 10, bottom: 10),
+          color: Theme.of(context).dividerColor.withOpacity(0.08),
+          child: articlePanel(item, context, floor: floor));
     // 转发
     case 'DYNAMIC_TYPE_FORWARD':
       return InkWell(

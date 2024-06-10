@@ -53,6 +53,7 @@ class _SearchPageState extends State<SearchPage> with RouteAware {
         titleSpacing: 0,
         actions: [
           IconButton(
+            tooltip: '搜索',
             onPressed: () => _searchController.submit(),
             icon: const Icon(CupertinoIcons.search, size: 22),
           ),
@@ -69,6 +70,7 @@ class _SearchPageState extends State<SearchPage> with RouteAware {
               hintText: _searchController.hintText,
               border: InputBorder.none,
               suffixIcon: IconButton(
+                tooltip: '清空',
                 icon: Icon(
                   Icons.clear,
                   size: 22,

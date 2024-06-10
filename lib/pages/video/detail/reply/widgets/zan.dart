@@ -34,7 +34,7 @@ class _ZanButtonState extends State<ZanButton> {
         type: widget.replyType!.index, oid: oid, rpid: rpid, action: action);
     // SmartDialog.dismiss();
     if (res['status']) {
-      SmartDialog.showToast(replyItem.action == 0 ? '点赞成功 👍' : '取消赞 💔');
+      SmartDialog.showToast(replyItem.action == 0 ? '点赞成功' : '取消赞');
       if (action == 1) {
         replyItem.like = replyItem.like! + 1;
         replyItem.action = 1;
@@ -76,6 +76,7 @@ class _ZanButtonState extends State<ZanButton> {
                   : FontAwesomeIcons.thumbsUp,
               size: 16,
               color: widget.replyItem!.action == 1 ? primary : color,
+              semanticLabel: widget.replyItem!.action == 1 ? '已赞' : '点赞',
             ),
             const SizedBox(width: 4),
             AnimatedSwitcher(

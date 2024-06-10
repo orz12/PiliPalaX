@@ -10,7 +10,7 @@ class FansController extends GetxController {
   int pn = 1;
   int ps = 20;
   int total = 0;
-  RxList<FansItemModel> fansList = [FansItemModel()].obs;
+  RxList<FansItemModel> fansList = <FansItemModel>[].obs;
   late int mid;
   late String name;
   var userInfo;
@@ -29,7 +29,7 @@ class FansController extends GetxController {
   }
 
   Future queryFans(type) async {
-    if (type == 'init') {
+    if (type == 'init' || type == 'refresh') {
       pn = 1;
       loadingText.value == '加载中...';
     }
@@ -49,11 +49,14 @@ class FansController extends GetxController {
       } else if (type == 'onLoad') {
         fansList.addAll(res['data'].list);
       }
-      print(total);
+      print('fansList: ${fansList.length}, total: $total');
       if ((pn == 1 && total < ps) || res['data'].list.isEmpty) {
         loadingText.value = '没有更多了';
       }
       pn += 1;
+      if (total > ps && pn == 2) {
+        queryFans('onLoad');
+      }
     } else {
       SmartDialog.showToast(res['msg']);
     }

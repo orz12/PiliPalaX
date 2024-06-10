@@ -37,94 +37,112 @@ class VideoCardH extends StatelessWidget {
   Widget build(BuildContext context) {
     final int aid = videoItem.aid;
     final String bvid = videoItem.bvid;
+    String type = 'video';
+    try {
+      type = videoItem.type;
+    } catch (_) {}
     final String heroTag = Utils.makeHeroTag(aid);
-    return GestureDetector(
-      onLongPress: () {
-        if (longPress != null) {
-          longPress!();
-        }
-      },
-      // onLongPressEnd: (details) {
-      //   if (longPressEnd != null) {
-      //     longPressEnd!();
-      //   }
-      // },
-      child: InkWell(
-        onTap: () async {
-          try {
-            final int cid =
-                videoItem.cid ?? await SearchHttp.ab2c(aid: aid, bvid: bvid);
-            Get.toNamed('/video?bvid=$bvid&cid=$cid',
-                arguments: {'videoItem': videoItem, 'heroTag': heroTag});
-          } catch (err) {
-            SmartDialog.showToast(err.toString());
-          }
-        },
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(
-              StyleString.safeSpace, 5, StyleString.safeSpace, 5),
-          child: LayoutBuilder(
-            builder: (BuildContext context, BoxConstraints boxConstraints) {
-              final double width = (boxConstraints.maxWidth -
-                      StyleString.cardSpace *
-                          6 /
-                          MediaQuery.textScalerOf(context).scale(1.0)) /
-                  2;
-              return Container(
-                constraints: const BoxConstraints(minHeight: 88),
-                height: width / StyleString.aspectRatio,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    AspectRatio(
-                      aspectRatio: StyleString.aspectRatio,
-                      child: LayoutBuilder(
-                        builder: (BuildContext context,
-                            BoxConstraints boxConstraints) {
-                          final double maxWidth = boxConstraints.maxWidth;
-                          final double maxHeight = boxConstraints.maxHeight;
-                          return Stack(
-                            children: [
-                              Hero(
-                                tag: heroTag,
-                                child: NetworkImgLayer(
-                                  src: videoItem.pic as String,
-                                  width: maxWidth,
-                                  height: maxHeight,
-                                ),
-                              ),
-                              PBadge(
-                                text: Utils.timeFormat(videoItem.duration!),
-                                right: 6.0,
-                                bottom: 6.0,
-                                type: 'gray',
-                              ),
-                              // if (videoItem.rcmdReason != null &&
-                              //     videoItem.rcmdReason.content != '')
-                              //   pBadge(videoItem.rcmdReason.content, context,
-                              //       6.0, 6.0, null, null),
-                            ],
-                          );
-                        },
-                      ),
-                    ),
-                    VideoContent(
-                      videoItem: videoItem,
-                      source: source,
-                      showOwner: showOwner,
-                      showView: showView,
-                      showDanmaku: showDanmaku,
-                      showPubdate: showPubdate,
-                    )
-                  ],
-                ),
-              );
+    return Stack(children: [
+      Semantics(
+          label: Utils.videoItemSemantics(videoItem),
+          excludeSemantics: true,
+          child: GestureDetector(
+            onLongPress: () {
+              if (longPress != null) {
+                longPress!();
+              }
             },
+            // onLongPressEnd: (details) {
+            //   if (longPressEnd != null) {
+            //     longPressEnd!();
+            //   }
+            // },
+            child: InkWell(
+              onTap: () async {
+                if (type == 'ketang') {
+                  SmartDialog.showToast('课堂视频暂不支持播放');
+                  return;
+                }
+                try {
+                  final int cid = videoItem.cid ??
+                      await SearchHttp.ab2c(aid: aid, bvid: bvid);
+                  Get.toNamed('/video?bvid=$bvid&cid=$cid',
+                      arguments: {'videoItem': videoItem, 'heroTag': heroTag});
+                } catch (err) {
+                  SmartDialog.showToast(err.toString());
+                }
+              },
+              child: LayoutBuilder(
+                builder: (BuildContext context, BoxConstraints boxConstraints) {
+                  return Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      AspectRatio(
+                        aspectRatio: StyleString.aspectRatio,
+                        child: LayoutBuilder(
+                          builder: (BuildContext context,
+                              BoxConstraints boxConstraints) {
+                            final double maxWidth = boxConstraints.maxWidth;
+                            final double maxHeight = boxConstraints.maxHeight;
+                            return Stack(
+                              children: [
+                                Hero(
+                                  tag: heroTag,
+                                  child: NetworkImgLayer(
+                                    src: videoItem.pic as String,
+                                    width: maxWidth,
+                                    height: maxHeight,
+                                  ),
+                                ),
+                                if (videoItem.duration != 0)
+                                  PBadge(
+                                    text: Utils.timeFormat(videoItem.duration!),
+                                    right: 6.0,
+                                    bottom: 6.0,
+                                    type: 'gray',
+                                  ),
+                                if (type != 'video')
+                                  PBadge(
+                                    text: type,
+                                    left: 6.0,
+                                    bottom: 6.0,
+                                    type: 'primary',
+                                  ),
+                                // if (videoItem.rcmdReason != null &&
+                                //     videoItem.rcmdReason.content != '')
+                                //   pBadge(videoItem.rcmdReason.content, context,
+                                //       6.0, 6.0, null, null),
+                              ],
+                            );
+                          },
+                        ),
+                      ),
+                      VideoContent(
+                        videoItem: videoItem,
+                        source: source,
+                        showOwner: showOwner,
+                        showView: showView,
+                        showDanmaku: showDanmaku,
+                        showPubdate: showPubdate,
+                      )
+                    ],
+                  );
+                },
+              ),
+            ),
+          )),
+      if (source == 'normal')
+        Positioned(
+          bottom: 0,
+          right: 10,
+          child: VideoPopupMenu(
+            size: 29,
+            iconSize: 17,
+            videoItem: videoItem,
           ),
         ),
-      ),
-    );
+    ]);
   }
 }
 
@@ -149,6 +167,10 @@ class VideoContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    String pubdate = showPubdate
+        ? Utils.dateFormat(videoItem.pubdate!, formatType: 'day')
+        : '';
+    if (pubdate != '') pubdate += ' ';
     return Expanded(
       child: Padding(
         padding: const EdgeInsets.fromLTRB(10, 0, 6, 0),
@@ -159,14 +181,18 @@ class VideoContent extends StatelessWidget {
               Text(
                 videoItem.title as String,
                 textAlign: TextAlign.start,
-                style: const TextStyle(
+                style: TextStyle(
                   fontWeight: FontWeight.w500,
+                  fontSize: Theme.of(context).textTheme.bodyMedium!.fontSize,
+                  height: 1.4,
+                  letterSpacing: 0.3,
                 ),
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
               ),
             ] else ...[
               RichText(
+                overflow: TextOverflow.ellipsis,
                 maxLines: 2,
                 text: TextSpan(
                   children: [
@@ -175,6 +201,8 @@ class VideoContent extends StatelessWidget {
                         text: i['text'] as String,
                         style: TextStyle(
                           fontWeight: FontWeight.w500,
+                          fontSize:
+                              Theme.of(context).textTheme.bodyMedium!.fontSize,
                           letterSpacing: 0.3,
                           color: i['type'] == 'em'
                               ? Theme.of(context).colorScheme.primary
@@ -204,25 +232,21 @@ class VideoContent extends StatelessWidget {
             //     ),
             //   ),
             // const SizedBox(height: 4),
-            if (showPubdate)
-              Text(
-                Utils.dateFormat(videoItem.pubdate!),
-                style: TextStyle(
-                    fontSize: 11, color: Theme.of(context).colorScheme.outline),
-              ),
-            if (showOwner)
-              Row(
-                children: [
-                  Text(
-                    videoItem.owner.name as String,
-                    style: TextStyle(
-                      fontSize:
-                          Theme.of(context).textTheme.labelMedium!.fontSize,
-                      color: Theme.of(context).colorScheme.outline,
-                    ),
+            if (showOwner || showPubdate)
+              Expanded(
+                flex: 0,
+                child: Text(
+                  "${pubdate}${showOwner ? videoItem.owner.name : ''}",
+                  maxLines: 1,
+                  style: TextStyle(
+                    fontSize: 11,
+                    height: 1,
+                    color: Theme.of(context).colorScheme.outline,
+                    overflow: TextOverflow.clip,
                   ),
-                ],
+                ),
               ),
+            const SizedBox(height: 4),
             Row(
               children: [
                 if (showView) ...[
@@ -235,22 +259,13 @@ class VideoContent extends StatelessWidget {
                 if (showDanmaku)
                   StatDanMu(
                     theme: 'gray',
-                    danmu: videoItem.stat.danmaku as int,
+                    danmu: videoItem.stat.danmu as int,
                   ),
-
                 const Spacer(),
-                if (source == 'normal')
-                  SizedBox(
-                    width: 24,
-                    height: 24,
-                    child: VideoPopupMenu(
-                      size: 32,
-                      iconSize: 18,
-                      videoItem: videoItem,
-                    ),
-                  ),
+                if (source == 'normal') const SizedBox(width: 24),
               ],
             ),
+            const SizedBox(height: 5),
           ],
         ),
       ),

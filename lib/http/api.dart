@@ -13,6 +13,10 @@ class Api {
   // https://github.com/SocialSisterYi/bilibili-API-collect/blob/master/docs/video/videostream_url.md
   static const String videoUrl = '/x/player/wbi/playurl';
 
+  // 字幕
+  // aid, cid
+  static const String subtitleUrl = '/x/player/wbi/v2';
+
   // 视频详情
   // 竖屏 https://api.bilibili.com/x/web-interface/view?aid=527403921
   // https://api.bilibili.com/x/web-interface/view/detail  获取视频超详细信息(web端)
@@ -37,6 +41,12 @@ class Api {
   static const String hasLikeVideo = '/x/web-interface/archive/has/like';
 
   // 视频点踩 web端不支持
+
+  // 点踩 Post(app端)
+  /// access_key str	APP登录Token 必要
+  /// aid num	稿件avid	必要
+  ///
+  static const String dislikeVideo = '${HttpString.appBaseUrl}/x/v2/view/dislike';
 
   // 投币视频（web端）POST
   /// aid	num	稿件avid	必要（可选）	avid与bvid任选一个
@@ -116,9 +126,18 @@ class Api {
   // https://github.com/SocialSisterYi/bilibili-API-collect/blob/master/docs/comment/action.md
   static const String replyAdd = '/x/v2/reply/add';
 
+  // 删除评论
+  // https://github.com/SocialSisterYi/bilibili-API-collect/blob/master/docs/comment/action.md
+  static const String replyDel = '/x/v2/reply/del';
+
   // 用户(被)关注数、投稿数
   // https://api.bilibili.com/x/relation/stat?vmid=697166795
   static const String userStat = '/x/relation/stat';
+
+  // 获取我的表情列表
+  // business:reply（回复）dynamic（动态）
+  //https://api.bilibili.com/x/emote/user/panel/web?business=reply
+  static const String myEmote = '/x/emote/user/panel/web';
 
   // 获取用户信息
   static const String userInfo = '/x/web-interface/nav';
@@ -321,9 +340,25 @@ class Api {
 
   static const String webDanmaku = '/x/v2/dm/web/seg.so';
 
-  //发送视频弹幕
+  // 发送视频弹幕
   //https://github.com/SocialSisterYi/bilibili-API-collect/blob/master/docs/danmaku/action.md
   static const String shootDanmaku = '/x/v2/dm/post';
+
+  // 弹幕屏蔽查询（Get）
+  static const String danmakuFilter = '/x/dm/filter/user';
+
+  // 弹幕屏蔽词添加（Post）
+  // 表单内容：
+  // type: 0（关键词）1（正则）2（用户）
+  // filter: 屏蔽内容
+  // csrf
+  static const String danmakuFilterAdd = '/x/dm/filter/user/add';
+
+  // 弹幕屏蔽词删除（Post）
+  // 表单内容：
+  // ids: 被删除条目编号
+  // csrf
+  static const String danmakuFilterDel = '/x/dm/filter/user/del';
 
   // up主分组
   static const String followUpTag = '/x/relation/tags';
@@ -343,13 +378,13 @@ class Api {
   static const String msgFeedAt = '/x/msgfeed/at';
   //https://api.bilibili.com/x/msgfeed/like?platform=web&build=0&mobi_app=web
   static const String msgFeedLike = '/x/msgfeed/like';
-  //https://message.bilibili.com/x/sys-msg/query_user_notify?csrf=31b0caa533cea4d1a1bd2e921f045ec6&csrf=31b0caa533cea4d1a1bd2e921f045ec6&page_size=20&build=0&mobi_app=web
+  //https://message.bilibili.com/x/sys-msg/query_user_notify?csrf=xxxx&csrf=xxxx&page_size=20&build=0&mobi_app=web
   static const String msgSysUserNotify = '${HttpString.messageBaseUrl}/x/sys-msg/query_user_notify';
-  //https://message.bilibili.com/x/sys-msg/query_unified_notify?csrf=31b0caa533cea4d1a1bd2e921f045ec6&csrf=31b0caa533cea4d1a1bd2e921f045ec6&page_size=10&build=0&mobi_app=web
+  //https://message.bilibili.com/x/sys-msg/query_unified_notify?csrf=xxxx&csrf=xxxx&page_size=10&build=0&mobi_app=web
   static const String msgSysUnifiedNotify = '${HttpString.messageBaseUrl}/x/sys-msg/query_unified_notify';
 
   // 系统信息光标更新（已读标记）
-  //https://message.bilibili.com/x/sys-msg/update_cursor?csrf=31b0caa533cea4d1a1bd2e921f045ec6&csrf=31b0caa533cea4d1a1bd2e921f045ec6&cursor=1705288500000000000&has_up=0&build=0&mobi_app=web
+  //https://message.bilibili.com/x/sys-msg/update_cursor?csrf=xxxx&csrf=xxxx&cursor=1705288500000000000&has_up=0&build=0&mobi_app=web
   static const String msgSysUpdateCursor = '${HttpString.messageBaseUrl}/x/sys-msg/update_cursor';
 
   /// 私聊
@@ -448,12 +483,12 @@ class Api {
   static const getWebKey = '${HttpString.passBaseUrl}/x/passport-login/web/key';
 
   /// cookie转access_key
-  static const cookieToKey =
+  static const qrcodeConfirm =
       '${HttpString.passBaseUrl}/x/passport-tv-login/h5/qrcode/confirm';
 
   /// 申请二维码(TV端)
   static const getTVCode =
-      'https://passport.snm0516.aisee.tv/x/passport-tv-login/qrcode/auth_code';
+      'https://passport.bilibili.com/x/passport-tv-login/qrcode/auth_code';
 
   ///扫码登录（TV端）
   static const qrcodePoll =
@@ -494,4 +529,31 @@ class Api {
 
   /// 获取未读动态数
   static const getUnreadDynamic = '/x/web-interface/dynamic/entrance';
+
+  /// 用户动态主页
+  static const dynamicSpmPrefix = 'https://space.bilibili.com/1/dynamic';
+
+  /// 激活buvid3
+  static const activateBuvidApi = '/x/internal/gaia-gateway/ExClimbWuzhi';
+
+  /// 我的订阅
+  static const userSubFolder = '/x/v3/fav/folder/collected/list';
+
+  /// 我的订阅-合集详情
+  static const favSeasonList = '/x/space/fav/season/list';
+
+  /// 我的订阅-播单详情
+  static const favResourceList = '/x/v3/fav/resource/list';
+
+  /// 发送私信
+  static const String sendMsg = '${HttpString.tUrl}/web_im/v1/web_im/send_msg';
+
+  /// 排行榜
+  static const String getRankApi = "/x/web-interface/ranking/v2";
+
+  /// 取消订阅-合集
+  static const String unfavSeason = '/x/v3/fav/season/unfav';
+
+  /// 取消订阅-播单
+  static const String unfavFolder = '/x/v3/fav/folder/unfav';
 }

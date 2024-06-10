@@ -6,6 +6,8 @@ import 'package:PiliPalaX/common/widgets/http_error.dart';
 import 'package:PiliPalaX/common/widgets/no_data.dart';
 import 'package:PiliPalaX/pages/history/index.dart';
 
+import '../../common/constants.dart';
+import '../../utils/grid.dart';
 import 'widgets/item.dart';
 
 class HistoryPage extends StatefulWidget {
@@ -22,8 +24,8 @@ class _HistoryPageState extends State<HistoryPage> {
 
   @override
   void initState() {
-    _futureBuilderFuture = _historyController.queryHistoryList();
     super.initState();
+    _futureBuilderFuture = _historyController.queryHistoryList();
     scrollController = _historyController.scrollController;
     scrollController.addListener(
       () {
@@ -70,16 +72,13 @@ class _HistoryPageState extends State<HistoryPage> {
         child1: AppBar(
           titleSpacing: 0,
           centerTitle: false,
-          leading: IconButton(
-            onPressed: () => Get.back(),
-            icon: const Icon(Icons.arrow_back_outlined),
-          ),
           title: Text(
             '观看记录',
             style: Theme.of(context).textTheme.titleMedium,
           ),
           actions: [
             IconButton(
+              tooltip: '搜索',
               onPressed: () => Get.toNamed('/historySearch'),
               icon: const Icon(Icons.search_outlined),
             ),
@@ -88,10 +87,10 @@ class _HistoryPageState extends State<HistoryPage> {
                 // 处理菜单项选择的逻辑
                 switch (type) {
                   case 'pause':
-                    _historyController.onPauseHistory();
+                    _historyController.onPauseHistory(context);
                     break;
                   case 'clear':
-                    _historyController.onClearHistory();
+                    _historyController.onClearHistory(context);
                     break;
                   case 'del':
                     _historyController.onDelHistory();
@@ -133,6 +132,7 @@ class _HistoryPageState extends State<HistoryPage> {
           titleSpacing: 0,
           centerTitle: false,
           leading: IconButton(
+            tooltip: '取消',
             onPressed: () {
               _historyController.enableMultiple.value = false;
               for (var item in _historyController.historyList) {
@@ -162,7 +162,7 @@ class _HistoryPageState extends State<HistoryPage> {
               child: const Text('全选'),
             ),
             TextButton(
-              onPressed: () => _historyController.onDelCheckedHistory(),
+              onPressed: () => _historyController.onDelCheckedHistory(context),
               child: Text(
                 '删除',
                 style: TextStyle(color: Theme.of(context).colorScheme.error),
@@ -178,6 +178,7 @@ class _HistoryPageState extends State<HistoryPage> {
           return;
         },
         child: CustomScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
           controller: _historyController.scrollController,
           slivers: [
             FutureBuilder(
@@ -191,7 +192,15 @@ class _HistoryPageState extends State<HistoryPage> {
                   if (data['status']) {
                     return Obx(
                       () => _historyController.historyList.isNotEmpty
-                          ? SliverList(
+                          ? SliverGrid(
+                              gridDelegate:
+                                  SliverGridDelegateWithExtentAndRatio(
+                                      mainAxisSpacing: StyleString.cardSpace,
+                                      crossAxisSpacing: StyleString.safeSpace,
+                                      maxCrossAxisExtent: Grid.maxRowWidth * 2,
+                                      childAspectRatio:
+                                          StyleString.aspectRatio * 2.3,
+                                      mainAxisExtent: 0),
                               delegate: SliverChildBuilderDelegate(
                                   (context, index) {
                                 return HistoryItem(
@@ -219,7 +228,13 @@ class _HistoryPageState extends State<HistoryPage> {
                   }
                 } else {
                   // 骨架屏
-                  return SliverList(
+                  return SliverGrid(
+                    gridDelegate: SliverGridDelegateWithExtentAndRatio(
+                        mainAxisSpacing: StyleString.cardSpace,
+                        crossAxisSpacing: StyleString.safeSpace,
+                        maxCrossAxisExtent: Grid.maxRowWidth * 2,
+                        childAspectRatio: StyleString.aspectRatio * 2.3,
+                        mainAxisExtent: 0),
                     delegate: SliverChildBuilderDelegate((context, index) {
                       return const VideoCardHSkeleton();
                     }, childCount: 10),

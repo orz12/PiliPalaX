@@ -21,7 +21,7 @@ class _TabbarSetPageState extends State<TabbarSetPage> {
     super.initState();
     defaultTabs = tabsConfig;
     tabbarSort = settingStorage.get(SettingBoxKey.tabbarSort,
-        defaultValue: ['live', 'rcmd', 'hot', 'bangumi']);
+        defaultValue: ['live', 'rcmd', 'hot', 'rank', 'bangumi']);
     // 对 tabData 进行排序
     defaultTabs.sort((a, b) {
       int indexA = tabbarSort.indexOf((a['type'] as TabType).id);
@@ -40,10 +40,6 @@ class _TabbarSetPageState extends State<TabbarSetPage> {
         .where((i) => tabbarSort.contains((i['type'] as TabType).id))
         .map<String>((i) => (i['type'] as TabType).id)
         .toList();
-    if (sortedTabbar.isEmpty) {
-      SmartDialog.showToast('请至少设置一项！');
-      return;
-    }
     settingStorage.put(SettingBoxKey.tabbarSort, sortedTabbar);
     SmartDialog.showToast('保存成功，下次启动时生效');
   }

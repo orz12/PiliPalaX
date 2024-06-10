@@ -24,7 +24,7 @@ class FavController extends GetxController {
     if (!hasMore.value) {
       return;
     }
-    var res = await await UserHttp.userfavFolder(
+    var res = await UserHttp.userfavFolder(
       pn: currentPage,
       ps: pageSize,
       mid: userInfo!.mid!,
@@ -40,6 +40,9 @@ class FavController extends GetxController {
       }
       hasMore.value = res['data'].hasMore;
       currentPage++;
+      if (hasMore.value && type == 'init') {
+        queryFavFolder(type: 'onload');
+      }
     } else {
       SmartDialog.showToast(res['msg']);
     }

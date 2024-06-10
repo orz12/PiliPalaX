@@ -20,7 +20,7 @@ class MemberController extends GetxController {
   Box userInfoCache = GStrorage.userInfo;
   late int ownerMid;
   // 投稿列表
-  RxList<VListItemModel>? archiveList = [VListItemModel()].obs;
+  RxList<VListItemModel>? archiveList = <VListItemModel>[].obs;
   dynamic userInfo;
   RxInt attribute = (-1).obs;
   RxString attributeText = '关注'.obs;
@@ -68,25 +68,28 @@ class MemberController extends GetxController {
   }
 
   // 关注/取关up
-  Future actionRelationMod() async {
+  Future actionRelationMod(BuildContext context) async {
     if (userInfo == null) {
       SmartDialog.showToast('账号未登录');
       return;
     }
-    if (attribute.value == 128) {
-      blockUser();
+    if (memberInfo.value == null) {
+      SmartDialog.showToast('尚未获取到用户信息');
       return;
     }
-    SmartDialog.show(
-      useSystem: true,
-      animationType: SmartAnimationType.centerFade_otherSlide,
-      builder: (BuildContext context) {
+    if (attribute.value == 128) {
+      blockUser(context);
+      return;
+    }
+    await showDialog(
+      context: context,
+      builder: (context) {
         return AlertDialog(
           title: const Text('提示'),
           content: Text(memberInfo.value.isFollowed! ? '取消关注UP主?' : '关注UP主?'),
           actions: [
             TextButton(
-              onPressed: () => SmartDialog.dismiss(),
+              onPressed: () => Get.back(),
               child: Text(
                 '点错了',
                 style: TextStyle(color: Theme.of(context).colorScheme.outline),
@@ -94,6 +97,7 @@ class MemberController extends GetxController {
             ),
             TextButton(
               onPressed: () async {
+                Get.back();
                 await VideoHttp.relationMod(
                   mid: mid,
                   act: memberInfo.value.isFollowed! ? 2 : 1,
@@ -101,7 +105,6 @@ class MemberController extends GetxController {
                 );
                 memberInfo.value.isFollowed = !memberInfo.value.isFollowed!;
                 relationSearch();
-                SmartDialog.dismiss();
                 memberInfo.update((val) {});
               },
               child: const Text('确认'),
@@ -142,21 +145,20 @@ class MemberController extends GetxController {
   }
 
   // 拉黑用户
-  Future blockUser() async {
+  Future blockUser(BuildContext context) async {
     if (userInfo == null) {
       SmartDialog.showToast('账号未登录');
       return;
     }
-    SmartDialog.show(
-      useSystem: true,
-      animationType: SmartAnimationType.centerFade_otherSlide,
-      builder: (BuildContext context) {
+    await showDialog(
+      context: context,
+      builder: (context) {
         return AlertDialog(
           title: const Text('提示'),
           content: Text(attribute.value != 128 ? '确定拉黑UP主?' : '从黑名单移除UP主'),
           actions: [
             TextButton(
-              onPressed: () => SmartDialog.dismiss(),
+              onPressed: () => Get.back(),
               child: Text(
                 '点错了',
                 style: TextStyle(color: Theme.of(context).colorScheme.outline),
@@ -164,12 +166,12 @@ class MemberController extends GetxController {
             ),
             TextButton(
               onPressed: () async {
+                Get.back();
                 var res = await VideoHttp.relationMod(
                   mid: mid,
                   act: attribute.value != 128 ? 5 : 6,
                   reSrc: 11,
                 );
-                SmartDialog.dismiss();
                 if (res['status']) {
                   attribute.value = attribute.value != 128 ? 128 : 0;
                   attributeText.value = attribute.value == 128 ? '已拉黑' : '关注';

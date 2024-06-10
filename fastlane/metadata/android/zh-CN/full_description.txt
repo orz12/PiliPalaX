@@ -1,8 +1,9 @@
-PiliPala 是使用 Flutter 开发的 BiliBili 第三方客户端。
+PiliPalaX 是使用 Flutter 开发的 BiliBili 第三方客户端，
+是由PiliPala仓库fork并进行了差异化开发的版本
 
 主要功能：
 
-* 推荐视频列表 (app 端)
+* 推荐视频列表
 * 最热视频列表
 * 热门直播
 * 番剧列表

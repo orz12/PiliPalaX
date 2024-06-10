@@ -94,6 +94,7 @@ class MemberHttp {
       'dm_img_list': '[]',
       'dm_img_str': dmImgStr.substring(0, dmImgStr.length - 2),
       'dm_cover_img_str': dmCoverImgStr.substring(0, dmCoverImgStr.length - 2),
+      'dm_img_inter': '{"ds":[],"wh":[0,0,0],"of":[0,0,0]}',
     });
     var res = await Request().get(
       Api.memberArchive,
@@ -106,10 +107,13 @@ class MemberHttp {
         'data': MemberArchiveDataModel.fromJson(res.data['data'])
       };
     } else {
+      Map errMap = {
+        -352: '风控校验失败，请检查登录状态',
+      };
       return {
         'status': false,
         'data': [],
-        'msg': res.data['message'],
+        'msg': errMap[res.data['code']] ?? res.data['message'],
       };
     }
   }
@@ -128,10 +132,13 @@ class MemberHttp {
         'data': DynamicsDataModel.fromJson(res.data['data']),
       };
     } else {
+      Map errMap = {
+        -352: '风控校验失败，请检查登录状态',
+      };
       return {
         'status': false,
         'data': [],
-        'msg': res.data['message'],
+        'msg': errMap[res.data['code']] ?? res.data['message'],
       };
     }
   }
@@ -370,11 +377,14 @@ class MemberHttp {
 
   // 获取TV authCode
   static Future getTVCode() async {
-    SmartDialog.showLoading();
+    SmartDialog.showLoading(msg: "正在申请HD版二维码...");
     var params = {
       'appkey': Constants.appKey,
+      // 'local_id': 'Y952A395BB157D305D8A8340FC2AAECECE17',
       'local_id': '0',
-      'ts': (DateTime.now().millisecondsSinceEpoch ~/ 1000).toString(),
+      'ts': DateTime.now().millisecondsSinceEpoch.toString(),
+      'platform': 'android',
+      'mobi_app': 'android_hd',
     };
     String sign = Utils.appSign(
       params,
@@ -383,7 +393,10 @@ class MemberHttp {
     );
     var res = await Request()
         .post(Api.getTVCode, queryParameters: {...params, 'sign': sign});
+    SmartDialog.dismiss();
+    print(res.data);
     if (res.data['code'] == 0) {
+      print("getTVCode");
       return {
         'status': true,
         'data': res.data['data']['auth_code'],
@@ -393,7 +406,7 @@ class MemberHttp {
       return {
         'status': false,
         'data': [],
-        'msg': res.data['message'],
+        'msg': res.data,
       };
     }
   }
@@ -402,22 +415,45 @@ class MemberHttp {
   static Future cookieToKey() async {
     var authCodeRes = await getTVCode();
     if (authCodeRes['status']) {
-      var res = await Request().post(Api.cookieToKey, queryParameters: {
+      SmartDialog.showLoading(msg: "正在确认登录...");
+      var confirmRes = await Request().post(Api.qrcodeConfirm, queryParameters: {
         'auth_code': authCodeRes['data'],
-        'build': 708200,
+        'local_id': '0',
+        'build': 1442100,
+        'scanning_type': 1,
         'csrf': await Request.getCsrf(),
       });
-      await Future.delayed(const Duration(milliseconds: 300));
-      await qrcodePoll(authCodeRes['data']);
-      if (res.data['code'] == 0) {
-        return {'status': true, 'data': [], 'msg': '操作成功'};
+      print("confirmRes");
+      print(confirmRes);
+      SmartDialog.dismiss();
+      if (confirmRes.data['code'] != 0) {
+        return {
+          'status': false,
+          'data': [],
+          'msg': "确认登录失败：${confirmRes.data['message']}",
+        };
+      }
+      SmartDialog.showLoading(msg: "等待500毫秒...");
+      await Future.delayed(const Duration(milliseconds: 500));
+      SmartDialog.dismiss();
+      SmartDialog.showLoading(msg: "正在获取登录结果（含access_key）...");
+      var res = await qrcodePoll(authCodeRes['data']);
+      SmartDialog.dismiss();
+      if (res['status']) {
+        return {'status': true, 'data': [], 'msg': res['message']};
       } else {
         return {
           'status': false,
           'data': [],
-          'msg': res.data['message'],
+          'msg': "登录结果获取失败：${res.data['message']}",
         };
       }
+    } else {
+      return {
+        'status': false,
+        'data': [],
+        'msg': "TV版二维码申请失败：${authCodeRes['msg']}",
+      };
     }
   }
 
@@ -435,7 +471,6 @@ class MemberHttp {
     );
     var res = await Request()
         .post(Api.qrcodePoll, queryParameters: {...params, 'sign': sign});
-    SmartDialog.dismiss();
     if (res.data['code'] == 0) {
       String accessKey = res.data['data']['access_token'];
       Box localCache = GStrorage.localCache;
@@ -443,7 +478,7 @@ class MemberHttp {
       var userInfo = userInfoCache.get('userInfoCache');
       localCache.put(
           LocalCacheKey.accessKey, {'mid': userInfo.mid, 'value': accessKey});
-      return {'status': true, 'data': [], 'msg': '操作成功'};
+      return {'status': true, 'data': [], 'message': '操作成功，当前获取的access_key为：$accessKey'};
     } else {
       return {
         'status': false,

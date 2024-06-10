@@ -358,7 +358,9 @@ class ChatItem extends StatelessWidget {
               ));
         default:
           return Text(
-            content['content'] ?? content.toString(),
+            content != null && content != ''
+                ? (content['content'] ?? content.toString())
+                : '不支持的消息类型',
             style: TextStyle(
               letterSpacing: 0.6,
               height: 1.5,

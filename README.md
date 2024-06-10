@@ -41,8 +41,8 @@
 
 ## 技术交流
 
-Telegram: https://t.me/+lm_oOVmF0RJiODk1
-QQ频道: https://pd.qq.com/s/365esodk3
+Telegram: https://t.me/+162zlPtZlT9hNWVl
+QQ频道: https://pd.qq.com/s/3n0b3m5dm
 
 
 <br/>
@@ -59,6 +59,8 @@ QQ频道: https://pd.qq.com/s/365esodk3
 - [x] 热门直播
 - [x] 番剧列表
 - [x] 屏蔽黑名单内用户视频
+- [x] 无痕模式（播放视为未登录）
+- [x] 游客模式（推荐视为未登录）
 
 - [x] 用户相关
   - [x] 粉丝、关注用户、拉黑用户查看
@@ -88,7 +90,7 @@ QQ频道: https://pd.qq.com/s/365esodk3
   - [x] 解码格式选择（视视频而定）
   - [x] 弹幕
   - [ ] 直播弹幕
-  - [ ] 字幕
+  - [x] 字幕
   - [x] 记忆播放
   - [x] 视频比例：高度/宽度适应、填充、包含等
      

@@ -34,6 +34,7 @@ class PlayUrlModel {
   String? seekParam;
   String? seekType;
   Dash? dash;
+  List<Durl>? durl;
   List<FormatItem>? supportFormats;
   // String? highFormat;
   int? lastPlayTime;
@@ -52,15 +53,8 @@ class PlayUrlModel {
     videoCodecid = json['video_codecid'];
     seekParam = json['seek_param'];
     seekType = json['seek_type'];
-    if (json['dash'] != null) {
-      dash = Dash.fromJson(json['dash']);
-    } else if (json['durl'] != null) {
-      //试看的充电包月视频可能出现没有dash只有durl的情况
-      var durlList = json['durl']
-          .map<Durl>((e) => Durl.fromJson(e))
-        .toList();
-      //TODO
-    }
+    dash = json['dash'] != null ? Dash.fromJson(json['dash']) : null;
+    durl = json['durl']?.map<Durl>((e) => Durl.fromJson(e)).toList();
     supportFormats = json['support_formats'] != null
         ? json['support_formats']
             .map<FormatItem>((e) => FormatItem.fromJson(e))

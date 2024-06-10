@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:PiliPalaX/common/widgets/network_img_layer.dart';
 import 'package:PiliPalaX/models/user/fav_folder.dart';
@@ -62,24 +63,44 @@ class _MediaPageState extends State<MediaPage>
     super.build(context);
     Color primary = Theme.of(context).colorScheme.primary;
     return Scaffold(
-      appBar: AppBar(toolbarHeight: 30),
+      backgroundColor: Colors.transparent,
+      appBar: AppBar(
+        toolbarHeight: 30,
+        backgroundColor: Colors.transparent,
+        systemOverlayStyle: SystemUiOverlayStyle(
+          statusBarIconBrightness:
+              Theme.of(context).brightness == Brightness.light
+                  ? Brightness.dark
+                  : Brightness.light,
+        ),
+      ),
       body: SingleChildScrollView(
         controller: mediaController.scrollController,
         child: Column(
           children: [
             ListTile(
-              leading: null,
-              title: Padding(
-                padding: const EdgeInsets.only(left: 20),
-                child: Text(
-                  '媒体库',
-                  style: TextStyle(
-                    fontSize: Theme.of(context).textTheme.titleLarge!.fontSize,
-                    fontWeight: FontWeight.bold,
+                leading: null,
+                title: Padding(
+                  padding: const EdgeInsets.only(left: 20),
+                  child: Text(
+                    '媒体库',
+                    style: TextStyle(
+                      fontSize:
+                          Theme.of(context).textTheme.titleLarge!.fontSize,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
-              ),
-            ),
+                trailing: IconButton(
+                  tooltip: '设置',
+                  onPressed: () {
+                    Get.toNamed('/setting');
+                  },
+                  icon: const Icon(
+                    Icons.settings_outlined,
+                    size: 20,
+                  ),
+                )),
             for (var i in mediaController.list) ...[
               ListTile(
                 onTap: () => i['onTap'](),
@@ -102,7 +123,7 @@ class _MediaPageState extends State<MediaPage>
             ],
             Obx(() => mediaController.userLogin.value
                 ? favFolder(mediaController, context)
-                : const SizedBox())
+                : const SizedBox(height: 0))
           ],
         ),
       ),
@@ -113,11 +134,11 @@ class _MediaPageState extends State<MediaPage>
     return Column(
       children: [
         Divider(
-          height: 35,
+          height: 20,
           color: Theme.of(context).dividerColor.withOpacity(0.1),
         ),
         ListTile(
-          onTap: () {},
+          onTap: () => Get.toNamed('/fav'),
           leading: null,
           dense: true,
           title: Padding(
@@ -127,7 +148,7 @@ class _MediaPageState extends State<MediaPage>
                 TextSpan(
                   children: [
                     TextSpan(
-                      text: '收藏夹 ',
+                      text: '我的收藏  ',
                       style: TextStyle(
                           fontSize:
                               Theme.of(context).textTheme.titleMedium!.fontSize,
@@ -135,20 +156,26 @@ class _MediaPageState extends State<MediaPage>
                     ),
                     if (mediaController.favFolderData.value.count != null)
                       TextSpan(
-                        text: mediaController.favFolderData.value.count
-                            .toString(),
+                        text: "${mediaController.favFolderData.value.count}  ",
                         style: TextStyle(
                           fontSize:
                               Theme.of(context).textTheme.titleSmall!.fontSize,
                           color: Theme.of(context).colorScheme.primary,
                         ),
                       ),
+                    WidgetSpan(
+                        child: Icon(
+                      Icons.arrow_forward_ios,
+                      size: 18,
+                      color: Theme.of(context).colorScheme.primary,
+                    )),
                   ],
                 ),
               ),
             ),
           ),
           trailing: IconButton(
+            tooltip: '刷新',
             onPressed: () {
               setState(() {
                 _futureBuilderFuture = mediaController.queryFavFolder();
@@ -189,6 +216,7 @@ class _MediaPageState extends State<MediaPage>
                                       right: 14, bottom: 35),
                                   child: Center(
                                     child: IconButton(
+                                      tooltip: '查看更多',
                                       style: ButtonStyle(
                                         padding: MaterialStateProperty.all(
                                             EdgeInsets.zero),
@@ -263,10 +291,16 @@ class FavFolderItem extends StatelessWidget {
               clipBehavior: Clip.hardEdge,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(12),
-                color: Theme.of(context).colorScheme.onInverseSurface,
+                color: Theme.of(context)
+                    .colorScheme
+                    .onInverseSurface
+                    .withOpacity(0.4),
                 boxShadow: [
                   BoxShadow(
-                    color: Theme.of(context).colorScheme.onInverseSurface,
+                    color: Theme.of(context)
+                        .colorScheme
+                        .onInverseSurface
+                        .withOpacity(0.4),
                     offset: const Offset(4, -12), // 阴影与容器的距离
                     blurRadius: 0.0, // 高斯的标准偏差与盒子的形状卷积。
                     spreadRadius: 0.0, // 在应用模糊之前，框应该膨胀的量。

@@ -184,8 +184,9 @@ class VideoDetailData {
             : List<dynamic>.from(descV2!.map((e) => e.toJson())),
         "state": state,
         "duration": duration,
-        "rights":
-            Map.from(rights!).map((k, v) => MapEntry<String, dynamic>(k, v)),
+        "rights": rights == null
+            ? {}
+            : Map.from(rights!).map((k, v) => MapEntry<String, dynamic>(k, v)),
         "owner": owner?.toJson(),
         "stat": stat?.toJson(),
         "dynamic": videoDynamic,
@@ -377,6 +378,7 @@ class Part {
   String? weblink;
   Dimension? dimension;
   String? firstFrame;
+  String? badge;
 
   Part({
     this.cid,
@@ -388,6 +390,7 @@ class Part {
     this.weblink,
     this.dimension,
     this.firstFrame,
+    this.badge,
   });
 
   fromRawJson(String str) => Part.fromJson(json.decode(str));
@@ -406,6 +409,7 @@ class Part {
         ? null
         : Dimension.fromJson(json["dimension"]);
     firstFrame = json["first_frame"];
+    badge = json["badge"];
   }
 
   Map<String, dynamic> toJson() {
@@ -419,6 +423,7 @@ class Part {
     data["weblink"] = weblink;
     data["dimension"] = dimension?.toJson();
     data["first_frame"] = firstFrame;
+    data["badge"] = badge;
     return data;
   }
 }
@@ -426,7 +431,7 @@ class Part {
 class Stat {
   int? aid;
   int? view;
-  int? danmaku;
+  int? danmu;
   int? reply;
   int? favorite;
   int? coin;
@@ -441,7 +446,7 @@ class Stat {
   Stat({
     this.aid,
     this.view,
-    this.danmaku,
+    this.danmu,
     this.reply,
     this.favorite,
     this.coin,
@@ -461,7 +466,7 @@ class Stat {
   Stat.fromJson(Map<String, dynamic> json) {
     aid = json["aid"];
     view = json["view"];
-    danmaku = json["danmaku"];
+    danmu = json["danmaku"];
     reply = json["reply"];
     favorite = json["favorite"];
     coin = json["coin"];
@@ -479,7 +484,7 @@ class Stat {
 
     data["aid"] = aid;
     data["view"] = view;
-    data["danmaku"] = danmaku;
+    data["danmaku"] = danmu;
     data["reply"] = reply;
     data["favorite"] = favorite;
     data["coin"] = coin;
@@ -626,9 +631,11 @@ class EpisodeItem {
     this.aid,
     this.cid,
     this.title,
+    this.longTitle,
     this.attribute,
     this.page,
     this.bvid,
+    this.badge,
   });
   int? seasonId;
   int? sectionId;
@@ -636,9 +643,11 @@ class EpisodeItem {
   int? aid;
   int? cid;
   String? title;
+  String? longTitle;
   int? attribute;
   Part? page;
   String? bvid;
+  String? badge;
 
   EpisodeItem.fromJson(Map<String, dynamic> json) {
     seasonId = json['season_id'];
@@ -647,8 +656,10 @@ class EpisodeItem {
     aid = json['aid'];
     cid = json['cid'];
     title = json['title'];
+    longTitle = json['long_title'];
     attribute = json['attribute'];
     page = Part.fromJson(json['page']);
     bvid = json['bvid'];
+    badge = json['badge'];
   }
 }

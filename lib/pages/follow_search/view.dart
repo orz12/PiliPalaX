@@ -50,6 +50,7 @@ class _FollowSearchPageState extends State<FollowSearchPage> {
         titleSpacing: 0,
         actions: [
           IconButton(
+            tooltip: '搜索',
             onPressed: reRequest,
             icon: const Icon(CupertinoIcons.search, size: 22),
           ),
@@ -65,6 +66,7 @@ class _FollowSearchPageState extends State<FollowSearchPage> {
             hintText: _followSearchController.hintText,
             border: InputBorder.none,
             suffixIcon: IconButton(
+              tooltip: '清空',
               icon: Icon(
                 Icons.clear,
                 size: 22,

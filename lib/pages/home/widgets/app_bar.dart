@@ -43,6 +43,7 @@ class HomeAppBar extends StatelessWidget {
                     Hero(
                       tag: 'searchTag',
                       child: IconButton(
+                        tooltip: '搜索',
                         onPressed: () {
                           Get.toNamed('/search');
                         },
@@ -72,11 +73,13 @@ class HomeAppBar extends StatelessWidget {
                           width: 32,
                           height: 32,
                           src: userInfo.face,
+                          semanticsLabel: '我的',
                         ),
                       ),
                       const SizedBox(width: 10),
                     ] else ...[
                       IconButton(
+                        tooltip: '登录',
                         onPressed: () => showModalBottomSheet(
                           context: context,
                           builder: (_) => const SizedBox(

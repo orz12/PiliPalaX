@@ -23,7 +23,6 @@ class AnonymityInterceptor extends Interceptor {
     Api.webDanmaku,
     Api.dynamicDetail,
     Api.aiConclusion,
-    Api.getMemberViewApi,
     Api.getSeasonDetailApi,
   ];
 

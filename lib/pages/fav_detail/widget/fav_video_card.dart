@@ -1,3 +1,4 @@
+import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:PiliPalaX/common/constants.dart';
@@ -43,6 +44,8 @@ class FavVideoCardH extends StatelessWidget {
           var result = await VideoHttp.videoIntro(bvid: bvid);
           if (result['status']) {
             epId = result['data'].epId;
+          } else {
+            SmartDialog.showToast(result['msg']);
           }
         }
 
@@ -209,6 +212,7 @@ class VideoContent extends StatelessWidget {
                     right: 0,
                     bottom: -4,
                     child: IconButton(
+                      tooltip: '取消收藏',
                       style: ButtonStyle(
                         padding: MaterialStateProperty.all(EdgeInsets.zero),
                       ),

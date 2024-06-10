@@ -85,7 +85,9 @@ class SearchVideoItemModel {
     // title = json['title'].replaceAll(RegExp(r'<.*?>'), '');
     title = Em.regTitle(json['title']);
     description = json['description'];
-    pic = 'https:${json['pic']}';
+    pic = json['pic'] != null && json['pic'].startsWith('//')
+        ? 'https:${json['pic']}'
+        : json['pic'] ?? '';
     videoReview = json['video_review'];
     pubdate = json['pubdate'];
     senddate = json['senddate'];
@@ -98,7 +100,7 @@ class SearchVideoItemModel {
 class Stat {
   Stat({
     this.view,
-    this.danmaku,
+    this.danmu,
     this.favorite,
     this.reply,
     this.like,
@@ -107,7 +109,7 @@ class Stat {
   // 播放量
   int? view;
   // 弹幕数
-  int? danmaku;
+  int? danmu;
   // 收藏数
   int? favorite;
   // 评论数
@@ -117,7 +119,7 @@ class Stat {
 
   Stat.fromJson(Map<String, dynamic> json) {
     view = json['play'];
-    danmaku = json['danmaku'];
+    danmu = json['danmaku'];
     favorite = json['favorite'];
     reply = json['review'];
     like = json['like'];

@@ -78,7 +78,8 @@ class _ReplyMePageState extends State<ReplyMePage> {
                       title: Text(
                         "${_replyMeController.msgFeedReplyMeList[i].user?.nickname}  "
                         "回复了我的${_replyMeController.msgFeedReplyMeList[i].item?.business}",
-                        style: Theme.of(context).textTheme.bodyMedium!,
+                        style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                            color: Theme.of(context).colorScheme.primary),
                       ),
                       subtitle: Column(
                           mainAxisAlignment: MainAxisAlignment.start,
@@ -126,7 +127,7 @@ class _ReplyMePageState extends State<ReplyMePage> {
                                           color: Theme.of(context)
                                               .colorScheme
                                               .outline,
-                                      height: 1.5)),
+                                          height: 1.5)),
                           ]),
                     );
                   },

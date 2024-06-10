@@ -1,24 +1,16 @@
 import 'dart:async';
 
-import 'package:custom_sliding_segmented_control/custom_sliding_segmented_control.dart';
-import 'package:easy_debounce/easy_throttle.dart';
+import 'package:PiliPalaX/models/common/dynamics_type.dart';
+import 'package:PiliPalaX/models/common/up_panel_position.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
-import 'package:waterfall_flow/waterfall_flow.dart';
-import 'package:PiliPalaX/common/skeleton/dynamic_card.dart';
-import 'package:PiliPalaX/common/widgets/http_error.dart';
-import 'package:PiliPalaX/common/widgets/no_data.dart';
-import 'package:PiliPalaX/models/dynamics/result.dart';
-import 'package:PiliPalaX/pages/main/index.dart';
 import 'package:PiliPalaX/utils/feed_back.dart';
 import 'package:PiliPalaX/utils/storage.dart';
 
-import '../../common/constants.dart';
-import '../../utils/grid.dart';
 import 'controller.dart';
-import 'widgets/dynamic_panel.dart';
 import 'widgets/up_panel.dart';
 
 class DynamicsPage extends StatefulWidget {
@@ -29,12 +21,12 @@ class DynamicsPage extends StatefulWidget {
 }
 
 class _DynamicsPageState extends State<DynamicsPage>
-    with AutomaticKeepAliveClientMixin {
+    with AutomaticKeepAliveClientMixin, SingleTickerProviderStateMixin {
   final DynamicsController _dynamicsController = Get.put(DynamicsController());
-  late Future _futureBuilderFuture;
   late Future _futureBuilderFutureUp;
   Box userInfoCache = GStrorage.userInfo;
   late ScrollController scrollController;
+  late UpPanelPosition upPanelPosition;
 
   @override
   bool get wantKeepAlive => true;
@@ -42,268 +34,133 @@ class _DynamicsPageState extends State<DynamicsPage>
   @override
   void initState() {
     super.initState();
-    _futureBuilderFuture = _dynamicsController.queryFollowDynamic();
     _futureBuilderFutureUp = _dynamicsController.queryFollowUp();
-    scrollController = _dynamicsController.scrollController;
-    StreamController<bool> mainStream =
-        Get.find<MainController>().bottomBarStream;
-    scrollController.addListener(
-      () async {
-        if (scrollController.position.pixels >=
-            scrollController.position.maxScrollExtent - 200) {
-          EasyThrottle.throttle(
-              'queryFollowDynamic', const Duration(seconds: 1), () {
-            _dynamicsController.queryFollowDynamic(type: 'onLoad');
-          });
-        }
-
-        final ScrollDirection direction =
-            scrollController.position.userScrollDirection;
-        if (direction == ScrollDirection.forward) {
-          mainStream.add(true);
-        } else if (direction == ScrollDirection.reverse) {
-          mainStream.add(false);
-        }
-      },
-    );
-
+    // _dynamicsController.tabController =
+    //     TabController(vsync: this, length: DynamicsType.values.length);
+    // ..addListener(() {
+    //   if (!_dynamicsController.tabController.indexIsChanging) {
+    //     // if (!mounted) return;
+    //     // print('indexChanging: ${_dynamicsController.tabController.index}');
+    //     _dynamicsController
+    //         .onSelectType(_dynamicsController.tabController.index);
+    //   }
+    // });
     _dynamicsController.userLogin.listen((status) {
       if (mounted) {
         setState(() {
-          _futureBuilderFuture = _dynamicsController.queryFollowDynamic();
           _futureBuilderFutureUp = _dynamicsController.queryFollowUp();
         });
       }
     });
+    upPanelPosition = UpPanelPosition.values[setting.get(
+        SettingBoxKey.upPanelPosition,
+        defaultValue: UpPanelPosition.leftFixed.code)];
+    print('upPanelPosition: $upPanelPosition');
+    scrollController = _dynamicsController.scrollController;
   }
 
   @override
   void dispose() {
-    scrollController.removeListener(() {});
+    _dynamicsController.tabController.removeListener(() {});
+    _dynamicsController.tabController.dispose();
     super.dispose();
+  }
+
+  Widget upPanelPart() {
+    return Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 4),
+        child: Container(
+          //抽屉模式增加底色
+          color: upPanelPosition.code > 1
+              ? Theme.of(context).colorScheme.surface
+              : Colors.transparent,
+          width: 56,
+          child: FutureBuilder(
+            future: _futureBuilderFutureUp,
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.done) {
+                if (snapshot.data == null) {
+                  return const SizedBox();
+                }
+                Map data = snapshot.data;
+                if (data['status']) {
+                  return Obx(() => UpPanel(
+                      _dynamicsController.upData.value, scrollController));
+                } else {
+                  return const SizedBox();
+                }
+              } else {
+                return const SizedBox(
+                  width: 56,
+                  child: UpPanelSkeleton(),
+                );
+              }
+            },
+          ),
+        ));
   }
 
   @override
   Widget build(BuildContext context) {
+    print('upPanelPosition1: $upPanelPosition');
     super.build(context);
     return Scaffold(
-      appBar: AppBar(
-        elevation: 0,
-        scrolledUnderElevation: 0,
-        titleSpacing: 0,
-        title: SizedBox(
-          height: 34,
-          child: Stack(
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Obx(() {
-                    if (_dynamicsController.mid.value != -1 &&
-                        _dynamicsController.upInfo.value.uname != null) {
-                      return SizedBox(
-                        height: 36,
-                        child: AnimatedSwitcher(
-                          duration: const Duration(milliseconds: 300),
-                          transitionBuilder:
-                              (Widget child, Animation<double> animation) {
-                            return ScaleTransition(
-                                scale: animation, child: child);
-                          },
-                          child: Text(
-                              '${_dynamicsController.upInfo.value.uname!}的动态',
-                              key: ValueKey<String>(
-                                  _dynamicsController.upInfo.value.uname!),
-                              style: TextStyle(
-                                fontSize: Theme.of(context)
-                                    .textTheme
-                                    .labelLarge!
-                                    .fontSize,
-                              )),
-                        ),
-                      );
-                    } else {
-                      return const SizedBox();
-                    }
-                  }),
-                  Obx(
-                    () => _dynamicsController.userLogin.value
-                        ? Visibility(
-                            visible: _dynamicsController.mid.value == -1,
-                            child: Theme(
-                              data: ThemeData(
-                                splashColor:
-                                    Colors.transparent, // 点击时的水波纹颜色设置为透明
-                                highlightColor:
-                                    Colors.transparent, // 点击时的背景高亮颜色设置为透明
-                              ),
-                              child: CustomSlidingSegmentedControl<int>(
-                                initialValue:
-                                    _dynamicsController.initialValue.value,
-                                children: {
-                                  0: Text(
-                                    '全部',
-                                    style: TextStyle(
-                                        fontSize: Theme.of(context)
-                                            .textTheme
-                                            .labelMedium!
-                                            .fontSize),
-                                  ),
-                                  1: Text('投稿',
-                                      style: TextStyle(
-                                          fontSize: Theme.of(context)
-                                              .textTheme
-                                              .labelMedium!
-                                              .fontSize)),
-                                  2: Text('番剧',
-                                      style: TextStyle(
-                                          fontSize: Theme.of(context)
-                                              .textTheme
-                                              .labelMedium!
-                                              .fontSize)),
-                                  3: Text('专栏',
-                                      style: TextStyle(
-                                          fontSize: Theme.of(context)
-                                              .textTheme
-                                              .labelMedium!
-                                              .fontSize)),
-                                },
-                                padding: 13.0,
-                                decoration: BoxDecoration(
-                                  color: Theme.of(context)
-                                      .colorScheme
-                                      .surfaceVariant
-                                      .withOpacity(0.7),
-                                  borderRadius: BorderRadius.circular(20),
-                                ),
-                                thumbDecoration: BoxDecoration(
-                                  color:
-                                      Theme.of(context).colorScheme.background,
-                                  borderRadius: BorderRadius.circular(20),
-                                ),
-                                duration: const Duration(milliseconds: 300),
-                                curve: Curves.easeInOut,
-                                onValueChanged: (v) {
-                                  feedBack();
-                                  _dynamicsController.onSelectType(v);
-                                },
-                              ),
-                            ),
-                          )
-                        : Text('动态',
-                            style: Theme.of(context).textTheme.titleMedium),
-                  )
-                ],
-              ),
-            ],
+        backgroundColor: Colors.transparent,
+        appBar: AppBar(
+          toolbarHeight: 50,
+          elevation: 0,
+          backgroundColor: Colors.transparent,
+          systemOverlayStyle: SystemUiOverlayStyle(
+            statusBarIconBrightness:
+                Theme.of(context).brightness == Brightness.light
+                    ? Brightness.dark
+                    : Brightness.light,
           ),
+          title: SizedBox(
+              height: 50,
+              child: TabBar(
+                  controller: _dynamicsController.tabController,
+                  isScrollable: true,
+                  dividerColor: Colors.transparent,
+                  dividerHeight: 0,
+                  tabAlignment: TabAlignment.center,
+                  indicatorColor: Theme.of(context).colorScheme.primary,
+                  labelColor: Theme.of(context).colorScheme.primary,
+                  unselectedLabelColor: Theme.of(context).colorScheme.onSurface,
+                  labelStyle: TextStyle(
+                    fontSize: Theme.of(context).textTheme.labelMedium!.fontSize,
+                  ),
+                  tabs: DynamicsType.values
+                      .map((e) => Tab(text: e.labels))
+                      .toList(),
+                  onTap: (index) {
+                    print('index: $index');
+                    feedBack();
+                    tabsConfig[_dynamicsController.tabController.index]['ctr']
+                        .animateToTop();
+                    // _dynamicsController.tabController
+                    // _dynamicsController.tabController.index = index;
+                    // _dynamicsController.onSelectType(index);
+                    // _
+                  })),
         ),
-      ),
-      body: RefreshIndicator(
-        onRefresh: () => _dynamicsController.onRefresh(),
-        child: CustomScrollView(
-          controller: _dynamicsController.scrollController,
-          slivers: [
-            FutureBuilder(
-              future: _futureBuilderFutureUp,
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.done) {
-                  if (snapshot.data == null) {
-                    return const SliverToBoxAdapter(child: SizedBox());
-                  }
-                  Map data = snapshot.data;
-                  if (data['status']) {
-                    return Obx(() => UpPanel(_dynamicsController.upData.value));
-                  } else {
-                    return const SliverToBoxAdapter(
-                      child: SizedBox(height: 80),
-                    );
-                  }
-                } else {
-                  return const SliverToBoxAdapter(
-                      child: SizedBox(
-                    height: 90,
-                    child: UpPanelSkeleton(),
-                  ));
-                }
-              },
-            ),
-            FutureBuilder(
-              future: _futureBuilderFuture,
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.done) {
-                  if (snapshot.data == null) {
-                    return const SliverToBoxAdapter(child: SizedBox());
-                  }
-                  Map data = snapshot.data;
-                  if (data['status']) {
-                    List<DynamicItemModel> list =
-                        _dynamicsController.dynamicsList;
-                    return Obx(
-                      () {
-                        if (list.isEmpty) {
-                          if (_dynamicsController.isLoadingDynamic.value) {
-                            return skeleton();
-                          } else {
-                            return const NoData();
-                          }
-                        } else {
-                          return SliverWaterfallFlow.extent(
-                              maxCrossAxisExtent: Grid.maxRowWidth * 2,
-                              //cacheExtent: 0.0,
-                              crossAxisSpacing: StyleString.safeSpace,
-                              mainAxisSpacing: StyleString.safeSpace,
-
-                              /// follow max child trailing layout offset and layout with full cross axis extend
-                              /// last child as loadmore item/no more item in [GridView] and [WaterfallFlow]
-                              /// with full cross axis extend
-                              //  LastChildLayoutType.fullCrossAxisExtend,
-
-                              /// as foot at trailing and layout with full cross axis extend
-                              /// show no more item at trailing when children are not full of viewport
-                              /// if children is full of viewport, it's the same as fullCrossAxisExtend
-                              //  LastChildLayoutType.foot,
-                              lastChildLayoutTypeBuilder: (index) =>
-                                  index == list.length
-                                      ? LastChildLayoutType.foot
-                                      : LastChildLayoutType.none,
-                              children: [
-                                for (var i in list) DynamicPanel(item: i),
-                              ]);
-                        }
-                      },
-                    );
-                  } else {
-                    return HttpError(
-                      errMsg: data['msg'],
-                      fn: () {
-                        setState(() {
-                          _futureBuilderFuture =
-                              _dynamicsController.queryFollowDynamic();
-                          _futureBuilderFutureUp =
-                              _dynamicsController.queryFollowUp();
-                        });
-                      },
-                    );
-                  }
-                } else {
-                  // 骨架屏
-                  return skeleton();
-                }
-              },
-            ),
-            const SliverToBoxAdapter(child: SizedBox(height: 40))
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget skeleton() {
-    return SliverList(
-      delegate: SliverChildBuilderDelegate((context, index) {
-        return const DynamicCardSkeleton();
-      }, childCount: 5),
-    );
+        drawer: upPanelPosition == UpPanelPosition.leftDrawer
+            ? upPanelPart()
+            : null,
+        drawerEnableOpenDragGesture: true,
+        endDrawer: upPanelPosition == UpPanelPosition.rightDrawer
+            ? upPanelPart()
+            : null,
+        endDrawerEnableOpenDragGesture: true,
+        body: Row(children: [
+          if (upPanelPosition == UpPanelPosition.leftFixed) upPanelPart(),
+          Expanded(
+              child: TabBarView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            controller: _dynamicsController.tabController,
+            children: _dynamicsController.tabsPageList,
+          )),
+          if (upPanelPosition == UpPanelPosition.rightFixed) upPanelPart(),
+        ]));
   }
 }

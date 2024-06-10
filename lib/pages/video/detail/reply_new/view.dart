@@ -4,8 +4,12 @@ import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:PiliPalaX/http/video.dart';
 import 'package:PiliPalaX/models/common/reply_type.dart';
+import 'package:PiliPalaX/models/video/reply/emote.dart';
 import 'package:PiliPalaX/models/video/reply/item.dart';
+import 'package:PiliPalaX/pages/emote/index.dart';
 import 'package:PiliPalaX/utils/feed_back.dart';
+
+import 'toolbar_icon_button.dart';
 
 class VideoReplyNewDialog extends StatefulWidget {
   final int? oid;
@@ -32,6 +36,10 @@ class _VideoReplyNewDialogState extends State<VideoReplyNewDialog>
   final TextEditingController _replyContentController = TextEditingController();
   final FocusNode replyContentFocusNode = FocusNode();
   final GlobalKey _formKey = GlobalKey<FormState>();
+  late double emoteHeight = 0.0;
+  double keyboardHeight = 0.0; // 键盘高度
+  final _debouncer = Debouncer(milliseconds: 200); // 设置延迟时间
+  String toolbarType = 'input';
 
   @override
   void initState() {
@@ -42,6 +50,8 @@ class _VideoReplyNewDialogState extends State<VideoReplyNewDialog>
     WidgetsBinding.instance.addObserver(this);
     // 自动聚焦
     _autoFocus();
+    // 监听聚焦状态
+    _focuslistener();
   }
 
   _autoFocus() async {
@@ -49,6 +59,16 @@ class _VideoReplyNewDialogState extends State<VideoReplyNewDialog>
     if (context.mounted) {
       FocusScope.of(context).requestFocus(replyContentFocusNode);
     }
+  }
+
+  _focuslistener() {
+    replyContentFocusNode.addListener(() {
+      if (replyContentFocusNode.hasFocus) {
+        setState(() {
+          toolbarType = 'input';
+        });
+      }
+    });
   }
 
   Future submitReplyAdd() async {
@@ -73,10 +93,46 @@ class _VideoReplyNewDialogState extends State<VideoReplyNewDialog>
     }
   }
 
+  void onChooseEmote(Packages package, Emote emote) {
+    final int cursorPosition = _replyContentController.selection.baseOffset;
+    final String currentText = _replyContentController.text;
+    final String newText = currentText.substring(0, cursorPosition) +
+        emote.text! +
+        currentText.substring(cursorPosition);
+    _replyContentController.value = TextEditingValue(
+      text: newText,
+      selection:
+          TextSelection.collapsed(offset: cursorPosition + emote.text!.length),
+    );
+  }
+
+  @override
+  void didChangeMetrics() {
+    super.didChangeMetrics();
+    if (!mounted) return;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      // 键盘高度
+      final viewInsets = EdgeInsets.fromViewPadding(
+          View.of(context).viewInsets, View.of(context).devicePixelRatio);
+      _debouncer.run(() {
+        if (!mounted) return;
+        if (keyboardHeight == 0 && emoteHeight == 0) {
+          emoteHeight = keyboardHeight =
+              keyboardHeight == 0.0 ? viewInsets.bottom : keyboardHeight;
+          if (emoteHeight < 200) emoteHeight = 200;
+          setState(() {});
+        }
+      });
+    });
+  }
+
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
     _replyContentController.dispose();
+    replyContentFocusNode.removeListener(() {});
+    replyContentFocusNode.dispose();
     super.dispose();
   }
 
@@ -137,44 +193,80 @@ class _VideoReplyNewDialogState extends State<VideoReplyNewDialog>
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                SizedBox(
-                  width: 36,
-                  height: 36,
-                  child: IconButton(
-                    onPressed: () {
-                      FocusScope.of(context)
-                          .requestFocus(replyContentFocusNode);
-                    },
-                    icon: Icon(Icons.keyboard,
-                        size: 22,
-                        color: Theme.of(context).colorScheme.onBackground),
-                    highlightColor:
-                        Theme.of(context).colorScheme.onInverseSurface,
-                    style: ButtonStyle(
-                      padding: MaterialStateProperty.all(EdgeInsets.zero),
-                      backgroundColor:
-                          MaterialStateProperty.resolveWith((states) {
-                        return Theme.of(context).highlightColor;
-                      }),
-                    ),
-                  ),
+                ToolbarIconButton(
+                  tooltip: '输入',
+                  onPressed: () {
+                    if (toolbarType == 'emote') {
+                      setState(() {
+                        toolbarType = 'input';
+                      });
+                    }
+                    FocusScope.of(context).requestFocus(replyContentFocusNode);
+                  },
+                  icon: const Icon(Icons.keyboard, size: 22),
+                  toolbarType: toolbarType,
+                  selected: toolbarType == 'input',
+                ),
+                const SizedBox(width: 20),
+                ToolbarIconButton(
+                  tooltip: '表情',
+                  onPressed: () {
+                    if (toolbarType == 'input') {
+                      setState(() {
+                        toolbarType = 'emote';
+                      });
+                    }
+                    FocusScope.of(context).unfocus();
+                  },
+                  icon: const Icon(Icons.emoji_emotions, size: 22),
+                  toolbarType: toolbarType,
+                  selected: toolbarType == 'emote',
                 ),
                 const Spacer(),
+                TextButton(
+                    onPressed: () => Get.back(),
+                    child: Text('取消',
+                        style: TextStyle(
+                            color: Theme.of(context).colorScheme.secondary))),
+                const SizedBox(width: 10),
                 TextButton(
                     onPressed: () => submitReplyAdd(), child: const Text('发送'))
               ],
             ),
           ),
-          AnimatedSize(
-            curve: Curves.easeInOut,
-            duration: const Duration(milliseconds: 300),
-            child: SizedBox(
-              width: double.infinity,
-              height: keyboardHeight,
+          SizedBox(
+            width: double.infinity,
+            height: toolbarType == 'input' ? keyboardHeight : emoteHeight,
+            child: EmotePanel(
+              onChoose: (package, emote) => onChooseEmote(package, emote),
             ),
           ),
+          if (toolbarType == 'input' && keyboardHeight == 0.0)
+            SizedBox(
+              width: double.infinity,
+              height: MediaQuery.of(context).padding.bottom,
+            )
         ],
       ),
     );
+  }
+}
+
+typedef DebounceCallback = void Function();
+
+class Debouncer {
+  DebounceCallback? callback;
+  final int? milliseconds;
+  Timer? _timer;
+
+  Debouncer({this.milliseconds});
+
+  run(DebounceCallback callback) {
+    if (_timer != null) {
+      _timer!.cancel();
+    }
+    _timer = Timer(Duration(milliseconds: milliseconds!), () {
+      callback();
+    });
   }
 }

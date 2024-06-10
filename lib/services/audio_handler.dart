@@ -1,4 +1,6 @@
+import 'package:PiliPalaX/models/danmaku/dm.pb.dart';
 import 'package:audio_service/audio_service.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:hive/hive.dart';
 import 'package:PiliPalaX/models/bangumi/info.dart';
 import 'package:PiliPalaX/models/video_detail_res.dart';
@@ -25,7 +27,8 @@ Future<VideoPlayerServiceHandler> initAudioService() async {
 class VideoPlayerServiceHandler extends BaseAudioHandler with SeekHandler {
   static final List<MediaItem> _item = [];
   Box setting = GStrorage.setting;
-  bool enableBackgroundPlay = false;
+  bool enableBackgroundPlay = true;
+  // PlPlayerController player = PlPlayerController.getInstance();
 
   VideoPlayerServiceHandler() {
     revalidateSetting();
@@ -33,17 +36,19 @@ class VideoPlayerServiceHandler extends BaseAudioHandler with SeekHandler {
 
   revalidateSetting() {
     enableBackgroundPlay =
-        setting.get(SettingBoxKey.enableBackgroundPlay, defaultValue: false);
+        setting.get(SettingBoxKey.enableBackgroundPlay, defaultValue: true);
   }
 
   @override
   Future<void> play() async {
-    PlPlayerController.getInstance().play();
+    await PlPlayerController.playIfExists();
+    // player.play();
   }
 
   @override
   Future<void> pause() async {
-    PlPlayerController.getInstance().pause();
+    await PlPlayerController.pauseIfExists();
+    // player.pause();
   }
 
   @override
@@ -51,12 +56,17 @@ class VideoPlayerServiceHandler extends BaseAudioHandler with SeekHandler {
     playbackState.add(playbackState.value.copyWith(
       updatePosition: position,
     ));
-    await PlPlayerController.getInstance().seekTo(position);
+    await PlPlayerController.seekToIfExists(position);
+    // await player.seekTo(position);
   }
 
   Future<void> setMediaItem(MediaItem newMediaItem) async {
     if (!enableBackgroundPlay) return;
-    mediaItem.add(newMediaItem);
+    // print("此时调用栈为：");
+    // print(newMediaItem);
+    // print(newMediaItem.title);
+    // debugPrint(StackTrace.current.toString());
+    if(!mediaItem.isClosed) mediaItem.add(newMediaItem);
   }
 
   Future<void> setPlaybackState(PlayerStatus status, bool isBuffering) async {
@@ -98,17 +108,17 @@ class VideoPlayerServiceHandler extends BaseAudioHandler with SeekHandler {
 
   onVideoDetailChange(dynamic data, int cid) {
     if (!enableBackgroundPlay) return;
-
+    // print('当前调用栈为：');
+    // print(StackTrace.current);
+    if (!PlPlayerController.instanceExists()) return;
     if (data == null) return;
-    Map argMap = Get.arguments;
-    final heroTag = argMap['heroTag'];
 
     late MediaItem? mediaItem;
     if (data is VideoDetailData) {
       if ((data.pages?.length ?? 0) > 1) {
         final current = data.pages?.firstWhere((element) => element.cid == cid);
         mediaItem = MediaItem(
-          id: heroTag,
+          id: UniqueKey().toString(),
           title: current?.pagePart ?? "",
           artist: data.title ?? "",
           album: data.title ?? "",
@@ -117,7 +127,7 @@ class VideoPlayerServiceHandler extends BaseAudioHandler with SeekHandler {
         );
       } else {
         mediaItem = MediaItem(
-          id: heroTag,
+          id: UniqueKey().toString(),
           title: data.title ?? "",
           artist: data.owner?.name ?? "",
           duration: Duration(seconds: data.duration ?? 0),
@@ -128,7 +138,7 @@ class VideoPlayerServiceHandler extends BaseAudioHandler with SeekHandler {
       final current =
           data.episodes?.firstWhere((element) => element.cid == cid);
       mediaItem = MediaItem(
-        id: heroTag,
+        id: UniqueKey().toString(),
         title: current?.longTitle ?? "",
         artist: data.title ?? "",
         duration: Duration(milliseconds: current?.duration ?? 0),
@@ -136,6 +146,8 @@ class VideoPlayerServiceHandler extends BaseAudioHandler with SeekHandler {
       );
     }
     if (mediaItem == null) return;
+    // print("exist: ${PlPlayerController.instanceExists()}");
+    if (!PlPlayerController.instanceExists()) return;
     setMediaItem(mediaItem);
     _item.add(mediaItem);
   }
@@ -152,10 +164,8 @@ class VideoPlayerServiceHandler extends BaseAudioHandler with SeekHandler {
     }
     if (_item.isNotEmpty) {
       setMediaItem(_item.last);
-    }
-    if (_item.isEmpty) {
-      playbackState
-          .add(playbackState.value.copyWith(updatePosition: Duration.zero));
+    } else {
+      mediaItem?.close();
     }
     stop();
   }

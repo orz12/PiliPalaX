@@ -61,7 +61,7 @@ class IntroDetail extends StatelessWidget {
                         const SizedBox(width: 10),
                         StatDanMu(
                           theme: 'gray',
-                          danmu: videoDetail!.stat!.danmaku,
+                          danmu: videoDetail!.stat!.danmu,
                           size: 'medium',
                         ),
                         const SizedBox(width: 10),
@@ -104,6 +104,7 @@ class IntroDetail extends StatelessWidget {
                         ),
                       ),
                     ),
+                    const SizedBox(height: 100),
                   ],
                 ),
               ),

@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
@@ -23,7 +24,7 @@ import 'widgets/group_panel.dart';
 
 class VideoIntroController extends GetxController {
   // 视频bvid
-  String bvid = Get.parameters['bvid']!;
+  late String bvid;
 
   // 是否预渲染 骨架屏
   bool preRender = false;
@@ -42,6 +43,8 @@ class VideoIntroController extends GetxController {
 
   // 是否点赞
   RxBool hasLike = false.obs;
+  // 是否点踩
+  RxBool hasDislike = false.obs;
   // 是否投币
   RxBool hasCoin = false.obs;
   // 是否收藏
@@ -72,6 +75,7 @@ class VideoIntroController extends GetxController {
     userInfo = userInfoCache.get('userInfoCache');
     try {
       heroTag = Get.arguments['heroTag'];
+      bvid = Get.parameters['bvid']!;
     } catch (_) {}
     if (Get.arguments.isNotEmpty) {
       if (Get.arguments.containsKey('videoItem')) {
@@ -117,6 +121,8 @@ class VideoIntroController extends GetxController {
       // ];
       // 获取到粉丝数再返回
       await queryUserStat();
+    } else {
+      SmartDialog.showToast(result['msg']);
     }
     if (userLogin) {
       // 获取点赞状态
@@ -142,15 +148,16 @@ class VideoIntroController extends GetxController {
   // 获取点赞状态
   Future queryHasLikeVideo() async {
     var result = await VideoHttp.hasLikeVideo(bvid: bvid);
-    // data	num	被点赞标志	0：未点赞  1：已点赞
-    hasLike.value = result["data"] == 1 ? true : false;
+    // data	num	被点赞标志	0：未点赞  1：已点赞  2：已点踩
+    hasLike.value = result["data"] == 1;
+    hasDislike.value = result["data"] == 2;
   }
 
   // 获取投币状态
   Future queryHasCoinVideo() async {
     var result = await VideoHttp.hasCoinVideo(bvid: bvid);
     if (result['status']) {
-      hasCoin.value = result["data"]['multiply'] == 0 ? false : true;
+      hasCoin.value = result["data"]['multiply'] != 0;
     }
   }
 
@@ -167,7 +174,7 @@ class VideoIntroController extends GetxController {
   }
 
   // 一键三连
-  Future actionOneThree() async {
+  Future actionOneThree(BuildContext context) async {
     if (userInfo == null) {
       SmartDialog.showToast('账号未登录');
       return;
@@ -177,19 +184,19 @@ class VideoIntroController extends GetxController {
       SmartDialog.showToast('🙏 UP已经收到了～');
       return false;
     }
-    SmartDialog.show(
-      useSystem: true,
-      animationType: SmartAnimationType.centerFade_otherSlide,
-      builder: (BuildContext context) {
+    await showDialog(
+      context: context,
+      builder: (context) {
         return AlertDialog(
           title: const Text('提示'),
           content: const Text('一键三连 给UP送温暖'),
           actions: [
             TextButton(
-                onPressed: () => SmartDialog.dismiss(),
+                onPressed: () => Get.back(),
                 child: const Text('点错了')),
             TextButton(
               onPressed: () async {
+                Get.back();
                 var result = await VideoHttp.oneThree(bvid: bvid);
                 if (result['status']) {
                   hasLike.value = result["data"]["like"];
@@ -199,7 +206,6 @@ class VideoIntroController extends GetxController {
                 } else {
                   SmartDialog.showToast(result['msg']);
                 }
-                SmartDialog.dismiss();
               },
               child: const Text('确认'),
             )
@@ -219,8 +225,9 @@ class VideoIntroController extends GetxController {
     if (result['status']) {
       // hasLike.value = result["data"] == 1 ? true : false;
       if (!hasLike.value) {
-        SmartDialog.showToast('点赞成功 👍');
+        SmartDialog.showToast('点赞成功');
         hasLike.value = true;
+        hasDislike.value = false;
         videoDetail.value.stat!.like = videoDetail.value.stat!.like! + 1;
       } else if (hasLike.value) {
         SmartDialog.showToast('取消赞');
@@ -228,6 +235,29 @@ class VideoIntroController extends GetxController {
         videoDetail.value.stat!.like = videoDetail.value.stat!.like! - 1;
       }
       hasLike.refresh();
+    } else {
+      SmartDialog.showToast(result['msg']);
+    }
+  }
+
+  Future actionDislikeVideo() async {
+    if (userInfo == null) {
+      SmartDialog.showToast('账号未登录');
+      return;
+    }
+    var result =
+        await VideoHttp.dislikeVideo(bvid: bvid, type: !hasDislike.value);
+    if (result['status']) {
+      // hasLike.value = result["data"] == 1 ? true : false;
+      if (!hasDislike.value) {
+        SmartDialog.showToast('点踩成功');
+        hasDislike.value = true;
+        hasLike.value = false;
+      } else {
+        SmartDialog.showToast('取消踩');
+        hasDislike.value = false;
+      }
+      // hasDislike.refresh();
     } else {
       SmartDialog.showToast(result['msg']);
     }
@@ -277,7 +307,7 @@ class VideoIntroController extends GetxController {
                     var res = await VideoHttp.coinVideo(
                         bvid: bvid, multiply: _tempThemeValue);
                     if (res['status']) {
-                      SmartDialog.showToast('投币成功 👏');
+                      SmartDialog.showToast('投币成功');
                       hasCoin.value = true;
                       videoDetail.value.stat!.coin =
                           videoDetail.value.stat!.coin! + _tempThemeValue;
@@ -296,6 +326,7 @@ class VideoIntroController extends GetxController {
   Future actionFavVideo({type = 'choose'}) async {
     // 收藏至默认文件夹
     if (type == 'default') {
+      SmartDialog.showLoading(msg: '请求中');
       await queryVideoInFolder();
       int defaultFolderId = favFolderData.value.list!.first.id!;
       int favStatus = favFolderData.value.list!.first.favState!;
@@ -304,12 +335,11 @@ class VideoIntroController extends GetxController {
         addIds: favStatus == 0 ? '$defaultFolderId' : '',
         delIds: favStatus == 1 ? '$defaultFolderId' : '',
       );
+      SmartDialog.dismiss();
       if (result['status']) {
-        if (result['data']['prompt']) {
-          // 重新获取收藏状态
-          await queryHasFavVideo();
-          SmartDialog.showToast('✅ 操作成功');
-        }
+        // 重新获取收藏状态
+        await queryHasFavVideo();
+        SmartDialog.showToast('✅ 快速收藏/取消收藏成功');
       } else {
         SmartDialog.showToast(result['msg']);
       }
@@ -334,14 +364,12 @@ class VideoIntroController extends GetxController {
         delIds: delMediaIdsNew.join(','));
     SmartDialog.dismiss();
     if (result['status']) {
-      if (result['data']['prompt']) {
-        addMediaIdsNew = [];
-        delMediaIdsNew = [];
-        Get.back();
-        // 重新获取收藏状态
-        await queryHasFavVideo();
-        SmartDialog.showToast('✅ 操作成功');
-      }
+      addMediaIdsNew = [];
+      delMediaIdsNew = [];
+      Get.back();
+      // 重新获取收藏状态
+      await queryHasFavVideo();
+      SmartDialog.showToast('操作成功');
     } else {
       SmartDialog.showToast(result['msg']);
     }
@@ -349,10 +377,33 @@ class VideoIntroController extends GetxController {
 
   // 分享视频
   Future actionShareVideo() async {
-    var result = await Share.share(
-            '${videoDetail.value.title} UP主: ${videoDetail.value.owner!.name!} - ${HttpString.baseUrl}/video/$bvid')
-        .whenComplete(() {});
-    return result;
+    showDialog(
+        context: Get.context!,
+        builder: (context) {
+          String videoUrl = '${HttpString.baseUrl}/video/$bvid';
+          return AlertDialog(
+            title: const Text('分享方式'),
+            actions: [
+              TextButton(
+                  onPressed: () {
+                    Clipboard.setData(ClipboardData(text: videoUrl));
+                    SmartDialog.showToast('已复制');
+                    Get.back();
+                  },
+                  child: const Text('复制链接')),
+              TextButton(
+                  onPressed: () async {
+                    var result = await Share.share('${videoDetail.value.title} '
+                            'UP主: ${videoDetail.value.owner!.name!}'
+                            ' - $videoUrl')
+                        .whenComplete(() {});
+                    Get.back();
+                    return result;
+                  },
+                  child: const Text('分享视频')),
+            ],
+          );
+        });
   }
 
   Future queryVideoInFolder() async {
@@ -393,7 +444,7 @@ class VideoIntroController extends GetxController {
   }
 
   // 关注/取关up
-  Future actionRelationMod() async {
+  Future actionRelationMod(BuildContext context) async {
     feedBack();
     if (userInfo == null) {
       SmartDialog.showToast('账号未登录');
@@ -412,16 +463,15 @@ class VideoIntroController extends GetxController {
         actionStatus = 0;
         break;
     }
-    SmartDialog.show(
-      useSystem: true,
-      animationType: SmartAnimationType.centerFade_otherSlide,
-      builder: (BuildContext context) {
+    await showDialog(
+      context: context,
+      builder: (context) {
         return AlertDialog(
           title: const Text('提示'),
           content: Text(currentStatus == 0 ? '关注UP主?' : '取消关注UP主?'),
           actions: [
             TextButton(
-              onPressed: () => SmartDialog.dismiss(),
+              onPressed: () => Get.back(),
               child: Text(
                 '点错了',
                 style: TextStyle(color: Theme.of(context).colorScheme.outline),
@@ -464,7 +514,7 @@ class VideoIntroController extends GetxController {
                     }
                   }
                 }
-                SmartDialog.dismiss();
+                Get.back();
               },
               child: const Text('确认'),
             )
@@ -482,7 +532,7 @@ class VideoIntroController extends GetxController {
     final ReleatedController releatedCtr =
         Get.find<ReleatedController>(tag: heroTag);
     videoDetailCtr.bvid = bvid;
-    videoDetailCtr.oid.value = aid;
+    videoDetailCtr.oid.value = aid ?? IdUtils.bv2av(bvid);
     videoDetailCtr.cid.value = cid;
     videoDetailCtr.danmakuCid.value = cid;
     videoDetailCtr.queryVideoUrl();
@@ -531,7 +581,7 @@ class VideoIntroController extends GetxController {
   }
 
   /// 列表循环或者顺序播放时，自动播放下一个
-  void nextPlay() {
+  bool nextPlay() {
     final List episodes = [];
     bool isPages = false;
     if (videoDetail.value.ugcSeason != null) {
@@ -560,13 +610,14 @@ class VideoIntroController extends GetxController {
         nextIndex = 0;
       }
       if (platRepeat == PlayRepeat.listOrder) {
-        return;
+        return false;
       }
     }
     final int cid = episodes[nextIndex].cid!;
     final String rBvid = isPages ? bvid : episodes[nextIndex].bvid;
     final int rAid = isPages ? IdUtils.bv2av(bvid) : episodes[nextIndex].aid!;
     changeSeasonOrbangu(rBvid, cid, rAid);
+    return true;
   }
 
   // 设置关注分组

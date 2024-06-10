@@ -50,6 +50,7 @@ class _FavSearchPageState extends State<FavSearchPage> {
         titleSpacing: 0,
         actions: [
           IconButton(
+              tooltip: '搜索',
               onPressed: () => _favSearchCtr.submit(),
               icon: const Icon(Icons.search_outlined, size: 22)),
           const SizedBox(width: 10)
@@ -65,6 +66,7 @@ class _FavSearchPageState extends State<FavSearchPage> {
               hintText: _favSearchCtr.hintText,
               border: InputBorder.none,
               suffixIcon: IconButton(
+                tooltip: '清空',
                 icon: Icon(
                   Icons.clear,
                   size: 22,

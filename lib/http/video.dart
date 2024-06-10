@@ -1,4 +1,5 @@
 import 'dart:developer';
+import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:hive/hive.dart';
 import '../common/constants.dart';
 import '../models/common/reply_type.dart';
@@ -9,6 +10,7 @@ import '../models/user/fav_folder.dart';
 import '../models/video/ai.dart';
 import '../models/video/play/url.dart';
 import '../models/video_detail_res.dart';
+import '../utils/id_utils.dart';
 import '../utils/recommend_filter.dart';
 import '../utils/storage.dart';
 import '../utils/wbi_sign.dart';
@@ -44,8 +46,10 @@ class VideoHttp {
       );
       if (res.data['code'] == 0) {
         List<RecVideoItemModel> list = [];
-        List<int> blackMidsList =
-            setting.get(SettingBoxKey.blackMidsList, defaultValue: [-1]);
+        List<int> blackMidsList = setting
+            .get(SettingBoxKey.blackMidsList, defaultValue: [-1])
+            .map<int>((e) => e as int)
+            .toList();
         for (var i in res.data['data']['item']) {
           //过滤掉live与ad，以及拉黑用户
           if (i['goto'] == 'av' &&
@@ -90,8 +94,10 @@ class VideoHttp {
       );
       if (res.data['code'] == 0) {
         List<RecVideoItemAppModel> list = [];
-        List<int> blackMidsList =
-            setting.get(SettingBoxKey.blackMidsList, defaultValue: [-1]);
+        List<int> blackMidsList = setting
+            .get(SettingBoxKey.blackMidsList, defaultValue: [-1])
+            .map<int>((e) => e as int)
+            .toList();
         for (var i in res.data['data']['items']) {
           // 屏蔽推广和拉黑用户
           if (i['card_goto'] != 'ad_av' &&
@@ -122,8 +128,10 @@ class VideoHttp {
       );
       if (res.data['code'] == 0) {
         List<HotVideoItemModel> list = [];
-        List<int> blackMidsList =
-            setting.get(SettingBoxKey.blackMidsList, defaultValue: [-1]);
+        List<int> blackMidsList = setting
+            .get(SettingBoxKey.blackMidsList, defaultValue: [-1])
+            .map<int>((e) => e as int)
+            .toList();
         for (var i in res.data['data']['list']) {
           if (!blackMidsList.contains(i['owner']['mid'])) {
             list.add(HotVideoItemModel.fromJson(i));
@@ -155,7 +163,8 @@ class VideoHttp {
     }
 
     // 免登录查看1080p
-    if ((userInfoCache.get('userInfoCache') == null || MineController.anonymity) &&
+    if ((userInfoCache.get('userInfoCache') == null ||
+            MineController.anonymity) &&
         setting.get(SettingBoxKey.p1080, defaultValue: true)) {
       data['try_look'] = 1;
     }
@@ -195,18 +204,19 @@ class VideoHttp {
     if (result.code == 0) {
       return {'status': true, 'data': result.data!};
     } else {
-      Map errMap = {
-        -400: '请求错误',
-        -403: '权限不足',
-        -404: '视频资源失效',
-        62002: '稿件不可见',
-        62004: '稿件审核中',
-      };
+      // Map errMap = {
+      //   -400: '请求错误',
+      //   -403: '权限不足',
+      //   -404: '视频资源失效',
+      //   62002: '稿件不可见',
+      //   62004: '稿件审核中',
+      // };
       return {
         'status': false,
         'data': null,
         'code': result.code,
-        'msg': errMap[result.code] ?? '请求异常',
+        'msg': result.message,
+        // 'msg': errMap[result.code] ?? '请求异常',
       };
     }
   }
@@ -310,6 +320,29 @@ class VideoHttp {
     }
   }
 
+  // （取消）点踩
+  static Future dislikeVideo({required String bvid, required bool type}) async {
+    String? accessKey = GStrorage.localCache
+        .get(LocalCacheKey.accessKey, defaultValue: {})['value'];
+    if (accessKey == null || accessKey == "") {
+      return {'status': false, 'data': [], 'msg': "本操作使用app端接口，请前往【隐私设置】刷新access_key"};
+    }
+    var res = await Request().post(
+      Api.dislikeVideo,
+      queryParameters: {
+        'aid': IdUtils.bv2av(bvid),
+        'dislike': type ? 0 : 1,
+        'access_key': accessKey,
+      },
+    );
+    print(res);
+    if (res.data is! String && res.data['code'] == 0) {
+      return {'status': true, 'data': res.data['data']};
+    } else {
+      return {'status': false, 'data': [], 'msg': res.data['message']};
+    }
+  }
+
   // （取消）收藏
   static Future favVideo(
       {required int aid, String? addIds, String? delIds}) async {
@@ -370,6 +403,25 @@ class VideoHttp {
       return {'status': true, 'data': res.data['data']};
     } else {
       return {'status': false, 'data': [], 'msg': res.data['message']};
+    }
+  }
+
+  static Future replyDel({
+    required int type, //replyType
+    required int oid,
+    required int rpid,
+  }) async {
+    var res = await Request().post(Api.replyDel, queryParameters: {
+      'type': type, //type.index
+      'oid': oid,
+      'rpid': rpid,
+      'csrf': await Request.getCsrf(),
+    });
+    log(res.toString());
+    if (res.data['code'] == 0) {
+      return {'status': true};
+    } else {
+      return {'status': false, 'msg': res.data['message']};
     }
   }
 
@@ -474,6 +526,140 @@ class VideoHttp {
       };
     } else {
       return {'status': false, 'data': []};
+    }
+  }
+
+  static Future subtitlesJson(
+      {String? aid, String? bvid, required int cid}) async {
+    assert(aid != null || bvid != null);
+    var res = await Request().get(Api.subtitleUrl, data: {
+      if (aid != null) 'aid': aid,
+      if (bvid != null) 'bvid': bvid,
+      'cid': cid,
+    });
+    if (res.data['code'] == 0) {
+      dynamic data = res.data['data'];
+      List subtitlesJson = data['subtitle']['subtitles'];
+      /*
+      [
+        {
+          "id": 1430455228267894300,
+          "lan": "ai-zh",
+          "lan_doc": "中文（自动生成）",
+          "is_lock": false,
+          "subtitle_url": "//aisubtitle.hdslb.com/bfs/ai_subtitle/prod/15508958271448462983dacf99a49f40ccdf91a4df8d925e2b58?auth_key=1708941835-aaa0e44844594386ad356795733983a2-0-89af73c6aad5a1fca43b02113fa9d485",
+          "type": 1,
+          "id_str": "1430455228267894272",
+          "ai_type": 0,
+          "ai_status": 2
+        }
+      ]
+       */
+      return {
+        'status': true,
+        'data': subtitlesJson,
+      };
+    } else {
+      return {'status': false, 'data': [], 'msg': res.data['message']};
+    }
+  }
+
+  static Future vttSubtitles(List subtitlesJson) async {
+    if (subtitlesJson.isEmpty) {
+      return [];
+    }
+    List<Map<String, String>> subtitlesVtt = [];
+
+    String subtitleTimecode(num seconds) {
+      int h = (seconds / 3600).floor();
+      int m = ((seconds % 3600) / 60).floor();
+      int s = (seconds % 60).floor();
+      int ms = ((seconds * 1000) % 1000).floor();
+      if (h == 0) {
+        return "${m.toString().padLeft(2, '0')}:${s.toString().padLeft(2, '0')}.${ms.toString().padLeft(3, '0')}";
+      }
+      return "${h.toString().padLeft(2, '0')}:${m.toString().padLeft(2, '0')}:${s.toString().padLeft(2, '0')}.${ms.toString().padLeft(3, '0')}";
+    }
+
+    for (var i in subtitlesJson) {
+      var res =
+          await Request().get("https://${i['subtitle_url'].split('//')[1]}");
+      /*
+          {
+            "font_size": 0.4,
+            "font_color": "#FFFFFF",
+            "background_alpha": 0.5,
+            "background_color": "#9C27B0",
+            "Stroke": "none",
+            "type": "AIsubtitle",
+            "lang": "zh",
+            "version": "v1.6.0.4",
+            "body": [
+              {
+                "from": 0.5,
+                "to": 1.58,
+                "sid": 1,
+                "location": 2,
+                "content": "很多人可能不知道",
+                "music": 0.0
+              },
+              ……,
+              {
+                "from": 558.629,
+                "to": 560.22,
+                "sid": 280,
+                "location": 2,
+                "content": "我们下期再见",
+                "music": 0.0
+              }
+            ]
+          }
+         */
+      if (res.data != null) {
+        String vttData = "WEBVTT\n\n";
+        for (var item in res.data['body']) {
+          vttData += "${item['sid'] ?? 0}\n";
+          vttData +=
+              "${subtitleTimecode(item['from'])} --> ${subtitleTimecode(item['to'])}\n";
+          vttData += "${item['content'].trim()}\n\n";
+        }
+        subtitlesVtt.add({
+          'language': i['lan'],
+          'title': i['lan_doc'],
+          'text': vttData,
+        });
+      } else {
+        SmartDialog.showToast("字幕${i['lan_doc']}加载失败, ${res.data['message']}");
+      }
+    }
+    if (subtitlesVtt.isNotEmpty) {
+      subtitlesVtt.insert(0, {'language': '', 'title': '关闭字幕', 'text': ""});
+    }
+    return subtitlesVtt;
+  }
+
+  // 视频排行
+  static Future getRankVideoList(int rid) async {
+    try {
+      var rankApi = "${Api.getRankApi}?rid=$rid&type=all";
+      var res = await Request().get(rankApi);
+      if (res.data['code'] == 0) {
+        List<HotVideoItemModel> list = [];
+        List<int> blackMidsList = setting
+            .get(SettingBoxKey.blackMidsList, defaultValue: [-1])
+            .map<int>((e) => e as int)
+            .toList();
+        for (var i in res.data['data']['list']) {
+          if (!blackMidsList.contains(i['owner']['mid'])) {
+            list.add(HotVideoItemModel.fromJson(i));
+          }
+        }
+        return {'status': true, 'data': list};
+      } else {
+        return {'status': false, 'data': [], 'msg': res.data['message']};
+      }
+    } catch (err) {
+      return {'status': false, 'data': [], 'msg': err};
     }
   }
 }

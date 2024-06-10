@@ -61,6 +61,7 @@ class _GroupPanelState extends State<GroupPanel> {
             centerTitle: false,
             elevation: 0,
             leading: IconButton(
+                tooltip: '关闭',
                 onPressed: () => Get.back(),
                 icon: const Icon(Icons.close_outlined)),
             title:

@@ -90,7 +90,8 @@ class _ImagePreviewState extends State<ImagePreview>
               ListTile(
                 onTap: () {
                   Get.back();
-                  DownloadUtils.downloadImg(_previewController.currentImgUrl);
+                  DownloadUtils.downloadImg(
+                      context, _previewController.currentImgUrl);
                 },
                 dense: true,
                 title: const Text('保存到手机', style: TextStyle(fontSize: 14)),
@@ -135,16 +136,8 @@ class _ImagePreviewState extends State<ImagePreview>
       ),
       body: Stack(
         children: [
-          DismissiblePage(
-            backgroundColor: Colors.transparent,
-            onDismissed: () {
-              Navigator.of(context).pop();
-            },
-            // Note that scrollable widget inside DismissiblePage might limit the functionality
-            // If scroll direction matches DismissiblePage direction
-            direction: DismissiblePageDismissDirection.down,
-            disabled: _dismissDisabled,
-            isFullScreen: true,
+          Semantics(
+            label: '长按保存',
             child: GestureDetector(
               onLongPress: () => onOpenMenu(),
               child: ExtendedImageGesturePageView.builder(
@@ -251,33 +244,50 @@ class _ImagePreviewState extends State<ImagePreview>
             right: 0,
             bottom: 0,
             child: Container(
-              padding: EdgeInsets.only(
-                  bottom: MediaQuery.of(context).padding.bottom + 30),
-              decoration: const BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: <Color>[
-                    Colors.transparent,
-                    Colors.black87,
+                padding: EdgeInsets.only(
+                    left: 20,
+                    right: 20,
+                    bottom: MediaQuery.of(context).padding.bottom + 30),
+                decoration: const BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: <Color>[
+                      Colors.transparent,
+                      Colors.black87,
+                    ],
+                    tileMode: TileMode.mirror,
+                  ),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    widget.imgList!.length > 1
+                        ? Obx(
+                            () => Text.rich(
+                              textAlign: TextAlign.center,
+                              TextSpan(
+                                  style: const TextStyle(
+                                      color: Colors.white, fontSize: 16),
+                                  children: [
+                                    TextSpan(
+                                        text: _previewController.currentPage
+                                            .toString()),
+                                    const TextSpan(text: ' / '),
+                                    TextSpan(
+                                        text:
+                                            widget.imgList!.length.toString()),
+                                  ]),
+                            ),
+                          )
+                        : const SizedBox(),
+                    IconButton(
+                      onPressed: () => Get.back(),
+                      icon: const Icon(Icons.close, color: Colors.white),
+                      tooltip: '关闭',
+                    ),
                   ],
-                  tileMode: TileMode.mirror,
-                ),
-              ),
-              child: Obx(
-                () => Text.rich(
-                  textAlign: TextAlign.center,
-                  TextSpan(
-                      style: const TextStyle(color: Colors.white, fontSize: 15),
-                      children: [
-                        TextSpan(
-                            text: _previewController.currentPage.toString()),
-                        const TextSpan(text: ' / '),
-                        TextSpan(text: widget.imgList!.length.toString()),
-                      ]),
-                ),
-              ),
-            ),
+                )),
           ),
         ],
       ),

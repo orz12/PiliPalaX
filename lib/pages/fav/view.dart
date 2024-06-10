@@ -1,9 +1,13 @@
+import 'package:PiliPalaX/common/skeleton/video_card_h.dart';
 import 'package:easy_debounce/easy_throttle.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:PiliPalaX/common/widgets/http_error.dart';
 import 'package:PiliPalaX/pages/fav/index.dart';
 import 'package:PiliPalaX/pages/fav/widgets/item.dart';
+
+import '../../common/constants.dart';
+import '../../utils/grid.dart';
 
 class FavPage extends StatefulWidget {
   const FavPage({super.key});
@@ -49,6 +53,7 @@ class _FavPageState extends State<FavPage> {
             onPressed: () => Get.toNamed(
                 '/favSearch?searchType=1&mediaId=${_favController.favFolderData.value.list!.first.id}'),
             icon: const Icon(Icons.search_outlined),
+            tooltip: '搜索',
           ),
           const SizedBox(width: 6),
         ],
@@ -59,17 +64,28 @@ class _FavPageState extends State<FavPage> {
           if (snapshot.connectionState == ConnectionState.done) {
             Map data = snapshot.data as Map;
             if (data['status']) {
-              return Obx(
-                () => ListView.builder(
-                  controller: scrollController,
-                  itemCount: _favController.favFolderData.value.list!.length,
-                  itemBuilder: (context, index) {
-                    return FavItem(
-                        favFolderItem:
-                            _favController.favFolderData.value.list![index]);
-                  },
-                ),
-              );
+              return Obx(() => CustomScrollView(
+                      controller: scrollController,
+                      physics: const AlwaysScrollableScrollPhysics(),
+                      slivers: [
+                        SliverGrid(
+                          gridDelegate: SliverGridDelegateWithExtentAndRatio(
+                              mainAxisSpacing: StyleString.cardSpace,
+                              crossAxisSpacing: StyleString.safeSpace,
+                              maxCrossAxisExtent: Grid.maxRowWidth * 2,
+                              childAspectRatio: StyleString.aspectRatio * 2.3,
+                              mainAxisExtent: 0),
+                          delegate: SliverChildBuilderDelegate(
+                            childCount:
+                                _favController.favFolderData.value.list!.length,
+                            (BuildContext context, int index) {
+                              return FavItem(
+                                  favFolderItem: _favController
+                                      .favFolderData.value.list![index]);
+                            },
+                          ),
+                        )
+                      ]));
             } else {
               return CustomScrollView(
                 physics: const NeverScrollableScrollPhysics(),
@@ -83,7 +99,25 @@ class _FavPageState extends State<FavPage> {
             }
           } else {
             // 骨架屏
-            return const Text('请求中');
+            return CustomScrollView(
+              physics: const NeverScrollableScrollPhysics(),
+              slivers: [
+                SliverGrid(
+                  gridDelegate: SliverGridDelegateWithExtentAndRatio(
+                      mainAxisSpacing: StyleString.cardSpace,
+                      crossAxisSpacing: StyleString.safeSpace,
+                      maxCrossAxisExtent: Grid.maxRowWidth * 2,
+                      childAspectRatio: StyleString.aspectRatio * 2.3,
+                      mainAxisExtent: 0),
+                  delegate: SliverChildBuilderDelegate(
+                    (BuildContext context, int index) {
+                      return const VideoCardHSkeleton();
+                    },
+                    childCount: 10,
+                  ),
+                ),
+              ],
+            );
           }
         },
       ),

@@ -22,9 +22,9 @@ class HtmlRenderController extends GetxController {
   RxInt acount = 0.obs;
   final ScrollController scrollController = ScrollController();
 
-  ReplySortType _sortType = ReplySortType.time;
-  RxString sortTypeTitle = ReplySortType.time.titles.obs;
-  RxString sortTypeLabel = ReplySortType.time.labels.obs;
+  late ReplySortType _sortType;
+  late RxString sortTypeTitle;
+  late RxString sortTypeLabel;
   Box setting = GStrorage.setting;
 
   @override
@@ -33,6 +33,15 @@ class HtmlRenderController extends GetxController {
     id = Get.parameters['id']!;
     dynamicType = Get.parameters['dynamicType']!;
     type = dynamicType == 'picture' ? 11 : 12;
+    int defaultReplySortIndex =
+    setting.get(SettingBoxKey.replySortType, defaultValue: 0) as int;
+    if (defaultReplySortIndex == 2) {
+      setting.put(SettingBoxKey.replySortType, 0);
+      defaultReplySortIndex = 0;
+    }
+    _sortType = ReplySortType.values[defaultReplySortIndex];
+    sortTypeLabel = _sortType.labels.obs;
+    sortTypeTitle = _sortType.titles.obs;
   }
 
   // 请求动态内容
@@ -45,11 +54,15 @@ class HtmlRenderController extends GetxController {
     }
     response = res;
     oid.value = res['commentId'];
+    queryReplyList(reqType: 'init');
     return res;
   }
 
   // 请求评论
   Future queryReplyList({reqType = 'init'}) async {
+    if (reqType == 'init') {
+      currentPage = 0;
+    }
     var res = await ReplyHttp.replyList(
       oid: oid.value,
       pageNum: currentPage + 1,
