@@ -1,4 +1,4 @@
-name: CI
+name: Build iOS
 
 on:
   workflow_dispatch:
