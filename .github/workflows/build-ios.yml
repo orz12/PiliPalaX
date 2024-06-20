@@ -83,7 +83,6 @@ jobs:
 
     needs:
       - update_version
-      - android
       - iOS
     steps:
 
