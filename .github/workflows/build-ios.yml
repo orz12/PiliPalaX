@@ -2,6 +2,15 @@ name: Build iOS
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - 'build-ios'
+    paths-ignore:
+      - '**.md'
+      - '**.txt'
+      - '.github/**'
+      - '.idea/**'
+      - '!.github/workflows/**'
   
 jobs:
   update_version:
