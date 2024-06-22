@@ -10,7 +10,7 @@ on:
       - '**.txt'
       - '.github/**'
       - '.idea/**'
-      - '!.github/workflows/**'
+      - '!.github/workflows/CI.yml'
 
 jobs:
   update_version:
