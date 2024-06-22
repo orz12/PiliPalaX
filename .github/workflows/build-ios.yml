@@ -23,7 +23,7 @@ jobs:
         run: |
           version=$(yq e .version pubspec.yaml | cut -d "+" -f 1)
           last_tag=$(git tag --sort=committerdate | tail -1)
-          if (echo $last_lag | grep -v "+"); then
+          if (echo $last_tag | grep -v "+"); then
             echo "Illegal tag!"
             exit 1
           elif (echo $last_tag | grep -v $version); then
@@ -31,7 +31,7 @@ jobs:
             exit 1
           fi
 
-          echo "tag=$last_tag" >> GITHUB_OUTPUT
+          echo "tag=$last_tag" >> $GITHUB_OUTPUT
 
   iOS:
     name: Build CI (iOS)
@@ -111,6 +111,6 @@ jobs:
           api_id: ${{ secrets.TELEGRAM_API_ID }}
           api_hash: ${{ secrets.TELEGRAM_API_HASH }}
           method: sendFile
-          path: PiliPalaiX-iOS/*
+          path: PiliPalaX-iOS/*
           parse_mode: Markdown
           context: "*v${{ needs.update_version.outputs.new_version }}*\n${{ needs.update_version.outputs.last_commit }}"
