@@ -116,9 +116,7 @@ jobs:
         with:
           bot_token: ${{ secrets.BOT_TOKEN }}
           chat_id: ${{ secrets.CHAT_ID }}
-          large_file: true
-          api_id: ${{ secrets.TELEGRAM_API_ID }}
-          api_hash: ${{ secrets.TELEGRAM_API_HASH }}
+          large_file: false
           method: sendFile
           path: PiliPalaX-iOS/*
           parse_mode: Markdown
