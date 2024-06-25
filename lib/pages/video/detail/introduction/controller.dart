@@ -20,6 +20,7 @@ import 'package:PiliPalaX/utils/storage.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:PiliPalaX/utils/utils.dart';
 import 'package:PiliPalaX/pages/member/controller.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../related/index.dart';
 import 'widgets/group_panel.dart';
@@ -385,12 +386,13 @@ class VideoIntroController extends GetxController {
             title: const Text('分享方式'),
             actions: [
               TextButton(
-                  onPressed: () {
-                    Clipboard.setData(ClipboardData(text: videoUrl));
-                    SmartDialog.showToast('已复制');
+                  onPressed: () async {
+                    launchUrl(
+                      Uri.parse(videoUrl)
+                    );
                     Get.back();
                   },
-                  child: const Text('复制链接')),
+                  child: const Text('其他APP打开')),
               TextButton(
                   onPressed: () async {
                     var result = await Share.share('${videoDetail.value.title} '
