@@ -1,6 +1,7 @@
 import 'package:PiliPalaX/services/service_locator.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:hive/hive.dart';
 import 'package:PiliPalaX/models/bangumi/info.dart';
 import 'package:PiliPalaX/models/video_detail_res.dart';
@@ -41,6 +42,7 @@ class VideoPlayerServiceHandler extends BaseAudioHandler with SeekHandler {
 
   @override
   Future<void> play() async {
+    SmartDialog.showNotify(msg: "开始播放", notifyType: NotifyType.alert);
     await PlPlayerController.playIfExists();
     // player.play();
   }
@@ -158,7 +160,9 @@ class VideoPlayerServiceHandler extends BaseAudioHandler with SeekHandler {
     if (!enableBackgroundPlay) return;
 
     playbackState.add(playbackState.value.copyWith(
-      processingState: Platform.isIOS ? AudioProcessingState.ready : AudioProcessingState.idle,
+      processingState: Platform.isIOS
+          ? AudioProcessingState.ready
+          : AudioProcessingState.idle,
       playing: false,
     ));
     if (_item.isNotEmpty) {
@@ -176,7 +180,9 @@ class VideoPlayerServiceHandler extends BaseAudioHandler with SeekHandler {
     if (!enableBackgroundPlay) return;
     mediaItem.add(null);
     playbackState.add(PlaybackState(
-      processingState: Platform.isIOS ? AudioProcessingState.ready : AudioProcessingState.idle,
+      processingState: Platform.isIOS
+          ? AudioProcessingState.ready
+          : AudioProcessingState.idle,
       playing: false,
     ));
     _item.clear();

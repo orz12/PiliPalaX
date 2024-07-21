@@ -885,7 +885,8 @@ class PlPlayerController {
   /// TODO  _duration.value丢失
   Future<void> play({bool repeat = false, bool hideControls = true}) async {
     if (_playerCount.value == 0) return;
-    await audioSessionHandler.setActive(true);
+    SmartDialog.showToast(
+        (await audioSessionHandler.setActive(true)).toString());
     // 播放时自动隐藏控制条
     controls = !hideControls;
     // repeat为true，将从头播放
