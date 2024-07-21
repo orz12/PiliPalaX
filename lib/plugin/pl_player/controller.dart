@@ -447,6 +447,8 @@ class PlPlayerController {
       if (!_listenersInitialized) {
         startListeners();
       }
+
+      audioSessionHandler.setActive(true);
       await _initializePlayer(seekTo: seekTo);
       if (videoType.value != 'live' && _cid != 0) {
         refreshSubtitles().then((value) {
@@ -616,6 +618,7 @@ class PlPlayerController {
             : dataSource.audioSource!.replaceAll(':', '\\:'),
       );
     }
+    audioSessionHandler.setActive(true);
     await _videoPlayerController!.open(
       Media(
         dataSource.videoSource!,
@@ -882,7 +885,7 @@ class PlPlayerController {
   /// TODO  _duration.value丢失
   Future<void> play({bool repeat = false, bool hideControls = true}) async {
     if (_playerCount.value == 0) return;
-    audioSessionHandler.setActive(true);
+    await audioSessionHandler.setActive(true);
     // 播放时自动隐藏控制条
     controls = !hideControls;
     // repeat为true，将从头播放
@@ -898,7 +901,6 @@ class PlPlayerController {
 
     playerStatus.status.value = PlayerStatus.playing;
     // screenManager.setOverlays(false);
-
   }
 
   /// 暂停播放

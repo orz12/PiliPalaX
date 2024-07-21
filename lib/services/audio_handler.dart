@@ -1,3 +1,4 @@
+import 'package:PiliPalaX/services/service_locator.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:hive/hive.dart';
@@ -64,7 +65,7 @@ class VideoPlayerServiceHandler extends BaseAudioHandler with SeekHandler {
     // print(newMediaItem);
     // print(newMediaItem.title);
     // debugPrint(StackTrace.current.toString());
-    if(!mediaItem.isClosed) mediaItem.add(newMediaItem);
+    if (!mediaItem.isClosed) mediaItem.add(newMediaItem);
   }
 
   Future<void> setPlaybackState(PlayerStatus status, bool isBuffering) async {
@@ -90,6 +91,7 @@ class VideoPlayerServiceHandler extends BaseAudioHandler with SeekHandler {
         MediaControl.fastForward
             .copyWith(androidIcon: 'drawable/ic_baseline_forward_10_24'),
       ],
+      androidCompactActionIndices: const [0, 1, 2],
       playing: playing,
       systemActions: const {
         MediaAction.seek,
@@ -146,6 +148,7 @@ class VideoPlayerServiceHandler extends BaseAudioHandler with SeekHandler {
     if (mediaItem == null) return;
     // print("exist: ${PlPlayerController.instanceExists()}");
     if (!PlPlayerController.instanceExists()) return;
+    audioSessionHandler.setActive(true);
     _item.add(mediaItem);
     setMediaItem(mediaItem);
   }

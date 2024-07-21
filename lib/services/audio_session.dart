@@ -31,13 +31,8 @@ class AudioSessionHandler {
             // player.setVolume(player.volume.value * 0.5);
             break;
           case AudioInterruptionType.pause:
-            PlPlayerController.pauseIfExists(isInterrupt: true);
-            // player.pause(isInterrupt: true);
-            _playInterrupted = true;
-            break;
           case AudioInterruptionType.unknown:
             PlPlayerController.pauseIfExists(isInterrupt: true);
-            // player.pause(isInterrupt: true);
             _playInterrupted = true;
             break;
         }
@@ -49,15 +44,8 @@ class AudioSessionHandler {
             // player.setVolume(player.volume.value * 2);
             break;
           case AudioInterruptionType.pause:
-            if (_playInterrupted && await setActive(true)) {
-              PlPlayerController.playIfExists();
-            } else {
-              SmartDialog.showToast(
-                  'The request was denied and the app should not play audio');
-            }
-            //player.play();
-            break;
           case AudioInterruptionType.unknown:
+            if (_playInterrupted) PlPlayerController.playIfExists();
             break;
         }
         _playInterrupted = false;
