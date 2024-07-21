@@ -6,6 +6,7 @@ import 'package:PiliPalaX/models/bangumi/info.dart';
 import 'package:PiliPalaX/models/video_detail_res.dart';
 import 'package:PiliPalaX/plugin/pl_player/index.dart';
 import 'package:PiliPalaX/utils/storage.dart';
+import 'dart:io';
 
 Future<VideoPlayerServiceHandler> initAudioService() async {
   return await AudioService.init(
@@ -157,7 +158,7 @@ class VideoPlayerServiceHandler extends BaseAudioHandler with SeekHandler {
     if (!enableBackgroundPlay) return;
 
     playbackState.add(playbackState.value.copyWith(
-      processingState: AudioProcessingState.idle,
+      processingState: Platform.isIOS ? AudioProcessingState.ready : AudioProcessingState.idle,
       playing: false,
     ));
     if (_item.isNotEmpty) {
@@ -175,7 +176,7 @@ class VideoPlayerServiceHandler extends BaseAudioHandler with SeekHandler {
     if (!enableBackgroundPlay) return;
     mediaItem.add(null);
     playbackState.add(PlaybackState(
-      processingState: AudioProcessingState.idle,
+      processingState: Platform.isIOS ? AudioProcessingState.ready : AudioProcessingState.idle,
       playing: false,
     ));
     _item.clear();
