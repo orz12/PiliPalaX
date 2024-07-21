@@ -171,9 +171,14 @@ class MyApp extends StatelessWidget {
             ),
             pageTransitionsTheme: const PageTransitionsTheme(
               builders: <TargetPlatform, PageTransitionsBuilder>{
-                TargetPlatform.android: ZoomPageTransitionsBuilder(
-                  allowEnterRouteSnapshotting: false,
-                ),
+                TargetPlatform.windows: OpenUpwardsPageTransitionsBuilder(),
+                TargetPlatform.linux: OpenUpwardsPageTransitionsBuilder(),
+                TargetPlatform.macOS: OpenUpwardsPageTransitionsBuilder(),
+                TargetPlatform.iOS: OpenUpwardsPageTransitionsBuilder(),
+                TargetPlatform.android: OpenUpwardsPageTransitionsBuilder(),
+                // TargetPlatform.android: ZoomPageTransitionsBuilder(
+                //   allowEnterRouteSnapshotting: false,
+                // ),
               },
             ),
           ),
@@ -189,6 +194,15 @@ class MyApp extends StatelessWidget {
               closeIconColor: darkColorScheme.secondary,
               contentTextStyle: TextStyle(color: darkColorScheme.secondary),
               elevation: 20,
+            ),
+            pageTransitionsTheme: const PageTransitionsTheme(
+              builders: <TargetPlatform, PageTransitionsBuilder>{
+                TargetPlatform.windows: OpenUpwardsPageTransitionsBuilder(),
+                TargetPlatform.linux: OpenUpwardsPageTransitionsBuilder(),
+                TargetPlatform.macOS: OpenUpwardsPageTransitionsBuilder(),
+                TargetPlatform.iOS: OpenUpwardsPageTransitionsBuilder(),
+                TargetPlatform.android: OpenUpwardsPageTransitionsBuilder(),
+              },
             ),
           ),
           localizationsDelegates: const [
