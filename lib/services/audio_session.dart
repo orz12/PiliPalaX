@@ -1,12 +1,13 @@
 import 'package:audio_session/audio_session.dart';
 import 'package:PiliPalaX/plugin/pl_player/index.dart';
+import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 
 class AudioSessionHandler {
   late AudioSession session;
   bool _playInterrupted = false;
 
-  setActive(bool active) {
-    session.setActive(active);
+  Future<bool> setActive(bool active) async {
+    return await session.setActive(active);
   }
 
   AudioSessionHandler() {
@@ -15,9 +16,9 @@ class AudioSessionHandler {
 
   Future<void> initSession() async {
     session = await AudioSession.instance;
-    session.configure(const AudioSessionConfiguration.music());
+    await session.configure(const AudioSessionConfiguration.music());
 
-    session.interruptionEventStream.listen((event) {
+    session.interruptionEventStream.listen((event) async {
       final playerStatus = PlPlayerController.getPlayerStatusIfExists();
       // final player = PlPlayerController.getInstance();
       if (event.begin) {
@@ -48,8 +49,13 @@ class AudioSessionHandler {
             // player.setVolume(player.volume.value * 2);
             break;
           case AudioInterruptionType.pause:
-            if (_playInterrupted) PlPlayerController.playIfExists();
-              //player.play();
+            if (_playInterrupted && await setActive(true)) {
+              PlPlayerController.playIfExists();
+            } else {
+              SmartDialog.showToast(
+                  'The request was denied and the app should not play audio');
+            }
+            //player.play();
             break;
           case AudioInterruptionType.unknown:
             break;
