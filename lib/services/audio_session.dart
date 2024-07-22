@@ -16,11 +16,7 @@ class AudioSessionHandler {
 
   Future<void> initSession() async {
     session = await AudioSession.instance;
-    await session.configure(const AudioSessionConfiguration.music().copyWith(
-        avAudioSessionCategoryOptions:
-            AVAudioSessionCategoryOptions.mixWithOthers,
-        avAudioSessionSetActiveOptions:
-            AVAudioSessionSetActiveOptions.notifyOthersOnDeactivation));
+    await session.configure(const AudioSessionConfiguration.music());
 
     session.interruptionEventStream.listen((event) async {
       final playerStatus = PlPlayerController.getPlayerStatusIfExists();
