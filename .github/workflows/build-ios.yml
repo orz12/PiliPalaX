@@ -20,12 +20,19 @@ jobs:
     outputs:
       # 定义输出变量 version，以便在其他job中引用
       new_version: ${{ steps.get-last-tag.outputs.tag}}
+      last_commit: ${{ steps.get-last-commit.outputs.last_commit }}
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+
+      - name: 获取最后一次提交
+        id: get-last-commit
+        run: |
+          last_commit=$(git log -1 --pretty="%h %s" --first-parent)
+          echo "last_commit=$last_commit" >> $GITHUB_OUTPUT
 
       - name: 获取最后一个tag
         id: get-last-tag
