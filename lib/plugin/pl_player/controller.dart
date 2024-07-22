@@ -895,7 +895,8 @@ class PlPlayerController {
       await seekTo(Duration.zero, type: "slider");
     }
 
-    await _videoPlayerController?.play();
+    // await _videoPlayerController?.play();
+    if (!playerStatus.playing) await _videoPlayerController?.playOrPause();
 
     await getCurrentVolume();
     await getCurrentBrightness();
