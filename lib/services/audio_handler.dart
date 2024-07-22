@@ -151,7 +151,7 @@ class VideoPlayerServiceHandler extends BaseAudioHandler with SeekHandler {
     if (mediaItem == null) return;
     // print("exist: ${PlPlayerController.instanceExists()}");
     if (!PlPlayerController.instanceExists()) return;
-    //audioSessionHandler.setActive(true);
+    audioSessionHandler.setActive(true);
     _item.add(mediaItem);
     setMediaItem(mediaItem);
   }
