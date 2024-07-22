@@ -63,7 +63,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
   late bool showStatusBarBackgroundColor;
   final Floating floating = Floating();
   // 生命周期监听
-  late final AppLifecycleListener _lifecycleListener;
+  // late final AppLifecycleListener _lifecycleListener;
   bool isShowing = true;
   RxBool isFullScreen = false.obs;
   late StreamSubscription<bool> fullScreenStatusListener;
@@ -112,7 +112,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
     if (removeSafeArea) hideStatusBar();
     videoSourceInit();
     appbarStreamListen();
-    lifecycleListener();
+    // lifecycleListener();
     autoScreen();
     onUserLeaveHintListener = const MethodChannel("onUserLeaveHint");
     onUserLeaveHintListener.setMethodCallHandler((call) async {
@@ -210,33 +210,26 @@ class _VideoDetailPageState extends State<VideoDetailPage>
     videoDetailController.autoPlay.value = true;
   }
 
-
-  void setAudioSessionActive() {
-    if (plPlayerController != null) {
-      audioSessionHandler.setActive(true);
-    }
-  }
-
-  // 生命周期监听
-  void lifecycleListener() {
-    _lifecycleListener = AppLifecycleListener(
-      onResume: setAudioSessionActive,
-      // 后台
-      onInactive: setAudioSessionActive,
-      // 在Android和iOS端不生效
-      onHide: setAudioSessionActive,
-      onShow: setAudioSessionActive,
-      onPause: setAudioSessionActive,
-      onRestart: setAudioSessionActive,
-      onDetach: setAudioSessionActive,
-      // // 只作用于桌面端
-      // onExitRequested: () {
-      //   ScaffoldMessenger.maybeOf(context)
-      //       ?.showSnackBar(const SnackBar(content: Text("拦截应用退出")));
-      //   return Future.value(AppExitResponse.cancel);
-      // },
-    );
-  }
+  // // 生命周期监听
+  // void lifecycleListener() {
+  //   _lifecycleListener = AppLifecycleListener(
+  //     onResume: () => _handleTransition('resume'),
+  //     // 后台
+  //     onInactive: () => _handleTransition('inactive'),
+  //     // 在Android和iOS端不生效
+  //     onHide: () => _handleTransition('hide'),
+  //     onShow: () => _handleTransition('show'),
+  //     onPause: () => _handleTransition('pause'),
+  //     onRestart: () => _handleTransition('restart'),
+  //     onDetach: () => _handleTransition('detach'),
+  //     // 只作用于桌面端
+  //     onExitRequested: () {
+  //       ScaffoldMessenger.maybeOf(context)
+  //           ?.showSnackBar(const SnackBar(content: Text("拦截应用退出")));
+  //       return Future.value(AppExitResponse.cancel);
+  //     },
+  //   );
+  // }
 
   void listenFullScreenStatus() {
     fullScreenStatusListener =
@@ -279,7 +272,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
     }
     videoPlayerServiceHandler.onVideoDetailDispose();
     VideoDetailPage.routeObserver.unsubscribe(this);
-    _lifecycleListener.dispose();
+    // _lifecycleListener.dispose();
     showStatusBar();
     // _animationController.dispose();
     super.dispose();
