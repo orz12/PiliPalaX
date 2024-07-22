@@ -885,10 +885,11 @@ class PlPlayerController {
   /// TODO  _duration.value丢失
   Future<void> play({bool repeat = false, bool hideControls = true}) async {
     if (_playerCount.value == 0) return;
-    SmartDialog.showToast(
-        (await audioSessionHandler.setActive(true)).toString());
+    // SmartDialog.showToast(
+    //     (await audioSessionHandler.setActive(true)).toString());
     // 播放时自动隐藏控制条
     controls = !hideControls;
+    playerStatus.status.value = PlayerStatus.playing;
     // repeat为true，将从头播放
     if (repeat) {
       // await seekTo(Duration.zero);
@@ -901,7 +902,6 @@ class PlPlayerController {
     await getCurrentVolume();
     await getCurrentBrightness();
 
-    playerStatus.status.value = PlayerStatus.playing;
     // screenManager.setOverlays(false);
   }
 
