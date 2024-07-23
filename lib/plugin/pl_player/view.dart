@@ -19,6 +19,7 @@ import 'package:PiliPalaX/plugin/pl_player/models/fullscreen_mode.dart';
 import 'package:PiliPalaX/plugin/pl_player/utils.dart';
 import 'package:PiliPalaX/utils/feed_back.dart';
 import 'package:PiliPalaX/utils/storage.dart';
+import 'package:media_kit_video/media_kit_video.dart';
 import 'package:saver_gallery/saver_gallery.dart';
 import 'package:screen_brightness/screen_brightness.dart';
 
@@ -67,7 +68,8 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
   late VideoIntroController? videoIntroController;
   late BangumiIntroController? bangumiIntroController;
 
-  final GlobalKey _playerKey = GlobalKey();
+  final GlobalKey<VideoState> _playerKey = GlobalKey<VideoState>();
+
   final RxBool _mountSeekBackwardButton = false.obs;
   final RxBool _mountSeekForwardButton = false.obs;
   final RxBool _hideSeekBackwardButton = false.obs;
@@ -138,6 +140,8 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
   @override
   void initState() {
     super.initState();
+    SmartDialog.showNotify(
+        msg: '双击左侧区域快退，右侧区域快进', notifyType: NotifyType.warning);
     animationController = AnimationController(
         vsync: this, duration: const Duration(milliseconds: 100));
     videoController = widget.controller.videoController!;
@@ -174,6 +178,11 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
         });
       } catch (_) {}
     });
+    widget.controller.videoFit.listen((p0) {
+      if (mounted) {
+        _playerKey.currentState?.update(fit: p0);
+      }
+    });
   }
 
   Future<void> setVolume(double value) async {
@@ -209,6 +218,7 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
 
   @override
   void dispose() {
+    SmartDialog.showNotify(msg: '啦啦啦', notifyType: NotifyType.error);
     animationController.dispose();
     FlutterVolumeController.removeListener();
     super.dispose();
@@ -515,152 +525,147 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
     );
     return Stack(
       fit: StackFit.passthrough,
-      key: _playerKey,
       children: <Widget>[
-        Obx(
-          () => InteractiveViewer(
-            panEnabled: false, // 启用平移 //单指平移会与横竖手势冲突
-            scaleEnabled: true, // 启用缩放
-            minScale: 1.0,
-            maxScale: 2.0,
-            onInteractionStart: (ScaleStartDetails details) {
-              if (details.pointerCount == 2) {
-                interacting = true;
-              }
-              _initialFocalPoint = details.localFocalPoint;
-              _gestureType = null;
-            },
+        InteractiveViewer(
+          panEnabled: false, // 启用平移 //单指平移会与横竖手势冲突
+          scaleEnabled: true, // 启用缩放
+          minScale: 1.0,
+          maxScale: 2.0,
+          onInteractionStart: (ScaleStartDetails details) {
+            if (details.pointerCount == 2) {
+              interacting = true;
+            }
+            _initialFocalPoint = details.localFocalPoint;
+            _gestureType = null;
+          },
 
-            onInteractionUpdate: (ScaleUpdateDetails details) {
-              if (interacting) return;
-              Offset cumulativeDelta =
-                  details.localFocalPoint - _initialFocalPoint;
-              if (details.pointerCount == 2 && cumulativeDelta.distance < 1.5) {
-                interacting = true;
-                _gestureType = null;
+          onInteractionUpdate: (ScaleUpdateDetails details) {
+            if (interacting) return;
+            Offset cumulativeDelta =
+                details.localFocalPoint - _initialFocalPoint;
+            if (details.pointerCount == 2 && cumulativeDelta.distance < 1.5) {
+              interacting = true;
+              _gestureType = null;
+              return;
+            }
+
+            /// 锁定时禁用
+            if (_.controlsLock.value) return;
+            RenderBox renderBox =
+                _playerKey.currentContext!.findRenderObject() as RenderBox;
+
+            if (_gestureType == null) {
+              if (cumulativeDelta.distance < 1.5) return;
+              if (cumulativeDelta.dx.abs() > 4 * cumulativeDelta.dy.abs()) {
+                _gestureType = 'horizontal';
+              } else if (cumulativeDelta.dy.abs() >
+                  4 * cumulativeDelta.dx.abs()) {
+                // _gestureType = 'vertical';
+
+                final double totalWidth = renderBox.size.width;
+                final double tapPosition = details.localFocalPoint.dx;
+                final double sectionWidth = totalWidth / 4;
+                if (tapPosition < sectionWidth) {
+                  // 左边区域
+                  _gestureType = 'left';
+                } else if (tapPosition < sectionWidth * 3) {
+                  // 全屏
+                  _gestureType = 'center';
+                } else {
+                  // 右边区域
+                  _gestureType = 'right';
+                }
+              } else {
                 return;
               }
+            }
 
-              /// 锁定时禁用
-              if (_.controlsLock.value) return;
-              RenderBox renderBox =
-                  _playerKey.currentContext!.findRenderObject() as RenderBox;
+            Offset delta = details.focalPointDelta;
 
-              if (_gestureType == null) {
-                if (cumulativeDelta.distance < 1.5) return;
-                if (cumulativeDelta.dx.abs() > 4 * cumulativeDelta.dy.abs()) {
-                  _gestureType = 'horizontal';
-                } else if (cumulativeDelta.dy.abs() >
-                    4 * cumulativeDelta.dx.abs()) {
-                  // _gestureType = 'vertical';
+            if (_gestureType == 'horizontal') {
+              // live模式下禁用
+              if (_.videoType.value == 'live') return;
+              final int curSliderPosition =
+                  _.sliderPosition.value.inMilliseconds;
+              final double scale = 90000 / renderBox.size.width;
+              final Duration pos = Duration(
+                  milliseconds: curSliderPosition + (delta.dx * scale).round());
+              final Duration result =
+                  pos.clamp(Duration.zero, _.duration.value);
+              _.onUpdatedSliderProgress(result);
+              _.onChangedSliderStart();
+            } else if (_gestureType == 'left') {
+              // 左边区域 👈
+              final double level = renderBox.size.height * 3;
+              final double brightness =
+                  _brightnessValue.value - delta.dy / level;
+              final double result = brightness.clamp(0.0, 1.0);
+              setBrightness(result);
+            } else if (_gestureType == 'center') {
+              // 全屏
+              const double threshold = 5; // 滑动阈值
+              // void fullScreenTrigger(bool status) async {
+              //   EasyThrottle.throttle(
+              //       'fullScreen', const Duration(milliseconds: 1000), () {
+              //     _.triggerFullScreen(status: status);
+              //   });
+              // }
 
-                  final double totalWidth = renderBox.size.width;
-                  final double tapPosition = details.localFocalPoint.dx;
-                  final double sectionWidth = totalWidth / 4;
-                  if (tapPosition < sectionWidth) {
-                    // 左边区域
-                    _gestureType = 'left';
-                  } else if (tapPosition < sectionWidth * 3) {
-                    // 全屏
-                    _gestureType = 'center';
-                  } else {
-                    // 右边区域
-                    _gestureType = 'right';
-                  }
-                } else {
-                  return;
-                }
+              double cumulativeDy =
+                  details.localFocalPoint.dy - _initialFocalPoint.dy;
+              if (cumulativeDy > threshold) {
+                _gestureType = 'center_down';
+              } else if (cumulativeDy < -threshold) {
+                _gestureType = 'center_up';
               }
+            } else if (_gestureType == 'right') {
+              // 右边区域
+              final double level = renderBox.size.height * 0.5;
+              EasyThrottle.throttle(
+                  'setVolume', const Duration(milliseconds: 20), () {
+                final double volume = _volumeValue.value - delta.dy / level;
+                final double result = volume.clamp(0.0, 1.0);
+                setVolume(result);
+              });
+            }
+          },
+          onInteractionEnd: (ScaleEndDetails details) {
+            if (_.isSliderMoving.value) {
+              _.onChangedSliderEnd();
+              _.seekTo(_.sliderPosition.value, type: 'slider');
+            }
+            void fullScreenTrigger(bool status) async {
+              EasyThrottle.throttle(
+                  'fullScreen', const Duration(milliseconds: 1000), () {
+                _.triggerFullScreen(status: status);
+              });
+            }
 
-              Offset delta = details.focalPointDelta;
-
-              if (_gestureType == 'horizontal') {
-                // live模式下禁用
-                if (_.videoType.value == 'live') return;
-                final int curSliderPosition =
-                    _.sliderPosition.value.inMilliseconds;
-                final double scale = 90000 / renderBox.size.width;
-                final Duration pos = Duration(
-                    milliseconds:
-                        curSliderPosition + (delta.dx * scale).round());
-                final Duration result =
-                    pos.clamp(Duration.zero, _.duration.value);
-                _.onUpdatedSliderProgress(result);
-                _.onChangedSliderStart();
-              } else if (_gestureType == 'left') {
-                // 左边区域 👈
-                final double level = renderBox.size.height * 3;
-                final double brightness =
-                    _brightnessValue.value - delta.dy / level;
-                final double result = brightness.clamp(0.0, 1.0);
-                setBrightness(result);
-              } else if (_gestureType == 'center') {
-                // 全屏
-                const double threshold = 5; // 滑动阈值
-                // void fullScreenTrigger(bool status) async {
-                //   EasyThrottle.throttle(
-                //       'fullScreen', const Duration(milliseconds: 1000), () {
-                //     _.triggerFullScreen(status: status);
-                //   });
-                // }
-
-                double cumulativeDy =
-                    details.localFocalPoint.dy - _initialFocalPoint.dy;
-                if (cumulativeDy > threshold) {
-                  _gestureType = 'center_down';
-                } else if (cumulativeDy < -threshold) {
-                  _gestureType = 'center_up';
-                }
-              } else if (_gestureType == 'right') {
-                // 右边区域
-                final double level = renderBox.size.height * 0.5;
-                EasyThrottle.throttle(
-                    'setVolume', const Duration(milliseconds: 20), () {
-                  final double volume = _volumeValue.value - delta.dy / level;
-                  final double result = volume.clamp(0.0, 1.0);
-                  setVolume(result);
-                });
+            if (_gestureType == 'center_down') {
+              if (_.isFullScreen.value ^ fullScreenGestureReverse) {
+                fullScreenTrigger(fullScreenGestureReverse);
               }
-            },
-            onInteractionEnd: (ScaleEndDetails details) {
-              if (_.isSliderMoving.value) {
-                _.onChangedSliderEnd();
-                _.seekTo(_.sliderPosition.value, type: 'slider');
+            } else if (_gestureType == 'center_up') {
+              if (!_.isFullScreen.value ^ fullScreenGestureReverse) {
+                fullScreenTrigger(!fullScreenGestureReverse);
               }
-              void fullScreenTrigger(bool status) async {
-                EasyThrottle.throttle(
-                    'fullScreen', const Duration(milliseconds: 1000), () {
-                  _.triggerFullScreen(status: status);
-                });
-              }
-
-              if (_gestureType == 'center_down') {
-                if (_.isFullScreen.value ^ fullScreenGestureReverse) {
-                  fullScreenTrigger(fullScreenGestureReverse);
-                }
-              } else if (_gestureType == 'center_up') {
-                if (!_.isFullScreen.value ^ fullScreenGestureReverse) {
-                  fullScreenTrigger(!fullScreenGestureReverse);
-                }
-              }
-              interacting = false;
-              _initialFocalPoint = Offset.zero;
-              _gestureType = null;
-            },
-            child: Video(
-              key: ValueKey('${_.videoFit.value}'),
-              controller: videoController,
-              controls: NoVideoControls,
-              pauseUponEnteringBackgroundMode:
-                  !_.continuePlayInBackground.value,
-              resumeUponEnteringForegroundMode: true,
-              // 字幕尺寸调节
-              subtitleViewConfiguration: SubtitleViewConfiguration(
-                  style: subTitleStyle,
-                  padding: const EdgeInsets.all(24.0),
-                  textScaleFactor: MediaQuery.textScaleFactorOf(context)),
-              fit: _.videoFit.value,
-            ),
+            }
+            interacting = false;
+            _initialFocalPoint = Offset.zero;
+            _gestureType = null;
+          },
+          child: Video(
+            key: _playerKey,
+            controller: videoController,
+            controls: NoVideoControls,
+            pauseUponEnteringBackgroundMode: !_.continuePlayInBackground.value,
+            resumeUponEnteringForegroundMode: true,
+            // 字幕尺寸调节
+            subtitleViewConfiguration: SubtitleViewConfiguration(
+                style: subTitleStyle,
+                padding: const EdgeInsets.all(24.0),
+                textScaleFactor: MediaQuery.textScaleFactorOf(context)),
+            fit: _.videoFit.value,
           ),
         ),
 

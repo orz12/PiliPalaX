@@ -394,7 +394,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                       plPlayerController!.videoController == null
                   ? const ColoredBox(color: Colors.black)
                   : PLVideoPlayer(
-                      key: Key("${heroTag}PLVideoPlayer"),
+                      // key: Key("${heroTag}PLVideoPlayer"),
                       controller: plPlayerController!,
                       videoIntroController:
                           videoDetailController.videoType == SearchType.video
@@ -1053,7 +1053,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
       () => !videoDetailController.autoPlay.value
           ? const SizedBox()
           : PLVideoPlayer(
-              key: Key("${heroTag}PLVideoPlayer"),
+              // key: Key("${heroTag}PLVideoPlayer"),
               controller: plPlayerController!,
               videoIntroController:
                   videoDetailController.videoType == SearchType.video
