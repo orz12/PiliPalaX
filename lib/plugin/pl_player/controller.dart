@@ -368,6 +368,7 @@ class PlPlayerController {
     }
     speedsList.sort();
 
+    audioSessionHandler.setActive(true);
     // _playerEventSubs = onPlayerStatusChanged.listen((PlayerStatus status) {
     //   if (status == PlayerStatus.playing) {
     //     WakelockPlus.enable();
@@ -448,7 +449,7 @@ class PlPlayerController {
         startListeners();
       }
 
-      audioSessionHandler.setActive(true);
+      // audioSessionHandler.setActive(true);
       await _initializePlayer(seekTo: seekTo);
       if (videoType.value != 'live' && _cid != 0) {
         refreshSubtitles().then((value) {
@@ -618,7 +619,7 @@ class PlPlayerController {
             : dataSource.audioSource!.replaceAll(':', '\\:'),
       );
     }
-    audioSessionHandler.setActive(true);
+    // audioSessionHandler.setActive(true);
     await _videoPlayerController!.open(
       Media(
         dataSource.videoSource!,
@@ -885,8 +886,8 @@ class PlPlayerController {
   /// TODO  _duration.value丢失
   Future<void> play({bool repeat = false, bool hideControls = true}) async {
     if (_playerCount.value == 0) return;
-    SmartDialog.showToast(
-        (await audioSessionHandler.setActive(true)).toString());
+    // SmartDialog.showToast(
+    //     (await audioSessionHandler.setActive(true)).toString());
     // 播放时自动隐藏控制条
     controls = !hideControls;
     // repeat为true，将从头播放
