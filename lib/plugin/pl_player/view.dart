@@ -1217,7 +1217,7 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
                                   Duration.zero,
                                   player.state.duration,
                                 );
-                                player.seek(result);
+                                widget.controller.seekTo(result);
                                 widget.controller.play();
                               },
                             ),
@@ -1262,7 +1262,7 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
                                   Duration.zero,
                                   player.state.duration,
                                 );
-                                player.seek(result);
+                                widget.controller.seekTo(result);
                                 widget.controller.play();
                               },
                             ),
