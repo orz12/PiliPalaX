@@ -53,6 +53,12 @@ class VideoPlayerServiceHandler extends BaseAudioHandler with SeekHandler {
     // player.pause();
   }
 
+  seekToNotification(Duration position) {
+    playbackState.add(playbackState.value.copyWith(
+      updatePosition: position,
+    ));
+  }
+
   @override
   Future<void> seek(Duration position) async {
     SmartDialog.showNotify(

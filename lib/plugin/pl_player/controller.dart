@@ -649,6 +649,7 @@ class PlPlayerController {
 
     // 跳转播放
     if (seekTo != Duration.zero) {
+      videoPlayerServiceHandler.seekToNotification(seekTo);
       await this.seekTo(seekTo);
     }
 
@@ -884,11 +885,11 @@ class PlPlayerController {
   /// 播放视频
   /// TODO  _duration.value丢失
   Future<void> play({bool repeat = false, bool hideControls = true}) async {
-    // if (_playerCount.value == 0) return;
+    if (_playerCount.value == 0) return;
     // // SmartDialog.showToast(
     // //     (await audioSessionHandler.setActive(true)).toString());
     // // 播放时自动隐藏控制条
-    // controls = !hideControls;
+    controls = !hideControls;
     // // repeat为true，将从头播放
     // if (repeat) {
     //   // await seekTo(Duration.zero);
