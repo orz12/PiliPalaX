@@ -650,7 +650,7 @@ class PlPlayerController {
     // 跳转播放
     if (seekTo != Duration.zero) {
       videoPlayerServiceHandler.seekToNotification(seekTo);
-      await this.seekTo(seekTo);
+      await this.seekTo(seekTo, type: 'slider');
     }
 
     // 自动播放
