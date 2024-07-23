@@ -11,8 +11,9 @@ class AudioSessionHandler {
   }
 
   AudioSessionHandler() {
-    initSession();
-    setActive(true);
+    initSession().then((_) {
+      setActive(true);
+    });
   }
 
   Future<void> initSession() async {
