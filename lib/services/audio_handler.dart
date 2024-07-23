@@ -170,7 +170,7 @@ class VideoPlayerServiceHandler extends BaseAudioHandler with SeekHandler {
     }
     if (_item.isNotEmpty) {
       setMediaItem(_item.last);
-      stop();
+      // stop();
     } else {
       clear();
     }
@@ -186,7 +186,7 @@ class VideoPlayerServiceHandler extends BaseAudioHandler with SeekHandler {
       playing: false,
     ));
     _item.clear();
-    stop();
+    // stop();
   }
 
   onPositionChange(Duration position) {
