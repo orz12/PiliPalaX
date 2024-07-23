@@ -891,18 +891,18 @@ class PlPlayerController {
     // // 播放时自动隐藏控制条
     controls = !hideControls;
     // // repeat为true，将从头播放
-    // if (repeat) {
-    //   // await seekTo(Duration.zero);
-    //   await seekTo(Duration.zero, type: "slider");
-    // }
+    if (repeat) {
+      // await seekTo(Duration.zero);
+      await seekTo(Duration.zero, type: "slider");
+    }
 
+    playerStatus.status.value = PlayerStatus.playing;
     await _videoPlayerController?.play();
     // if (!playerStatus.playing) await _videoPlayerController?.playOrPause();
 
     // await getCurrentVolume();
     // await getCurrentBrightness();
     //
-    // playerStatus.status.value = PlayerStatus.playing;
     // screenManager.setOverlays(false);
   }
 
