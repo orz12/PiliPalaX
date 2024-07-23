@@ -649,8 +649,8 @@ class PlPlayerController {
 
     // 跳转播放
     if (seekTo != Duration.zero) {
-      videoPlayerServiceHandler.seekToNotification(seekTo);
-      await this.seekTo(seekTo, type: 'slider');
+      // videoPlayerServiceHandler.seekToNotification(seekTo);
+      await this.seekTo(seekTo);
     }
 
     // 自动播放
@@ -896,8 +896,8 @@ class PlPlayerController {
     //   await seekTo(Duration.zero, type: "slider");
     // }
 
-    // await _videoPlayerController?.play();
-    if (!playerStatus.playing) await _videoPlayerController?.playOrPause();
+    await _videoPlayerController?.play();
+    // if (!playerStatus.playing) await _videoPlayerController?.playOrPause();
 
     // await getCurrentVolume();
     // await getCurrentBrightness();
