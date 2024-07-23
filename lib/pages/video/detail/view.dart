@@ -392,7 +392,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
               () => !videoDetailController.autoPlay.value ||
                       plPlayerController == null ||
                       plPlayerController!.videoController == null
-                  ? nil
+                  ? const ColoredBox(color: Colors.black)
                   : PLVideoPlayer(
                       key: Key("${heroTag}PLVideoPlayer"),
                       controller: plPlayerController!,
@@ -416,7 +416,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                     ),
             );
           } else {
-            return const SizedBox();
+            return const ColoredBox(color: Colors.black);
           }
         });
     Widget manualPlayerWidget = Obx(
