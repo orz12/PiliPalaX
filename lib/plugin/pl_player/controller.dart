@@ -884,24 +884,24 @@ class PlPlayerController {
   /// 播放视频
   /// TODO  _duration.value丢失
   Future<void> play({bool repeat = false, bool hideControls = true}) async {
-    if (_playerCount.value == 0) return;
-    // SmartDialog.showToast(
-    //     (await audioSessionHandler.setActive(true)).toString());
-    // 播放时自动隐藏控制条
-    controls = !hideControls;
-    // repeat为true，将从头播放
-    if (repeat) {
-      // await seekTo(Duration.zero);
-      await seekTo(Duration.zero, type: "slider");
-    }
+    // if (_playerCount.value == 0) return;
+    // // SmartDialog.showToast(
+    // //     (await audioSessionHandler.setActive(true)).toString());
+    // // 播放时自动隐藏控制条
+    // controls = !hideControls;
+    // // repeat为true，将从头播放
+    // if (repeat) {
+    //   // await seekTo(Duration.zero);
+    //   await seekTo(Duration.zero, type: "slider");
+    // }
 
     // await _videoPlayerController?.play();
     if (!playerStatus.playing) await _videoPlayerController?.playOrPause();
 
-    await getCurrentVolume();
-    await getCurrentBrightness();
-
-    playerStatus.status.value = PlayerStatus.playing;
+    // await getCurrentVolume();
+    // await getCurrentBrightness();
+    //
+    // playerStatus.status.value = PlayerStatus.playing;
     // screenManager.setOverlays(false);
   }
 
