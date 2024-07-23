@@ -137,7 +137,12 @@ class CacheManage {
   static Future clearLibraryCache() async {
     var appDocDir = await getTemporaryDirectory();
     if (appDocDir.existsSync()) {
-      await appDocDir.delete(recursive: true);
+      // await appDocDir.delete(recursive: true);
+      final List<FileSystemEntity> children =
+          appDocDir.listSync(recursive: false);
+      for (final FileSystemEntity file in children) {
+        await file.delete(recursive: true);
+      }
     }
   }
 
