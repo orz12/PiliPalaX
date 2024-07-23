@@ -368,7 +368,6 @@ class PlPlayerController {
     }
     speedsList.sort();
 
-    audioSessionHandler.setActive(true);
     // _playerEventSubs = onPlayerStatusChanged.listen((PlayerStatus status) {
     //   if (status == PlayerStatus.playing) {
     //     WakelockPlus.enable();
@@ -912,9 +911,9 @@ class PlPlayerController {
     playerStatus.status.value = PlayerStatus.paused;
 
     // 主动暂停时让出音频焦点
-    if (!isInterrupt) {
-      audioSessionHandler.setActive(false);
-    }
+    // if (!isInterrupt) {
+    //   audioSessionHandler.setActive(false);
+    // }
   }
 
   /// 更改播放状态
