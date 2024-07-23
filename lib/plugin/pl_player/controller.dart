@@ -38,6 +38,8 @@ class PlPlayerController {
   // 添加一个私有静态变量来保存实例
   static PlPlayerController? _instance;
 
+  static GlobalKey plVideoPlayerKey = GlobalKey();
+
   // 流事件  监听播放状态变化
   StreamSubscription? _playerEventSubs;
 
@@ -367,7 +369,6 @@ class PlPlayerController {
       speedsList.add(i.value);
     }
     speedsList.sort();
-
     // _playerEventSubs = onPlayerStatusChanged.listen((PlayerStatus status) {
     //   if (status == PlayerStatus.playing) {
     //     WakelockPlus.enable();
@@ -885,6 +886,7 @@ class PlPlayerController {
   /// 播放视频
   /// TODO  _duration.value丢失
   Future<void> play({bool repeat = false, bool hideControls = true}) async {
+    SmartDialog.showToast('play, ${_playerCount.value}');
     if (_playerCount.value == 0) return;
     // // SmartDialog.showToast(
     // //     (await audioSessionHandler.setActive(true)).toString());

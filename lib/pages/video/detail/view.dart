@@ -10,7 +10,6 @@ import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
-import 'package:nil/nil.dart';
 import 'package:PiliPalaX/common/widgets/network_img_layer.dart';
 import 'package:PiliPalaX/http/user.dart';
 import 'package:PiliPalaX/models/common/search_type.dart';
@@ -394,7 +393,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                       plPlayerController!.videoController == null
                   ? const ColoredBox(color: Colors.black)
                   : PLVideoPlayer(
-                      // key: Key("${heroTag}PLVideoPlayer"),
+                      key: PlPlayerController.plVideoPlayerKey,
                       controller: plPlayerController!,
                       videoIntroController:
                           videoDetailController.videoType == SearchType.video
@@ -1053,7 +1052,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
       () => !videoDetailController.autoPlay.value
           ? const SizedBox()
           : PLVideoPlayer(
-              // key: Key("${heroTag}PLVideoPlayer"),
+              key: PlPlayerController.plVideoPlayerKey,
               controller: plPlayerController!,
               videoIntroController:
                   videoDetailController.videoType == SearchType.video
