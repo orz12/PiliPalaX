@@ -523,7 +523,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                                       !showStatusBarBackgroundColor
                                   ? Brightness.light
                                   : Brightness.dark,
-                          systemNavigationBarColor: Colors.transparent),
+                          systemNavigationBarColor: const Color(0x01000000)),
                     ),
               body: Column(
                 children: [
@@ -1008,7 +1008,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                                   !showStatusBarBackgroundColor
                               ? Brightness.light
                               : Brightness.dark,
-                      systemNavigationBarColor: Colors.transparent),
+                      systemNavigationBarColor: const Color(0x01000000)),
                 ),
           body: Container(
               color: Theme.of(context).colorScheme.background,
@@ -1037,7 +1037,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                                   !showStatusBarBackgroundColor
                               ? Brightness.light
                               : Brightness.dark,
-                      systemNavigationBarColor: Colors.transparent),
+                      systemNavigationBarColor: const Color(0x01000000)),
                 ),
           body: Container(
               color: Theme.of(context).colorScheme.background,

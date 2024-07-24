@@ -87,9 +87,9 @@ void main() async {
   // 小白条、导航栏沉浸
   SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
   SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
-    systemNavigationBarColor: Colors.transparent,
-    systemNavigationBarDividerColor: Colors.transparent,
-    statusBarColor: Colors.transparent,
+    systemNavigationBarColor: Color(0x01000000),
+    systemNavigationBarDividerColor: Color(0x01000000),
+    statusBarColor: Color(0x01000000),
   ));
   Data.init();
   PiliScheme.init();
