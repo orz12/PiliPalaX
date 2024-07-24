@@ -26,7 +26,7 @@ Future<VideoPlayerServiceHandler> initAudioService() async {
 }
 
 class VideoPlayerServiceHandler extends BaseAudioHandler with SeekHandler {
-  static final List<MediaItem> _item = [];
+  // static final List<MediaItem> _item = [];
   Box setting = GStorage.setting;
   bool enableBackgroundPlay = true;
   // PlPlayerController player = PlPlayerController.getInstance();
@@ -113,7 +113,7 @@ class VideoPlayerServiceHandler extends BaseAudioHandler with SeekHandler {
   onStatusChange(PlayerStatus status, bool isBuffering) {
     if (!enableBackgroundPlay) return;
 
-    if (_item.isEmpty) return;
+    // if (_item.isEmpty) return;
     setPlaybackState(status, isBuffering);
   }
 
@@ -159,7 +159,7 @@ class VideoPlayerServiceHandler extends BaseAudioHandler with SeekHandler {
     if (mediaItem == null) return;
     // print("exist: ${PlPlayerController.instanceExists()}");
     if (!PlPlayerController.instanceExists()) return;
-    _item.add(mediaItem);
+    // _item.add(mediaItem);
     setMediaItem(mediaItem);
   }
 
@@ -172,15 +172,15 @@ class VideoPlayerServiceHandler extends BaseAudioHandler with SeekHandler {
           : AudioProcessingState.idle,
       playing: false,
     ));
-    if (_item.isNotEmpty) {
-      _item.removeLast();
-    }
-    if (_item.isNotEmpty) {
-      setMediaItem(_item.last);
-      // stop();
-    } else {
-      clear();
-    }
+    // if (_item.isNotEmpty) {
+    //   _item.removeLast();
+    // }
+    // if (_item.isNotEmpty) {
+    //   setMediaItem(_item.last);
+    //   // stop();
+    // } else {
+    //   clear();
+    // }
   }
 
   clear() {
@@ -192,7 +192,7 @@ class VideoPlayerServiceHandler extends BaseAudioHandler with SeekHandler {
           : AudioProcessingState.idle,
       playing: false,
     ));
-    _item.clear();
+    // _item.clear();
     // stop();
   }
 

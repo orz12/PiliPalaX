@@ -914,9 +914,9 @@ class PlPlayerController {
     playerStatus.status.value = PlayerStatus.paused;
 
     // 主动暂停时让出音频焦点
-    // if (!isInterrupt) {
-    //   audioSessionHandler.setActive(false);
-    // }
+    if (!isInterrupt) {
+      audioSessionHandler.setActive(false);
+    }
   }
 
   /// 更改播放状态
@@ -1277,6 +1277,7 @@ class PlPlayerController {
   Future<void> dispose({String type = 'single'}) async {
     // 每次减1，最后销毁
     if (type == 'single' && playerCount.value > 1) {
+      // videoPlayerServiceHandler.onVideoDetailDispose();
       _playerCount.value -= 1;
       _heartDuration = 0;
       pause();

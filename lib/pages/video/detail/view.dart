@@ -269,7 +269,6 @@ class _VideoDetailPageState extends State<VideoDetailPage>
       fullScreenStatusListener.cancel();
       plPlayerController!.dispose();
     }
-    videoPlayerServiceHandler.onVideoDetailDispose();
     VideoDetailPage.routeObserver.unsubscribe(this);
     // _lifecycleListener.dispose();
     showStatusBar();
