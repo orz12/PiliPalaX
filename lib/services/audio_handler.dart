@@ -123,12 +123,20 @@ class VideoPlayerServiceHandler extends BaseAudioHandler with SeekHandler {
     if (!enableBackgroundPlay) return;
     // print('当前调用栈为：');
     // print(StackTrace.current);
+
+    SmartDialog.showToast(data.title+"a");
     if (!PlPlayerController.instanceExists()) return;
+    SmartDialog.showToast(data.title+"b");
     if (data == null) return;
+
+    SmartDialog.showToast(data.title+"c");
 
     late MediaItem? mediaItem;
     if (data is VideoDetailData) {
+
+      SmartDialog.showToast("${data.title}d");
       if ((data.pages?.length ?? 0) > 1) {
+        SmartDialog.showToast("${data.title}e");
         final current = data.pages?.firstWhere((element) => element.cid == cid);
         mediaItem = MediaItem(
           id: UniqueKey().toString(),
@@ -139,6 +147,8 @@ class VideoPlayerServiceHandler extends BaseAudioHandler with SeekHandler {
           artUri: Uri.parse(data.pic ?? ""),
         );
       } else {
+
+        SmartDialog.showToast("${data.title}f");
         mediaItem = MediaItem(
           id: UniqueKey().toString(),
           title: data.title ?? "",
@@ -158,13 +168,18 @@ class VideoPlayerServiceHandler extends BaseAudioHandler with SeekHandler {
         artUri: Uri.parse(data.cover ?? ""),
       );
     }
+
+    SmartDialog.showToast("${data.title}g");
     if (mediaItem == null) return;
+
+    SmartDialog.showToast("${data.title}h");
     // print("exist: ${PlPlayerController.instanceExists()}");
     if (!PlPlayerController.instanceExists()) return;
+
+    SmartDialog.showToast("${data.title}i");
     SmartDialog.showToast(mediaItem.title ?? "无");
     // _item.add(mediaItem);
     setMediaItem(mediaItem);
-    setPlaybackState(PlayerStatus.playing, false);
   }
 
   onVideoDetailDispose() {
