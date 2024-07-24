@@ -126,5 +126,5 @@ jobs:
           large_file: false
           method: sendFile
           path: PiliPalaX-iOS/*
-          # parse_mode: Markdown
+          parse_mode: Markdown
           context: "*v${{ needs.update_version.outputs.new_version }}*\n${{ needs.update_version.outputs.last_commit }}"
