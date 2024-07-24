@@ -885,7 +885,6 @@ class PlPlayerController {
   /// 播放视频
   /// TODO  _duration.value丢失
   Future<void> play({bool repeat = false, bool hideControls = true}) async {
-    SmartDialog.showToast('play, ${_playerCount.value}');
     if (_playerCount.value == 0) return;
     // // SmartDialog.showToast(
     // //     (await audioSessionHandler.setActive(true)).toString());
