@@ -118,6 +118,7 @@ class VideoPlayerServiceHandler extends BaseAudioHandler with SeekHandler {
   }
 
   onVideoDetailChange(dynamic data, int cid) {
+    SmartDialog.showLoading(msg: data.toString(),displayTime: const Duration(seconds: 1));
     if (!enableBackgroundPlay) return;
     // print('当前调用栈为：');
     // print(StackTrace.current);

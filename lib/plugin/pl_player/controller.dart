@@ -689,13 +689,10 @@ class PlPlayerController {
     subscriptions.addAll(
       [
         videoPlayerController!.stream.playing.listen((event) {
-          if (event) {
-            playerStatus.status.value = PlayerStatus.playing;
-          } else {
-            playerStatus.status.value = PlayerStatus.paused;
-          }
-          videoPlayerServiceHandler.onStatusChange(
-              playerStatus.status.value, isBuffering.value);
+          playerStatus.status.value =
+              event ? PlayerStatus.playing : PlayerStatus.paused;
+          // videoPlayerServiceHandler.onStatusChange(
+          //     playerStatus.status.value, isBuffering.value);
 
           /// 触发回调事件
           for (var element in _statusListeners) {
@@ -743,8 +740,8 @@ class PlPlayerController {
         }),
         videoPlayerController!.stream.buffering.listen((bool event) {
           isBuffering.value = event;
-          videoPlayerServiceHandler.onStatusChange(
-              playerStatus.status.value, event);
+          // videoPlayerServiceHandler.onStatusChange(
+          //     playerStatus.status.value, event);
         }),
         // videoPlayerController!.stream.log.listen((event) {
         //   print('videoPlayerController!.stream.log.listen');
@@ -786,6 +783,8 @@ class PlPlayerController {
         // }),
         // 媒体通知监听
         onPlayerStatusChanged.listen((PlayerStatus event) {
+          SmartDialog.showLoading(
+              msg: event.toString(), displayTime: const Duration(seconds: 1));
           videoPlayerServiceHandler.onStatusChange(event, isBuffering.value);
         }),
         onPositionChanged.listen((Duration event) {
