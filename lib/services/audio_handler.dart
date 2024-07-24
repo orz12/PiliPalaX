@@ -163,6 +163,7 @@ class VideoPlayerServiceHandler extends BaseAudioHandler with SeekHandler {
     if (!PlPlayerController.instanceExists()) return;
     // _item.add(mediaItem);
     setMediaItem(mediaItem);
+    setPlaybackState(PlayerStatus.playing, false);
   }
 
   onVideoDetailDispose() {
