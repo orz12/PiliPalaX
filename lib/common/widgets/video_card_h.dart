@@ -66,7 +66,7 @@ class VideoCardH extends StatelessWidget {
                 try {
                   final int cid = videoItem.cid ??
                       await SearchHttp.ab2c(aid: aid, bvid: bvid);
-                  Get.offNamed('/video?bvid=$bvid&cid=$cid',
+                  Get.toNamed('/video?bvid=$bvid&cid=$cid',
                       arguments: {'videoItem': videoItem, 'heroTag': heroTag});
                 } catch (err) {
                   SmartDialog.showToast(err.toString());
