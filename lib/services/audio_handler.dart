@@ -42,7 +42,6 @@ class VideoPlayerServiceHandler extends BaseAudioHandler with SeekHandler {
 
   @override
   Future<void> play() async {
-    SmartDialog.showNotify(msg: "开始播放", notifyType: NotifyType.alert);
     await PlPlayerController.playIfExists();
     // player.play();
   }
@@ -118,7 +117,7 @@ class VideoPlayerServiceHandler extends BaseAudioHandler with SeekHandler {
   }
 
   onVideoDetailChange(dynamic data, int cid) {
-    SmartDialog.showLoading(msg: data.toString(),displayTime: const Duration(seconds: 1));
+    SmartDialog.showNotify(msg: data.toString(), notifyType: NotifyType.alert);
     if (!enableBackgroundPlay) return;
     // print('当前调用栈为：');
     // print(StackTrace.current);

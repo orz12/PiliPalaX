@@ -783,8 +783,8 @@ class PlPlayerController {
         // }),
         // 媒体通知监听
         onPlayerStatusChanged.listen((PlayerStatus event) {
-          SmartDialog.showLoading(
-              msg: event.toString(), displayTime: const Duration(seconds: 1));
+          SmartDialog.showNotify(
+              msg: event.toString(), notifyType: NotifyType.success);
           videoPlayerServiceHandler.onStatusChange(event, isBuffering.value);
         }),
         onPositionChanged.listen((Duration event) {

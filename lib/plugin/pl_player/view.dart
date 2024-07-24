@@ -140,8 +140,6 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
   @override
   void initState() {
     super.initState();
-    SmartDialog.showNotify(
-        msg: '双击左侧区域快退，右侧区域快进', notifyType: NotifyType.warning);
     animationController = AnimationController(
         vsync: this, duration: const Duration(milliseconds: 100));
     videoController = widget.controller.videoController!;
@@ -218,7 +216,6 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
 
   @override
   void dispose() {
-    SmartDialog.showNotify(msg: '啦啦啦', notifyType: NotifyType.error);
     animationController.dispose();
     FlutterVolumeController.removeListener();
     super.dispose();
