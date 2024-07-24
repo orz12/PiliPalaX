@@ -931,6 +931,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                   child: CustomScrollView(
                     key: PageStorageKey<String>(
                         '简介${videoDetailController.bvid}'),
+                    physics: const ClampingScrollPhysics(),
                     slivers: <Widget>[
                       if (videoDetailController.videoType ==
                           SearchType.video) ...[
@@ -963,7 +964,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
               height: context.height -
                   (removeSafeArea ? 0 : MediaQuery.of(context).padding.top),
               child: TabBarView(
-                physics: const BouncingScrollPhysics(),
+                physics: const ClampingScrollPhysics(),
                 controller: videoDetailController.tabCtr,
                 children: <Widget>[
                   if (videoDetailController.videoType == SearchType.video)
