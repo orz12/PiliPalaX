@@ -161,6 +161,7 @@ class VideoPlayerServiceHandler extends BaseAudioHandler with SeekHandler {
     if (mediaItem == null) return;
     // print("exist: ${PlPlayerController.instanceExists()}");
     if (!PlPlayerController.instanceExists()) return;
+    SmartDialog.showToast(mediaItem.title ?? "无");
     // _item.add(mediaItem);
     setMediaItem(mediaItem);
     setPlaybackState(PlayerStatus.playing, false);
