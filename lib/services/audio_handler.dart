@@ -30,7 +30,6 @@ class VideoPlayerServiceHandler extends BaseAudioHandler with SeekHandler {
   Box setting = GStorage.setting;
   bool enableBackgroundPlay = true;
   // PlPlayerController player = PlPlayerController.getInstance();
-  MediaItem? _lastMediaItem;
 
   VideoPlayerServiceHandler() {
     revalidateSetting();
@@ -51,6 +50,12 @@ class VideoPlayerServiceHandler extends BaseAudioHandler with SeekHandler {
   Future<void> pause() async {
     await PlPlayerController.pauseIfExists();
     // player.pause();
+  }
+
+  seekToNotification(Duration position) {
+    playbackState.add(playbackState.value.copyWith(
+      updatePosition: position,
+    ));
   }
 
   @override
@@ -108,16 +113,9 @@ class VideoPlayerServiceHandler extends BaseAudioHandler with SeekHandler {
     if (!enableBackgroundPlay) return;
 
     // if (_item.isEmpty) return;
-    if (_lastMediaItem == null) {
-      SmartDialog.showToast("当前没有播放内容");
-      Future.delayed(const Duration(milliseconds: 500), () {
-        setMediaItem(_lastMediaItem!);
-        setPlaybackState(status, isBuffering);
-      });
-    } else {
-      setMediaItem(_lastMediaItem!);
+    Future.delayed(const Duration(milliseconds: 500), () {
       setPlaybackState(status, isBuffering);
-    }
+    });
   }
 
   onVideoDetailChange(dynamic data, int cid) {
@@ -163,7 +161,6 @@ class VideoPlayerServiceHandler extends BaseAudioHandler with SeekHandler {
     if (mediaItem == null) return;
     // print("exist: ${PlPlayerController.instanceExists()}");
     if (!PlPlayerController.instanceExists()) return;
-    _lastMediaItem = mediaItem;
     // _item.add(mediaItem);
     setMediaItem(mediaItem);
   }
@@ -204,7 +201,6 @@ class VideoPlayerServiceHandler extends BaseAudioHandler with SeekHandler {
   onPositionChange(Duration position) {
     if (!enableBackgroundPlay) return;
 
-    setMediaItem(_lastMediaItem!);
     playbackState.add(playbackState.value.copyWith(
       updatePosition: position,
     ));
