@@ -790,7 +790,7 @@ class PlPlayerController {
         onPositionChanged.listen((Duration event) {
           EasyThrottle.throttle(
               'mediaServicePosition',
-              const Duration(seconds: 1),
+              const Duration(milliseconds: 200),
               () => videoPlayerServiceHandler.onPositionChange(event));
         }),
       ],
