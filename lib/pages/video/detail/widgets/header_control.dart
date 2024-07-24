@@ -268,6 +268,8 @@ class _HeaderControlState extends State<HeaderControl> {
                       title: const Text('弹幕设置', style: titleStyle),
                     ),
                     ListTile(
+                      title: const Text('播放信息', style: titleStyle),
+                      leading: const Icon(Icons.info_outline, size: 20),
                       onTap:(){
                         Player? player = widget.controller?.videoPlayerController;
                         if (player == null) {
