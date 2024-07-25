@@ -651,7 +651,7 @@ class PlPlayerController {
     // 跳转播放
     if (seekTo != Duration.zero) {
       // videoPlayerServiceHandler.seekToNotification(seekTo);
-      await this.seekTo(seekTo);
+      this.seekTo(seekTo);
     }
 
     // 自动播放
@@ -893,15 +893,15 @@ class PlPlayerController {
     // // repeat为true，将从头播放
     if (repeat) {
       // await seekTo(Duration.zero);
-      await seekTo(Duration.zero, type: "slider");
+      seekTo(Duration.zero);
     }
 
     playerStatus.status.value = PlayerStatus.playing;
     await _videoPlayerController?.play();
     // if (!playerStatus.playing) await _videoPlayerController?.playOrPause();
 
-    await getCurrentVolume();
-    await getCurrentBrightness();
+    getCurrentVolume();
+    getCurrentBrightness();
 
     // screenManager.setOverlays(false);
   }
