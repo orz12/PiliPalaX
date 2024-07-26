@@ -113,9 +113,7 @@ class VideoPlayerServiceHandler extends BaseAudioHandler with SeekHandler {
     if (!enableBackgroundPlay) return;
 
     // if (_item.isEmpty) return;
-    Future.delayed(const Duration(milliseconds: 500), () {
-      setPlaybackState(status, isBuffering);
-    });
+    setPlaybackState(status, isBuffering);
   }
 
   onVideoDetailChange(dynamic data, int cid) {
