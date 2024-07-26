@@ -181,14 +181,14 @@ class VideoPlayerServiceHandler extends BaseAudioHandler with SeekHandler {
       return;
     }
 
-    SmartDialog.showToast(
-        "${mediaItem.title}\n"
-            "${mediaItem.id}\n"
-            "${mediaItem.duration}\n"
-            "${mediaItem.artist}\n"
-            "${mediaItem.album}\n"
-            "${mediaItem.artUri}");
+    SmartDialog.showToast("${mediaItem.title}\n"
+        "${mediaItem.id}\n"
+        "${mediaItem.duration}\n"
+        "${mediaItem.artist}\n"
+        "${mediaItem.album}\n"
+        "${mediaItem.artUri}");
     // _item.add(mediaItem);
+    clear();
     setMediaItem(mediaItem);
   }
 
@@ -196,9 +196,7 @@ class VideoPlayerServiceHandler extends BaseAudioHandler with SeekHandler {
     if (!enableBackgroundPlay) return;
 
     playbackState.add(playbackState.value.copyWith(
-      processingState: Platform.isIOS
-          ? AudioProcessingState.ready
-          : AudioProcessingState.idle,
+      processingState: AudioProcessingState.idle,
       playing: false,
     ));
     // if (_item.isNotEmpty) {
@@ -216,9 +214,7 @@ class VideoPlayerServiceHandler extends BaseAudioHandler with SeekHandler {
     if (!enableBackgroundPlay) return;
     mediaItem.add(null);
     playbackState.add(PlaybackState(
-      processingState: Platform.isIOS
-          ? AudioProcessingState.ready
-          : AudioProcessingState.idle,
+      processingState: AudioProcessingState.idle,
       playing: false,
     ));
     // _item.clear();
