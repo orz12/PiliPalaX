@@ -900,8 +900,8 @@ class PlPlayerController {
     await _videoPlayerController?.play();
     // if (!playerStatus.playing) await _videoPlayerController?.playOrPause();
 
-    getCurrentVolume();
-    getCurrentBrightness();
+    // getCurrentVolume();
+    // getCurrentBrightness();
 
     // screenManager.setOverlays(false);
   }
