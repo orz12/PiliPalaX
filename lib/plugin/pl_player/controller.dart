@@ -894,16 +894,16 @@ class PlPlayerController {
 
     if (repeat) {
       SmartDialog.showToast("stoping");
-      // await seekTo(Duration.zero);
-      await _videoPlayerController?.stop();
+      await seekTo(Duration.zero);
+      // await _videoPlayerController?.stop();
       SmartDialog.showToast("stopped");
     }
-    playerStatus.status.value = PlayerStatus.playing;
+    // playerStatus.status.value = PlayerStatus.playing;
     await _videoPlayerController?.play();
     // if (!playerStatus.playing) await _videoPlayerController?.playOrPause();
 
-    getCurrentVolume();
-    getCurrentBrightness();
+    // getCurrentVolume();
+    // getCurrentBrightness();
 
     // screenManager.setOverlays(false);
   }
