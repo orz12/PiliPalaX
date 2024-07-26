@@ -183,7 +183,13 @@ class VideoPlayerServiceHandler extends BaseAudioHandler with SeekHandler {
       return;
     }
 
-    SmartDialog.showToast(mediaItem.title ?? "无");
+    SmartDialog.showToast(
+        "${mediaItem.title}\n"
+            "${mediaItem.id}\n"
+            "${mediaItem.duration}\n"
+            "${mediaItem.artist}\n"
+            "${mediaItem.album}\n"
+            "${mediaItem.artUri}");
     // _item.add(mediaItem);
     setMediaItem(mediaItem);
   }
