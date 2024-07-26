@@ -892,17 +892,18 @@ class PlPlayerController {
     controls = !hideControls;
     // // repeat为true，将从头播放
 
+    if (repeat) {
+      SmartDialog.showToast("stoping");
+      // await seekTo(Duration.zero);
+      await _videoPlayerController?.stop();
+      SmartDialog.showToast("stopped");
+    }
     playerStatus.status.value = PlayerStatus.playing;
     await _videoPlayerController?.play();
-    if (repeat) {
-      SmartDialog.showToast("repeating");
-      await seekTo(Duration.zero);
-      SmartDialog.showToast("repeated");
-    }
     // if (!playerStatus.playing) await _videoPlayerController?.playOrPause();
 
-    // getCurrentVolume();
-    // getCurrentBrightness();
+    getCurrentVolume();
+    getCurrentBrightness();
 
     // screenManager.setOverlays(false);
   }
@@ -967,8 +968,14 @@ class PlPlayerController {
   Future<void> getCurrentVolume() async {
     // mac try...catch
     try {
-      _currentVolume.value = (await FlutterVolumeController.getVolume())!;
-    } catch (_) {}
+      _currentVolume.value = (await FlutterVolumeController.getVolume()
+          .onError((error, stackTrace) {
+        SmartDialog.showToast("get volume error11 $error $stackTrace");
+        return 0;
+      }))!;
+    } catch (e) {
+      SmartDialog.showToast("get volume error $e");
+    }
   }
 
   Future<void> setVolume(double volumeNew,
@@ -1002,9 +1009,13 @@ class PlPlayerController {
   /// 亮度
   Future<void> getCurrentBrightness() async {
     try {
-      _currentBrightness.value = await ScreenBrightness().current;
+      _currentBrightness.value =
+          await ScreenBrightness().current.onError((error, stackTrace) {
+        SmartDialog.showToast("get volume error11 $error $stackTrace");
+        return 0;
+      });
     } catch (e) {
-      throw 'Failed to get current brightness';
+      SmartDialog.showToast("get brightness error $e");
       //return 0;
     }
   }
@@ -1015,7 +1026,7 @@ class PlPlayerController {
       ScreenBrightness().setScreenBrightness(brightness);
       // setVideoBrightness();
     } catch (e) {
-      throw 'Failed to set brightness';
+      SmartDialog.showToast("set brightness error $e");
     }
   }
 
@@ -1023,7 +1034,7 @@ class PlPlayerController {
     try {
       await ScreenBrightness().resetScreenBrightness();
     } catch (e) {
-      throw 'Failed to reset brightness';
+      SmartDialog.showToast("reset brightness error $e");
     }
   }
 

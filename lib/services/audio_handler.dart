@@ -75,7 +75,11 @@ class VideoPlayerServiceHandler extends BaseAudioHandler with SeekHandler {
     // print(newMediaItem);
     // print(newMediaItem.title);
     // debugPrint(StackTrace.current.toString());
-    if (!mediaItem.isClosed) mediaItem.add(newMediaItem);
+    try {
+      if (!mediaItem.isClosed) mediaItem.add(newMediaItem);
+    } catch (e) {
+      SmartDialog.showToast("setMediaItem error $e");
+    }
   }
 
   Future<void> setPlaybackState(PlayerStatus status, bool isBuffering) async {
@@ -188,7 +192,6 @@ class VideoPlayerServiceHandler extends BaseAudioHandler with SeekHandler {
         "${mediaItem.album}\n"
         "${mediaItem.artUri}");
     // _item.add(mediaItem);
-    clear();
     setMediaItem(mediaItem);
   }
 
