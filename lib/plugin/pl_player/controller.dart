@@ -891,13 +891,14 @@ class PlPlayerController {
     // // 播放时自动隐藏控制条
     controls = !hideControls;
     // // repeat为true，将从头播放
-    if (repeat) {
-      // await seekTo(Duration.zero);
-      seekTo(Duration.zero);
-    }
 
     playerStatus.status.value = PlayerStatus.playing;
     await _videoPlayerController?.play();
+    if (repeat) {
+      SmartDialog.showToast("repeating");
+      await seekTo(Duration.zero);
+      SmartDialog.showToast("repeated");
+    }
     // if (!playerStatus.playing) await _videoPlayerController?.playOrPause();
 
     // getCurrentVolume();
