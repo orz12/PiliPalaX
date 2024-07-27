@@ -312,8 +312,11 @@ class _VideoDetailPageState extends State<VideoDetailPage>
     final bool autoplay = autoPlayEnable;
     videoDetailController.autoPlay.value =
         !videoDetailController.isShowCover.value;
+    plPlayerController?.addStatusLister(playerListener);
+    if (plPlayerController != null) {
+      listenFullScreenStatus();
+    }
     await videoDetailController.playerInit(autoplay: autoplay);
-
     /// 未开启自动播放时，未播放跳转下一页返回/播放后跳转下一页返回
     videoIntroController.isPaused = false;
     // if (autoplay) {
@@ -337,10 +340,6 @@ class _VideoDetailPageState extends State<VideoDetailPage>
     Future.delayed(const Duration(milliseconds: 600), () {
       AutoOrientation.fullAutoMode();
     });
-    plPlayerController?.addStatusLister(playerListener);
-    if (plPlayerController != null) {
-      listenFullScreenStatus();
-    }
   }
 
   @override

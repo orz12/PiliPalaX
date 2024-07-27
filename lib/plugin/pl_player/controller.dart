@@ -304,7 +304,7 @@ class PlPlayerController {
   static Future<void> pauseIfExists(
       {bool notify = true, bool isInterrupt = false}) async {
     // if (_instance?.playerStatus.status.value == PlayerStatus.playing) {
-      await _instance?.pause(notify: notify, isInterrupt: isInterrupt);
+    await _instance?.pause(notify: notify, isInterrupt: isInterrupt);
     // }
   }
 
@@ -908,8 +908,7 @@ class PlPlayerController {
 
     if (repeat) {
       SmartDialog.showToast("stoping");
-      await seekTo(Duration.zero);
-      // await _videoPlayerController?.stop();
+      await seekTo(Duration.zero, type: "slider");
       SmartDialog.showToast("stopped");
     }
     // playerStatus.status.value = PlayerStatus.playing;
@@ -1301,7 +1300,6 @@ class PlPlayerController {
   Future<void> dispose({String type = 'single'}) async {
     // 每次减1，最后销毁
     if (type == 'single' && playerCount.value > 1) {
-      videoPlayerServiceHandler.onVideoDetailDispose();
       _playerCount.value -= 1;
       _heartDuration = 0;
       pause();
