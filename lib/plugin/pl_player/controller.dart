@@ -219,7 +219,7 @@ class PlPlayerController {
   /// 是否长按倍速
   Rx<bool> get doubleSpeedStatus => _doubleSpeedStatus;
 
-  Rx<bool> isBuffering = true.obs;
+  Rx<bool> isBuffering = false.obs;
 
   /// 屏幕锁 为true时，关闭控制栏
   Rx<bool> get controlsLock => _controlsLock;
