@@ -84,13 +84,26 @@ class VideoPlayerServiceHandler extends BaseAudioHandler with SeekHandler {
   }
 
   PlaybackState _transformEvent() {
-    bool isPlaying =
-        PlPlayerController.getPlayerStatusIfExists() == PlayerStatus.playing;
+    PlayerStatus? playerStatus = PlPlayerController.getPlayerStatusIfExists();
+    bool isPlaying = playerStatus == PlayerStatus.playing;
+    late AudioProcessingState processingState;
+
+    if (playerStatus == null) {
+      processingState = AudioProcessingState.idle;
+    } else if (playerStatus == PlayerStatus.completed) {
+      processingState = AudioProcessingState.completed;
+    } else if (PlPlayerController.getIsBuffering() == true) {
+      processingState = AudioProcessingState.buffering;
+    } else {
+      processingState = AudioProcessingState.ready;
+    }
     return PlaybackState(
       controls: [
-        MediaControl.skipToPrevious,
+        MediaControl.rewind
+            .copyWith(androidIcon: 'drawable/ic_baseline_replay_10_24'),
         isPlaying ? MediaControl.pause : MediaControl.play,
-        MediaControl.skipToNext,
+        MediaControl.fastForward
+            .copyWith(androidIcon: 'drawable/ic_baseline_forward_10_24'),
         MediaControl.stop,
       ],
       systemActions: {
@@ -103,9 +116,7 @@ class VideoPlayerServiceHandler extends BaseAudioHandler with SeekHandler {
           PlPlayerController.getBufferedPosition() ?? Duration.zero,
       shuffleMode: AudioServiceShuffleMode.none,
       repeatMode: AudioServiceRepeatMode.none,
-      processingState: PlPlayerController.getIsBuffering() != false
-          ? AudioProcessingState.loading
-          : AudioProcessingState.ready,
+      processingState: processingState,
     );
   }
 
