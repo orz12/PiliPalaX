@@ -26,7 +26,7 @@ Future<VideoPlayerServiceHandler> initAudioService() async {
 }
 
 class VideoPlayerServiceHandler extends BaseAudioHandler with SeekHandler {
-  // static final List<MediaItem> _item = [];
+  static final List<MediaItem> _item = [];
   Box setting = GStorage.setting;
   bool enableBackgroundPlay = true;
   // PlPlayerController player = PlPlayerController.getInstance();
@@ -76,48 +76,75 @@ class VideoPlayerServiceHandler extends BaseAudioHandler with SeekHandler {
     // print(newMediaItem.title);
     // debugPrint(StackTrace.current.toString());
     try {
+      audioSessionHandler.setActive(true);
       if (!mediaItem.isClosed) mediaItem.add(newMediaItem);
     } catch (e) {
       SmartDialog.showToast("setMediaItem error $e");
     }
   }
 
-  Future<void> setPlaybackState(PlayerStatus status, bool isBuffering) async {
-    if (!enableBackgroundPlay) return;
-
-    final AudioProcessingState processingState;
-    final playing = status == PlayerStatus.playing;
-    if (status == PlayerStatus.completed) {
-      processingState = AudioProcessingState.completed;
-    } else if (isBuffering) {
-      processingState = AudioProcessingState.buffering;
-    } else {
-      processingState = AudioProcessingState.ready;
-    }
-
-    playbackState.add(playbackState.value.copyWith(
-      processingState:
-          isBuffering ? AudioProcessingState.buffering : processingState,
+  PlaybackState _transformEvent() {
+    bool isPlaying =
+        PlPlayerController.getPlayerStatusIfExists() == PlayerStatus.playing;
+    return PlaybackState(
       controls: [
-        MediaControl.rewind
-            .copyWith(androidIcon: 'drawable/ic_baseline_replay_10_24'),
-        if (playing) MediaControl.pause else MediaControl.play,
-        MediaControl.fastForward
-            .copyWith(androidIcon: 'drawable/ic_baseline_forward_10_24'),
+        MediaControl.skipToPrevious,
+        isPlaying ? MediaControl.pause : MediaControl.play,
+        MediaControl.skipToNext,
+        MediaControl.stop,
       ],
-      androidCompactActionIndices: const [0, 1, 2],
-      playing: playing,
-      systemActions: const {
+      systemActions: {
         MediaAction.seek,
       },
-    ));
+      androidCompactActionIndices: const [0, 1, 2],
+      playing: isPlaying,
+      updatePosition: PlPlayerController.getPosition() ?? Duration.zero,
+      bufferedPosition:
+          PlPlayerController.getBufferedPosition() ?? Duration.zero,
+      shuffleMode: AudioServiceShuffleMode.none,
+      repeatMode: AudioServiceRepeatMode.none,
+      processingState: PlPlayerController.getIsBuffering() != false
+          ? AudioProcessingState.loading
+          : AudioProcessingState.ready,
+    );
   }
 
-  onStatusChange(PlayerStatus status, bool isBuffering) {
+  // Future<void> setPlaybackState(PlayerStatus status, bool isBuffering) async {
+  //   if (!enableBackgroundPlay) return;
+  //
+  //   final AudioProcessingState processingState;
+  //   final playing = status == PlayerStatus.playing;
+  //   if (status == PlayerStatus.completed) {
+  //     processingState = AudioProcessingState.completed;
+  //   } else if (isBuffering) {
+  //     processingState = AudioProcessingState.buffering;
+  //   } else {
+  //     processingState = AudioProcessingState.ready;
+  //   }
+  //
+  //   playbackState.add(playbackState.value.copyWith(
+  //     processingState:
+  //         isBuffering ? AudioProcessingState.buffering : processingState,
+  //     controls: [
+  //       MediaControl.rewind
+  //           .copyWith(androidIcon: 'drawable/ic_baseline_replay_10_24'),
+  //       if (playing) MediaControl.pause else MediaControl.play,
+  //       MediaControl.fastForward
+  //           .copyWith(androidIcon: 'drawable/ic_baseline_forward_10_24'),
+  //     ],
+  //     androidCompactActionIndices: const [0, 1, 2],
+  //     playing: playing,
+  //     systemActions: const {
+  //       MediaAction.seek,
+  //     },
+  //   ));
+  // }
+
+  onStatusChange() {
     if (!enableBackgroundPlay) return;
 
-    // if (_item.isEmpty) return;
-    setPlaybackState(status, isBuffering);
+    if (_item.isEmpty) return;
+    _transformEvent();
   }
 
   onVideoDetailChange(dynamic data, int cid) {
@@ -191,7 +218,7 @@ class VideoPlayerServiceHandler extends BaseAudioHandler with SeekHandler {
         "${mediaItem.artist}\n"
         "${mediaItem.album}\n"
         "${mediaItem.artUri}");
-    // _item.add(mediaItem);
+    _item.add(mediaItem);
     setMediaItem(mediaItem);
   }
 
@@ -202,15 +229,15 @@ class VideoPlayerServiceHandler extends BaseAudioHandler with SeekHandler {
       processingState: AudioProcessingState.idle,
       playing: false,
     ));
-    // if (_item.isNotEmpty) {
-    //   _item.removeLast();
-    // }
-    // if (_item.isNotEmpty) {
-    //   setMediaItem(_item.last);
-    //   // stop();
-    // } else {
-    //   clear();
-    // }
+    if (_item.isNotEmpty) {
+      _item.removeLast();
+    }
+    if (_item.isNotEmpty) {
+      setMediaItem(_item.last);
+      // stop();
+    } else {
+      clear();
+    }
   }
 
   clear() {
@@ -220,15 +247,19 @@ class VideoPlayerServiceHandler extends BaseAudioHandler with SeekHandler {
       processingState: AudioProcessingState.idle,
       playing: false,
     ));
-    // _item.clear();
+    _item.clear();
     // stop();
   }
 
-  onPositionChange(Duration position) {
+  onPositionChange() {
     if (!enableBackgroundPlay) return;
 
-    playbackState.add(playbackState.value.copyWith(
-      updatePosition: position,
-    ));
+    playbackState.add(_transformEvent());
+  }
+
+  onBufferedPositionChange() {
+    if (!enableBackgroundPlay) return;
+
+    playbackState.add(_transformEvent());
   }
 }

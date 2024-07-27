@@ -321,6 +321,18 @@ class PlPlayerController {
     await _instance?.setVolume(volumeNew, videoPlayerVolume: videoPlayerVolume);
   }
 
+  static Duration? getBufferedPosition() {
+    return _instance?._buffered.value;
+  }
+
+  static bool? getIsBuffering() {
+    return _instance?.isBuffering.value;
+  }
+
+  static Duration? getPosition() {
+    return _instance?._position.value;
+  }
+
   // 添加一个私有构造函数
   PlPlayerController._() {
     _videoType = videoType;
@@ -736,6 +748,7 @@ class PlPlayerController {
         }),
         videoPlayerController!.stream.buffer.listen((Duration event) {
           _buffered.value = event;
+          videoPlayerServiceHandler.onBufferedPositionChange();
           updateBufferedSecond();
         }),
         videoPlayerController!.stream.buffering.listen((bool event) {
@@ -785,13 +798,14 @@ class PlPlayerController {
         onPlayerStatusChanged.listen((PlayerStatus event) {
           SmartDialog.showNotify(
               msg: event.toString(), notifyType: NotifyType.success);
-          videoPlayerServiceHandler.onStatusChange(event, isBuffering.value);
+          videoPlayerServiceHandler.onStatusChange();
         }),
         onPositionChanged.listen((Duration event) {
-          EasyThrottle.throttle(
-              'mediaServicePosition',
-              const Duration(seconds: 1),
-              () => videoPlayerServiceHandler.onPositionChange(event));
+          videoPlayerServiceHandler.onPositionChange();
+          // EasyThrottle.throttle(
+          //     'mediaServicePosition',
+          //     const Duration(seconds: 1),
+          //     () => videoPlayerServiceHandler.onPositionChange(event));
         }),
       ],
     );
@@ -1287,7 +1301,7 @@ class PlPlayerController {
   Future<void> dispose({String type = 'single'}) async {
     // 每次减1，最后销毁
     if (type == 'single' && playerCount.value > 1) {
-      // videoPlayerServiceHandler.onVideoDetailDispose();
+      videoPlayerServiceHandler.onVideoDetailDispose();
       _playerCount.value -= 1;
       _heartDuration = 0;
       pause();
