@@ -281,17 +281,17 @@ class _VideoDetailPageState extends State<VideoDetailPage>
   void didPushNext() async {
     // _bufferedListener?.cancel();
 
+    if (plPlayerController != null) {
+      videoDetailController.defaultST = plPlayerController!.position.value;
+      plPlayerController!.pause();
+      videoIntroController.isPaused = true;
+      plPlayerController!.removeStatusLister(playerListener);
+      fullScreenStatusListener.cancel();
+    }
     /// 开启
     if (setting.get(SettingBoxKey.enableAutoBrightness, defaultValue: false)
         as bool) {
       videoDetailController.brightness = plPlayerController!.brightness.value;
-    }
-    if (plPlayerController != null) {
-      videoDetailController.defaultST = plPlayerController!.position.value;
-      videoIntroController.isPaused = true;
-      plPlayerController!.removeStatusLister(playerListener);
-      fullScreenStatusListener.cancel();
-      plPlayerController!.pause();
     }
     isShowing = false;
     if (mounted) {

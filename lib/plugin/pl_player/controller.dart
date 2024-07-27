@@ -303,9 +303,9 @@ class PlPlayerController {
 
   static Future<void> pauseIfExists(
       {bool notify = true, bool isInterrupt = false}) async {
-    if (_instance?.playerStatus.status.value == PlayerStatus.playing) {
+    // if (_instance?.playerStatus.status.value == PlayerStatus.playing) {
       await _instance?.pause(notify: notify, isInterrupt: isInterrupt);
-    }
+    // }
   }
 
   static Future<void> seekToIfExists(Duration position, {type = 'seek'}) async {
@@ -925,12 +925,12 @@ class PlPlayerController {
   /// 暂停播放
   Future<void> pause({bool notify = true, bool isInterrupt = false}) async {
     await _videoPlayerController?.pause();
-    playerStatus.status.value = PlayerStatus.paused;
+    // playerStatus.status.value = PlayerStatus.paused;
 
     // 主动暂停时让出音频焦点
-    if (!isInterrupt) {
-      audioSessionHandler.setActive(false);
-    }
+    // if (!isInterrupt) {
+    //   audioSessionHandler.setActive(false);
+    // }
   }
 
   /// 更改播放状态
