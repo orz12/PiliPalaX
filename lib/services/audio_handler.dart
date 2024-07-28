@@ -98,7 +98,6 @@ class VideoPlayerServiceHandler extends BaseAudioHandler with SeekHandler {
         isPlaying ? MediaControl.pause : MediaControl.play,
         MediaControl.fastForward
             .copyWith(androidIcon: 'drawable/ic_baseline_forward_10_24'),
-        MediaControl.stop,
       ],
       systemActions: {
         MediaAction.seek,
