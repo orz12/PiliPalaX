@@ -71,6 +71,7 @@ class VideoPlayerServiceHandler extends BaseAudioHandler with SeekHandler {
     // debugPrint(StackTrace.current.toString());
     try {
       audioSessionHandler.setActive(true);
+      queue.value.add(newMediaItem);
       if (!mediaItem.isClosed) mediaItem.add(newMediaItem);
     } catch (e) {
       SmartDialog.showToast("setMediaItem error $e");
