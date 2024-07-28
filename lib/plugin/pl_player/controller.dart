@@ -1302,7 +1302,7 @@ class PlPlayerController {
     if (type == 'single' && playerCount.value > 1) {
       _playerCount.value -= 1;
       _heartDuration = 0;
-      pause();
+      // pause();
       return;
     }
     _playerCount.value = 0;
