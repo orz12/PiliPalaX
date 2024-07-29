@@ -34,6 +34,8 @@ class AudioSessionHandler {
             break;
           case AudioInterruptionType.pause:
           case AudioInterruptionType.unknown:
+            SmartDialog.showNotify(
+                msg: '音频播放被中断, $event', notifyType: NotifyType.error);
             PlPlayerController.pauseIfExists(isInterrupt: true);
             _playInterrupted = true;
             break;
@@ -53,9 +55,14 @@ class AudioSessionHandler {
         _playInterrupted = false;
       }
     });
-
+    session.configurationStream.listen((event) {
+      SmartDialog.showNotify(
+          msg: 'configurationStream, $event', notifyType: NotifyType.failure);
+    });
     // 耳机拔出暂停
     session.becomingNoisyEventStream.listen((_) {
+      SmartDialog.showNotify(
+          msg: '音频播放被中断, noisy', notifyType: NotifyType.error);
       PlPlayerController.pauseIfExists();
       // final player = PlPlayerController.getInstance();
       // if (player.playerStatus.playing) {
