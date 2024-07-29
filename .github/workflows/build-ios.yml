@@ -81,13 +81,13 @@ jobs:
           cp -R build/ios/iphoneos/Runner.app build/ios/iphoneos/Payload/Runner.app
           cd build/ios/iphoneos/
           zip -q -r app.ipa Payload
-          cd ../../...
+          cd ../..
 #          ln -sf ./build/ios/iphoneos Payload
 #          zip -r9 app.ipa Payload/runner.app
 
       - name: 重命名应用
         run: |
-          for file in build/ios/iphoneos/app.ipa; do
+          for file in app.ipa; do
             new_file_name="build/Pili-${{ needs.update_version.outputs.new_version }}.ipa"
             mv "$file" "$new_file_name"
           done
