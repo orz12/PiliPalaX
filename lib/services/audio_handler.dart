@@ -149,7 +149,7 @@ class VideoPlayerServiceHandler extends BaseAudioHandler with SeekHandler {
     if (!enableBackgroundPlay) return;
 
     if (_item.isEmpty) return;
-    _transformEvent();
+    playbackState.add(_transformEvent());
   }
 
   onVideoDetailChange(dynamic data, int cid) {
