@@ -1,5 +1,6 @@
 import 'package:audio_session/audio_session.dart';
 import 'package:PiliPalaX/plugin/pl_player/index.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 
 class AudioSessionHandler {
@@ -19,8 +20,13 @@ class AudioSessionHandler {
   Future<void> initSession() async {
     session = await AudioSession.instance;
     await session.configure(const AudioSessionConfiguration.music());
-
-    session.interruptionEventStream.listen((AudioInterruptionEvent event) async {
+    session.devicesChangedEventStream.listen((AudioDevicesChangedEvent event) =>
+        SmartDialog.showNotify(
+            alignment: Alignment.centerLeft,
+            msg: '设备变化, ${event.devicesAdded}, ${event.devicesRemoved}',
+            notifyType: NotifyType.alert));
+    session.interruptionEventStream
+        .listen((AudioInterruptionEvent event) async {
       final playerStatus = PlPlayerController.getPlayerStatusIfExists();
       // final player = PlPlayerController.getInstance();
       if (event.begin) {
@@ -36,7 +42,7 @@ class AudioSessionHandler {
           case AudioInterruptionType.unknown:
             SmartDialog.showNotify(
                 msg: '音频播放被中断, ${event.type}', notifyType: NotifyType.error);
-            // PlPlayerController.pauseIfExists(isInterrupt: true);
+            PlPlayerController.pauseIfExists(isInterrupt: true);
             _playInterrupted = true;
             break;
         }
