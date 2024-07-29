@@ -79,19 +79,25 @@ class _VideoDetailPageState extends State<VideoDetailPage>
     videoIntroController = Get.put(VideoIntroController(), tag: heroTag);
     videoIntroController.videoDetail.listen((value) {
       if (!context.mounted) return;
-      videoPlayerServiceHandler.onVideoDetailChange(
-          value, videoDetailController.cid.value);
+      Future.delayed(const Duration(milliseconds: 200), () {
+        videoPlayerServiceHandler.onVideoDetailChange(
+            value, videoDetailController.cid.value);
+      });
     });
     bangumiIntroController = Get.put(BangumiIntroController(), tag: heroTag);
     bangumiIntroController.bangumiDetail.listen((value) {
       if (!context.mounted) return;
-      videoPlayerServiceHandler.onVideoDetailChange(
-          value, videoDetailController.cid.value);
+      Future.delayed(const Duration(milliseconds: 200), () {
+        videoPlayerServiceHandler.onVideoDetailChange(
+            value, videoDetailController.cid.value);
+      });
     });
     videoDetailController.cid.listen((p0) {
       if (!context.mounted) return;
-      videoPlayerServiceHandler.onVideoDetailChange(
-          bangumiIntroController.bangumiDetail.value, p0);
+      Future.delayed(const Duration(milliseconds: 200), () {
+        videoPlayerServiceHandler.onVideoDetailChange(
+            bangumiIntroController.bangumiDetail.value, p0);
+      });
     });
     autoExitFullscreen =
         setting.get(SettingBoxKey.enableAutoExit, defaultValue: true);
@@ -288,6 +294,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
       plPlayerController!.removeStatusLister(playerListener);
       fullScreenStatusListener.cancel();
     }
+
     /// 开启
     if (setting.get(SettingBoxKey.enableAutoBrightness, defaultValue: false)
         as bool) {
@@ -317,6 +324,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
       listenFullScreenStatus();
     }
     await videoDetailController.playerInit(autoplay: autoplay);
+
     /// 未开启自动播放时，未播放跳转下一页返回/播放后跳转下一页返回
     videoIntroController.isPaused = false;
     // if (autoplay) {
