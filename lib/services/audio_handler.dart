@@ -35,8 +35,14 @@ class VideoPlayerServiceHandler extends BaseAudioHandler with SeekHandler {
     revalidateSetting();
     mediaItem.listen((MediaItem? value) {
       SmartDialog.showNotify(
-          msg: "value changed: $value",
+          msg: "value changed: $value, ${DateTime.now().millisecond}",
           alignment: Alignment.topCenter,
+          notifyType: NotifyType.alert);
+    });
+    playbackState.listen((PlaybackState value) {
+      SmartDialog.showNotify(
+          msg: "playbackState changed: $value，, ${DateTime.now().millisecond}",
+          alignment: Alignment.bottomCenter,
           notifyType: NotifyType.alert);
     });
   }
