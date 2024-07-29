@@ -33,6 +33,12 @@ class VideoPlayerServiceHandler extends BaseAudioHandler with SeekHandler {
 
   VideoPlayerServiceHandler() {
     revalidateSetting();
+    mediaItem.listen((MediaItem? value) {
+      SmartDialog.showNotify(
+          msg: "value changed: $value",
+          alignment: Alignment.topCenter,
+          notifyType: NotifyType.alert);
+    });
   }
 
   revalidateSetting() {
@@ -72,9 +78,16 @@ class VideoPlayerServiceHandler extends BaseAudioHandler with SeekHandler {
     try {
       audioSessionHandler.setActive(true);
       queue.value.add(newMediaItem);
-      if (!mediaItem.isClosed) mediaItem.add(newMediaItem);
+
+      if (!mediaItem.isClosed) {
+        mediaItem.add(newMediaItem);
+      } else {
+        SmartDialog.showNotify(
+            msg: "mediaItem.isClosed", notifyType: NotifyType.failure);
+      }
     } catch (e) {
-      SmartDialog.showToast("setMediaItem error $e");
+      SmartDialog.showNotify(
+          msg: "setMediaItem error $e", notifyType: NotifyType.error);
     }
   }
 
@@ -84,6 +97,8 @@ class VideoPlayerServiceHandler extends BaseAudioHandler with SeekHandler {
     late AudioProcessingState processingState;
 
     if (playerStatus == null) {
+      SmartDialog.showNotify(
+          msg: "playerStatus null", notifyType: NotifyType.error);
       processingState = AudioProcessingState.idle;
     } else if (playerStatus == PlayerStatus.completed) {
       processingState = AudioProcessingState.completed;
@@ -248,6 +263,8 @@ class VideoPlayerServiceHandler extends BaseAudioHandler with SeekHandler {
   clear() {
     if (!enableBackgroundPlay) return;
     mediaItem.add(null);
+    SmartDialog.showNotify(
+        msg: "playerStatus clear", notifyType: NotifyType.error);
     playbackState.add(PlaybackState(
       processingState: AudioProcessingState.idle,
       playing: false,
