@@ -75,9 +75,15 @@ jobs:
 
       - name: flutter build ipa
         run: |
+          flutter pub get
           flutter build ios --release --no-codesign 
-          ln -sf ./build/ios/iphoneos Payload
-          zip -r9 app.ipa Payload/runner.app
+          mkdir build/ios/iphoneos/Payload
+          cp -R build/ios/iphoneos/Runner.app build/ios/iphoneos/Payload/Runner.app
+          cd build/ios/iphoneos/
+          zip -q -r app.ipa Payload
+          cd ../..
+#          ln -sf ./build/ios/iphoneos Payload
+#          zip -r9 app.ipa Payload/runner.app
 
       - name: 重命名应用
         run: |
