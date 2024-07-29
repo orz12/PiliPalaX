@@ -293,6 +293,7 @@ class PlPlayerController {
 
   static Future<void> playIfExists(
       {bool repeat = false, bool hideControls = true}) async {
+    if (_instance != null) audioSessionHandler.setActive(true);
     await _instance?.play(repeat: repeat, hideControls: hideControls);
   }
 
