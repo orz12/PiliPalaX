@@ -190,40 +190,44 @@ class VideoPlayerServiceHandler extends BaseAudioHandler with SeekHandler {
     }
 
     late MediaItem? mediaItem;
-    if (data is VideoDetailData) {
-      // SmartDialog.showToast("${data.title}d");
-      if ((data.pages?.length ?? 0) > 1) {
-        // SmartDialog.showToast("${data.title}e");
-        final current = data.pages?.firstWhere((element) => element.cid == cid);
-        mediaItem = MediaItem(
-          id: UniqueKey().toString(),
-          title: current?.pagePart ?? "",
-          artist: data.title ?? "",
-          album: data.title ?? "",
-          duration: Duration(seconds: current?.duration ?? 0),
-          artUri: Uri.parse(data.pic ?? ""),
-        );
-      } else {
-        // SmartDialog.showToast("${data.title}f");
-        mediaItem = MediaItem(
-          id: UniqueKey().toString(),
-          title: data.title ?? "",
-          artist: data.owner?.name ?? "",
-          duration: Duration(seconds: data.duration ?? 0),
-          artUri: Uri.parse(data.pic ?? ""),
-        );
-      }
-    } else if (data is BangumiInfoModel) {
-      final current =
-          data.episodes?.firstWhere((element) => element.cid == cid);
-      mediaItem = MediaItem(
+    mediaItem = MediaItem(
         id: UniqueKey().toString(),
-        title: current?.longTitle ?? "",
-        artist: data.title ?? "",
-        duration: Duration(milliseconds: current?.duration ?? 0),
-        artUri: Uri.parse(data.cover ?? ""),
-      );
-    }
+        title: "test$cid",
+        duration: const Duration(seconds: 2000));
+    // if (data is VideoDetailData) {
+    //   // SmartDialog.showToast("${data.title}d");
+    //   if ((data.pages?.length ?? 0) > 1) {
+    //     // SmartDialog.showToast("${data.title}e");
+    //     final current = data.pages?.firstWhere((element) => element.cid == cid);
+    //     mediaItem = MediaItem(
+    //       id: UniqueKey().toString(),
+    //       title: current?.pagePart ?? "",
+    //       artist: data.title ?? "",
+    //       album: data.title ?? "",
+    //       duration: Duration(seconds: current?.duration ?? 0),
+    //       artUri: Uri.parse(data.pic ?? ""),
+    //     );
+    //   } else {
+    //     // SmartDialog.showToast("${data.title}f");
+    //     mediaItem = MediaItem(
+    //       id: UniqueKey().toString(),
+    //       title: data.title ?? "",
+    //       artist: data.owner?.name ?? "",
+    //       duration: Duration(seconds: data.duration ?? 0),
+    //       artUri: Uri.parse(data.pic ?? ""),
+    //     );
+    //   }
+    // } else if (data is BangumiInfoModel) {
+    //   final current =
+    //       data.episodes?.firstWhere((element) => element.cid == cid);
+    //   mediaItem = MediaItem(
+    //     id: UniqueKey().toString(),
+    //     title: current?.longTitle ?? "",
+    //     artist: data.title ?? "",
+    //     duration: Duration(milliseconds: current?.duration ?? 0),
+    //     artUri: Uri.parse(data.cover ?? ""),
+    //   );
+    // }
 
     // SmartDialog.showToast("${data.title}g");
     if (mediaItem == null) {
