@@ -20,7 +20,7 @@ class AudioSessionHandler {
     session = await AudioSession.instance;
     await session.configure(const AudioSessionConfiguration.music());
 
-    session.interruptionEventStream.listen((event) async {
+    session.interruptionEventStream.listen((AudioInterruptionEvent event) async {
       final playerStatus = PlPlayerController.getPlayerStatusIfExists();
       // final player = PlPlayerController.getInstance();
       if (event.begin) {
@@ -35,8 +35,8 @@ class AudioSessionHandler {
           case AudioInterruptionType.pause:
           case AudioInterruptionType.unknown:
             SmartDialog.showNotify(
-                msg: '音频播放被中断, $event', notifyType: NotifyType.error);
-            PlPlayerController.pauseIfExists(isInterrupt: true);
+                msg: '音频播放被中断, ${event.type}', notifyType: NotifyType.error);
+            // PlPlayerController.pauseIfExists(isInterrupt: true);
             _playInterrupted = true;
             break;
         }
