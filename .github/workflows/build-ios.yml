@@ -75,6 +75,7 @@ jobs:
 
       - name: flutter build ipa
         run: |
+          flutter pub get
           flutter build ios --release --no-codesign 
           ln -sf ./build/ios/iphoneos Payload
           zip -r9 app.ipa Payload/runner.app
