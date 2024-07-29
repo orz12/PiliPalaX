@@ -905,15 +905,17 @@ class PlPlayerController {
     // // 播放时自动隐藏控制条
     // // repeat为true，将从头播放
 
+    controls = !hideControls;
     if (repeat) {
       SmartDialog.showToast("stoping");
       await seekTo(Duration.zero, type: "slider");
       SmartDialog.showToast("stopped");
     }
     // playerStatus.status.value = PlayerStatus.playing;
-    await _videoPlayerController?.play();
+    Future.delayed(const Duration(milliseconds: 100), () {
+      _videoPlayerController?.play();
+    });
     // if (!playerStatus.playing) await _videoPlayerController?.playOrPause();
-    controls = !hideControls;
 
     // getCurrentVolume();
     // getCurrentBrightness();
