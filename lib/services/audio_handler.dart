@@ -153,7 +153,7 @@ class VideoPlayerServiceHandler extends BaseAudioHandler with SeekHandler {
   }
 
   onVideoDetailChange(dynamic data, int cid) {
-    SmartDialog.showNotify(msg: data.toString(), notifyType: NotifyType.alert);
+    SmartDialog.showToast("onVideoDetailChange $data");
     if (!enableBackgroundPlay) return;
     // print('当前调用栈为：');
     // print(StackTrace.current);
