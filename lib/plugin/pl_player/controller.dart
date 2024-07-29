@@ -797,7 +797,7 @@ class PlPlayerController {
         // }),
         // 媒体通知监听
         onPlayerStatusChanged.listen((PlayerStatus event) {
-          SmartDialog.showToast(event.toString());
+          // SmartDialog.showToast(event.toString());
           videoPlayerServiceHandler.onStatusChange();
         }),
         onPositionChanged.listen((Duration event) {
