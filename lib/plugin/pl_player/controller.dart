@@ -903,7 +903,6 @@ class PlPlayerController {
     // // SmartDialog.showToast(
     // //     (await audioSessionHandler.setActive(true)).toString());
     // // 播放时自动隐藏控制条
-    controls = !hideControls;
     // // repeat为true，将从头播放
 
     if (repeat) {
@@ -914,6 +913,7 @@ class PlPlayerController {
     // playerStatus.status.value = PlayerStatus.playing;
     await _videoPlayerController?.play();
     // if (!playerStatus.playing) await _videoPlayerController?.playOrPause();
+    controls = !hideControls;
 
     // getCurrentVolume();
     // getCurrentBrightness();
