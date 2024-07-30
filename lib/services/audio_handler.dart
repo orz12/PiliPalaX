@@ -10,6 +10,9 @@ import 'package:PiliPalaX/utils/storage.dart';
 import 'dart:io';
 
 Future<VideoPlayerServiceHandler> initAudioService() async {
+  if (!setting.get(SettingBoxKey.enableBackgroundPlay, defaultValue: true)) {
+    return VideoPlayerServiceHandler();
+  }
   return await AudioService.init(
     builder: () => VideoPlayerServiceHandler(),
     config: const AudioServiceConfig(
