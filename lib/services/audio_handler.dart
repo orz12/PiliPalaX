@@ -18,7 +18,7 @@ Future<VideoPlayerServiceHandler> initAudioService() async {
     config: const AudioServiceConfig(
       androidNotificationChannelId: 'com.orz12.PiliPalaX.audio',
       androidNotificationChannelName: 'Audio Service PiliPalaX',
-      androidNotificationOngoing: true,
+      androidNotificationOngoing: false,
       androidStopForegroundOnPause: true,
       fastForwardInterval: Duration(seconds: 10),
       rewindInterval: Duration(seconds: 10),
