@@ -186,6 +186,22 @@ class _HeaderControlState extends State<HeaderControl> {
                       title: const Text('定时关闭', style: titleStyle),
                     ),
                     ListTile(
+                      onTap: () {
+                        Get.back();
+                        Player? player =
+                            widget.controller?.videoPlayerController;
+                        if (player == null) {
+                          SmartDialog.showToast('播放器未初始化');
+                          return;
+                        }
+                        var pp = player.platform as NativePlayer;
+                        pp.setProperty("video", "no");
+                      },
+                      dense: true,
+                      leading: const Icon(Icons.headphones_outlined, size: 20),
+                      title: const Text('听视频（需返回首页以终止该状态）', style: titleStyle),
+                    ),
+                    ListTile(
                       onTap: () =>
                           {Get.back(), widget.videoDetailCtr!.queryVideoUrl()},
                       dense: true,
