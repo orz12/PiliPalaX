@@ -3,6 +3,7 @@ import 'dart:io';
 import 'dart:math';
 import 'dart:ui';
 
+import 'package:PiliPalaX/utils/extension.dart';
 import 'package:auto_orientation/auto_orientation.dart';
 import 'package:floating/floating.dart';
 import 'package:flutter/services.dart';
@@ -40,10 +41,12 @@ class VideoDetailPage extends StatefulWidget {
 class _VideoDetailPageState extends State<VideoDetailPage>
     with TickerProviderStateMixin, RouteAware {
   late VideoDetailController videoDetailController;
+  late VideoReplyController _videoReplyController;
   PlPlayerController? plPlayerController;
   late StreamController<double> appbarStream;
   late VideoIntroController videoIntroController;
   late BangumiIntroController bangumiIntroController;
+  late final _introController = ScrollController();
   late String heroTag;
 
   PlayerStatus playerStatus = PlayerStatus.playing;
@@ -77,6 +80,9 @@ class _VideoDetailPageState extends State<VideoDetailPage>
       heroTag = Get.arguments['heroTag'];
     }
     videoDetailController = Get.put(VideoDetailController(), tag: heroTag);
+    _videoReplyController = Get.put(
+        VideoReplyController(videoDetailController.oid.value, '0', '1'),
+        tag: heroTag);
     videoIntroController = Get.put(VideoIntroController(), tag: heroTag);
     videoIntroController.videoDetail.listen((value) {
       if (!context.mounted) return;
@@ -384,6 +390,104 @@ class _VideoDetailPageState extends State<VideoDetailPage>
 
   @override
   Widget build(BuildContext context) {
+    /// tabbar
+    Widget tabbarBuild = Container(
+      width: double.infinity,
+      height: 45,
+      decoration: BoxDecoration(
+        border: Border(
+          bottom: BorderSide(
+            width: 1,
+            color: Theme.of(context).dividerColor.withOpacity(0.1),
+          ),
+        ),
+      ),
+      child: Material(
+        child: Row(
+          children: [
+            Flexible(
+              flex: 1,
+              child: Obx(
+                () => TabBar(
+                  padding: EdgeInsets.zero,
+                  controller: videoDetailController.tabCtr,
+                  labelStyle: const TextStyle(fontSize: 13),
+                  labelPadding:
+                      const EdgeInsets.symmetric(horizontal: 10.0), // 设置每个标签的宽度
+                  dividerColor: Colors.transparent,
+                  onTap: (value) {
+                    if (!videoDetailController.tabCtr.indexIsChanging) {
+                      if (value == 0) {
+                        _introController.animToTop();
+                      } else {
+                        _videoReplyController.animToTop();
+                      }
+                    }
+                  },
+                  tabs: [
+                    const Tab(text: '简介'),
+                    Tab(
+                      text:
+                          '评论${_videoReplyController.count.value == -1 ? '' : ' ${_videoReplyController.count.value}'}',
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            Flexible(
+                flex: 1,
+                child: Center(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      SizedBox(
+                        height: 32,
+                        child: TextButton(
+                          style: ButtonStyle(
+                            padding: WidgetStateProperty.all(EdgeInsets.zero),
+                          ),
+                          onPressed: null,
+                          // onPressed: () => videoDetailController.showShootDanmakuSheet(),
+                          child:
+                              const Text('发弹幕', style: TextStyle(fontSize: 12)),
+                        ),
+                      ),
+                      // SizedBox(
+                      //   width: 38,
+                      //   height: 38,
+                      //   child: Obx(
+                      //     () => IconButton(
+                      //       onPressed: () {
+                      //         plPlayerController?.isOpenDanmu.value =
+                      //             !(plPlayerController?.isOpenDanmu.value ??
+                      //                 false);
+                      //       },
+                      //       icon: !(plPlayerController?.isOpenDanmu.value ??
+                      //               false)
+                      //           ? SvgPicture.asset(
+                      //               'assets/images/video/danmu_close.svg',
+                      //               // ignore: deprecated_member_use
+                      //               color:
+                      //                   Theme.of(context).colorScheme.outline,
+                      //             )
+                      //           : SvgPicture.asset(
+                      //               'assets/images/video/danmu_open.svg',
+                      //               // ignore: deprecated_member_use
+                      //               color:
+                      //                   Theme.of(context).colorScheme.primary,
+                      //             ),
+                      //     ),
+                      //   ),
+                      // ),
+                      const SizedBox(width: 14),
+                    ],
+                  ),
+                )),
+          ],
+        ),
+      ),
+    );
+
     Widget plPlayer = FutureBuilder(
         future: _futureBuilderFuture,
         builder: (BuildContext context, AsyncSnapshot snapshot) {
@@ -587,33 +691,17 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                   Expanded(
                     child: ColoredBox(
                       key: Key(heroTag),
-                      color: Theme.of(context).colorScheme.background,
+                      color: Theme.of(context).colorScheme.surface,
                       child: Column(
                         children: [
-                          // Opacity(
-                          //   opacity: 0,
-                          //   child: SizedBox(
-                          //     width: context.width,
-                          //     height: 0,
-                          //     child: Obx(
-                          //       () => TabBar(
-                          //         controller: videoDetailController.tabCtr,
-                          //         dividerColor: Colors.transparent,
-                          //         indicatorColor:
-                          //             Theme.of(context).colorScheme.background,
-                          //         tabs: videoDetailController.tabs
-                          //             .map((String name) => Tab(text: name))
-                          //             .toList(),
-                          //       ),
-                          //     ),
-                          //   ),
-                          // ),
+                          tabbarBuild,
                           Expanded(
                             child: TabBarView(
                               physics: const BouncingScrollPhysics(),
                               controller: videoDetailController.tabCtr,
                               children: <Widget>[
                                 CustomScrollView(
+                                  controller: _introController,
                                   key: const PageStorageKey<String>('简介'),
                                   slivers: <Widget>[
                                     if (videoDetailController.videoType ==

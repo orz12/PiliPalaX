@@ -1,3 +1,4 @@
+import 'package:PiliPalaX/utils/extension.dart';
 import 'package:easy_debounce/easy_throttle.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -26,7 +27,7 @@ class VideoReplyController extends GetxController {
   String nextOffset = "";
   bool isLoadingMore = false;
   RxString noMore = ''.obs;
-  RxInt count = 0.obs;
+  RxInt count = (-1).obs;
   // 当前回复的回复
   ReplyItemModel? currentReplyItem;
 
@@ -77,7 +78,6 @@ class VideoReplyController extends GetxController {
         if (res['data'].cursor.isEnd == true) {
           noMore.value = '没有更多了';
         }
-
       } else {
         // 未登录状态replies可能返回null
         noMore.value = nextOffset == "" && type == 'init' ? '还没有评论' : '没有更多了';
@@ -125,5 +125,9 @@ class VideoReplyController extends GetxController {
       replyList.clear();
       queryReplyList(type: 'init');
     });
+  }
+
+  void animToTop() {
+    scrollController.animToTop();
   }
 }

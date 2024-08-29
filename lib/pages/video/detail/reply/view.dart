@@ -57,9 +57,7 @@ class _VideoReplyPanelState extends State<VideoReplyPanel>
           VideoReplyController(widget.oid, widget.rpid.toString(), replyLevel),
           tag: widget.rpid.toString());
     } else {
-      _videoReplyController = Get.put(
-          VideoReplyController(widget.oid, '', replyLevel),
-          tag: heroTag);
+      _videoReplyController = Get.find<VideoReplyController>(tag: heroTag);
     }
 
     fabAnimationCtr = AnimationController(
@@ -135,38 +133,20 @@ class _VideoReplyPanelState extends State<VideoReplyPanel>
             key: const PageStorageKey<String>('评论'),
             slivers: <Widget>[
               SliverPersistentHeader(
-                pinned: true,
-                floating: false,
+                pinned: false,
+                floating: true,
                 delegate: _MySliverPersistentHeaderDelegate(
                   child: Container(
-                    height: 45,
+                    height: 40,
                     padding: const EdgeInsets.fromLTRB(12, 0, 6, 0),
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).colorScheme.background,
-                      border: Border(
-                        bottom: BorderSide(
-                            color: Theme.of(context)
-                                .colorScheme
-                                .outline
-                                .withOpacity(0.1)),
-                      ),
-                    ),
+                    color: Theme.of(context).colorScheme.surface,
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Obx(
-                          () => AnimatedSwitcher(
-                            duration: const Duration(milliseconds: 400),
-                            transitionBuilder:
-                                (Widget child, Animation<double> animation) {
-                              return ScaleTransition(
-                                  scale: animation, child: child);
-                            },
-                            child: Text(
-                              '共${_videoReplyController.count.value}条回复',
-                              key: ValueKey<int>(
-                                  _videoReplyController.count.value),
-                            ),
+                          () => Text(
+                            '${_videoReplyController.sortTypeLabel.value}评论',
+                            style: const TextStyle(fontSize: 13),
                           ),
                         ),
                         SizedBox(
@@ -175,10 +155,12 @@ class _VideoReplyPanelState extends State<VideoReplyPanel>
                             onPressed: () =>
                                 _videoReplyController.queryBySort(),
                             icon: const Icon(Icons.sort, size: 16),
-                            label: Obx(() => Text(
-                                  _videoReplyController.sortTypeLabel.value,
-                                  style: const TextStyle(fontSize: 13),
-                                )),
+                            label: Obx(
+                              () => Text(
+                                _videoReplyController.sortTypeLabel.value,
+                                style: const TextStyle(fontSize: 13),
+                              ),
+                            ),
                           ),
                         )
                       ],
