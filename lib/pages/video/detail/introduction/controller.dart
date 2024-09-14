@@ -294,7 +294,7 @@ class VideoIntroController extends GetxController {
                   child: const Text('投 1 枚')),
               TextButton(
                   onPressed: () async {
-                    coinVideo(1);
+                    coinVideo(2);
                     Get.back();
                   },
                   child: const Text('投 2 枚'))
