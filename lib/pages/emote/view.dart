@@ -49,47 +49,72 @@ class _EmotePanelState extends State<EmotePanel>
                         int type = e.type!;
                         return Padding(
                           padding: const EdgeInsets.fromLTRB(12, 6, 12, 0),
-                          child: GridView.builder(
-                            gridDelegate:
-                                SliverGridDelegateWithMaxCrossAxisExtent(
-                              maxCrossAxisExtent:
-                                  type == 4 ? 100 : (size == 1 ? 40 : 60),
-                              crossAxisSpacing: 8,
-                              mainAxisSpacing: 8,
-                              mainAxisExtent: size == 1 ? 40 : 60,
-                            ),
-                            itemCount: e.emote!.length,
-                            itemBuilder: (context, index) {
-                              return Material(
-                                color: Colors.transparent,
-                                clipBehavior: Clip.hardEdge,
-                                // shape: RoundedRectangleBorder(
-                                //   borderRadius: BorderRadius.circular(4),
-                                // ),
-                                child: InkWell(
-                                  onTap: () {
-                                    widget.onChoose(e, e.emote![index]);
-                                  },
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(3),
-                                    child: type == 4
-                                        ? Text(
-                                            e.emote![index].text!,
-                                            overflow: TextOverflow.clip,
-                                            maxLines: 1,
-                                          )
-                                        : NetworkImgLayer(
-                                            src: e.emote![index].url!,
-                                            width: size * 38,
-                                            height: size * 38,
-                                            semanticsLabel: e.emote![index].text!,
-                                            type: 'emote',
+                          child: type != 4
+                              ? GridView.builder(
+                                  gridDelegate:
+                                      SliverGridDelegateWithMaxCrossAxisExtent(
+                                    maxCrossAxisExtent: (size == 1 ? 40 : 60),
+                                    crossAxisSpacing: 8,
+                                    mainAxisSpacing: 8,
+                                    mainAxisExtent: size == 1 ? 40 : 60,
+                                  ),
+                                  itemCount: e.emote!.length,
+                                  itemBuilder: (context, index) {
+                                    return Material(
+                                      color: Colors.transparent,
+                                      child: InkWell(
+                                        borderRadius: BorderRadius.circular(8),
+                                        onTap: () {
+                                          widget.onChoose(e, e.emote![index]);
+                                        },
+                                        child: Tooltip(
+                                          message: e.emote![index].text!
+                                              .substring(
+                                                  1,
+                                                  e.emote![index].text!.length -
+                                                      1),
+                                          child: Padding(
+                                            padding: const EdgeInsets.all(6),
+                                            child: NetworkImgLayer(
+                                              src: e.emote![index].url!,
+                                              width: size * 38,
+                                              height: size * 38,
+                                              semanticsLabel:
+                                                  e.emote![index].text!,
+                                              type: 'emote',
+                                            ),
                                           ),
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                )
+                              : SingleChildScrollView(
+                                  padding: const EdgeInsets.only(bottom: 12),
+                                  child: Wrap(
+                                    spacing: 8,
+                                    runSpacing: 8,
+                                    children: e.emote!
+                                        .map(
+                                          (item) => Material(
+                                            color: Colors.transparent,
+                                            child: InkWell(
+                                              borderRadius:
+                                                  BorderRadius.circular(8),
+                                              onTap: () {
+                                                widget.onChoose(e, item);
+                                              },
+                                              child: Padding(
+                                                padding:
+                                                    const EdgeInsets.all(6),
+                                                child: Text(item.text!),
+                                              ),
+                                            ),
+                                          ),
+                                        )
+                                        .toList(),
                                   ),
                                 ),
-                              );
-                            },
-                          ),
                         );
                       },
                     ).toList(),
@@ -104,11 +129,14 @@ class _EmotePanelState extends State<EmotePanel>
                     isScrollable: true,
                     tabs: _emotePanelController.emotePackage
                         .map(
-                          (e) => NetworkImgLayer(
-                            width: 36,
-                            height: 36,
-                            type: 'emote',
-                            src: e.url,
+                          (e) => Padding(
+                            padding: const EdgeInsets.all(8),
+                            child: NetworkImgLayer(
+                              width: 24,
+                              height: 24,
+                              type: 'emote',
+                              src: e.url,
+                            ),
                           ),
                         )
                         .toList(),

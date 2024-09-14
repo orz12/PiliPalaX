@@ -40,6 +40,8 @@ class _VideoReplyNewDialogState extends State<VideoReplyNewDialog>
   double keyboardHeight = 0.0; // 键盘高度
   final _debouncer = Debouncer(milliseconds: 200); // 设置延迟时间
   String toolbarType = 'input';
+  bool _enablePublish = false;
+  final _publishStream = StreamController<bool>();
 
   @override
   void initState() {
@@ -94,6 +96,10 @@ class _VideoReplyNewDialogState extends State<VideoReplyNewDialog>
   }
 
   void onChooseEmote(Packages package, Emote emote) {
+    if (!_enablePublish) {
+      _enablePublish = true;
+      _publishStream.add(true);
+    }
     final int cursorPosition = _replyContentController.selection.baseOffset;
     final String currentText = _replyContentController.text;
     final String newText = currentText.substring(0, cursorPosition) +
@@ -138,7 +144,7 @@ class _VideoReplyNewDialogState extends State<VideoReplyNewDialog>
 
   @override
   Widget build(BuildContext context) {
-    double keyboardHeight = EdgeInsets.fromViewPadding(
+    double _keyboardHeight = EdgeInsets.fromViewPadding(
             View.of(context).viewInsets, View.of(context).devicePixelRatio)
         .bottom;
     return Container(
@@ -153,32 +159,35 @@ class _VideoReplyNewDialogState extends State<VideoReplyNewDialog>
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          ConstrainedBox(
-            constraints: const BoxConstraints(
-              maxHeight: 200,
-              minHeight: 120,
-            ),
-            child: Container(
-              padding: const EdgeInsets.only(
-                  top: 12, right: 15, left: 15, bottom: 10),
-              child: SingleChildScrollView(
-                child: Form(
-                  key: _formKey,
-                  autovalidateMode: AutovalidateMode.onUserInteraction,
-                  child: TextField(
-                    controller: _replyContentController,
-                    minLines: 1,
-                    maxLines: null,
-                    autofocus: false,
-                    focusNode: replyContentFocusNode,
-                    decoration: const InputDecoration(
-                        hintText: "输入回复内容",
-                        border: InputBorder.none,
-                        hintStyle: TextStyle(
-                          fontSize: 14,
-                        )),
-                    style: Theme.of(context).textTheme.bodyLarge,
-                  ),
+          Container(
+            padding:
+                const EdgeInsets.only(top: 12, right: 15, left: 15, bottom: 10),
+            child: SingleChildScrollView(
+              child: Form(
+                key: _formKey,
+                autovalidateMode: AutovalidateMode.onUserInteraction,
+                child: TextField(
+                  controller: _replyContentController,
+                  minLines: 4,
+                  maxLines: 8,
+                  autofocus: false,
+                  onChanged: (value) {
+                    if (value.isNotEmpty && !_enablePublish) {
+                      _enablePublish = true;
+                      _publishStream.add(true);
+                    } else if (value.isEmpty && _enablePublish) {
+                      _enablePublish = false;
+                      _publishStream.add(false);
+                    }
+                  },
+                  focusNode: replyContentFocusNode,
+                  decoration: const InputDecoration(
+                      hintText: "输入回复内容",
+                      border: InputBorder.none,
+                      hintStyle: TextStyle(
+                        fontSize: 14,
+                      )),
+                  style: Theme.of(context).textTheme.bodyLarge,
                 ),
               ),
             ),
@@ -223,22 +232,36 @@ class _VideoReplyNewDialogState extends State<VideoReplyNewDialog>
                   selected: toolbarType == 'emote',
                 ),
                 const Spacer(),
-                TextButton(
-                    onPressed: () => Get.back(),
-                    child: Text('取消',
-                        style: TextStyle(
-                            color: Theme.of(context).colorScheme.secondary))),
-                const SizedBox(width: 10),
-                TextButton(
-                    onPressed: () => submitReplyAdd(), child: const Text('发送'))
+                StreamBuilder(
+                  initialData: false,
+                  stream: _publishStream.stream,
+                  builder: (_, snapshot) => FilledButton.tonal(
+                    onPressed: snapshot.data == true ? submitReplyAdd : null,
+                    style: FilledButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 20, vertical: 10),
+                      visualDensity: const VisualDensity(
+                        horizontal: -2,
+                        vertical: -2,
+                      ),
+                    ),
+                    child: const Text('发送'),
+                  ),
+                ),
               ],
             ),
           ),
-          SizedBox(
-            width: double.infinity,
-            height: toolbarType == 'input' ? keyboardHeight : emoteHeight,
-            child: EmotePanel(
-              onChoose: onChooseEmote,
+          AnimatedSize(
+            curve: Curves.easeInOut,
+            duration: const Duration(milliseconds: 300),
+            child: SizedBox(
+              width: double.infinity,
+              height: toolbarType == 'input'
+                  ? (_keyboardHeight > keyboardHeight
+                      ? _keyboardHeight
+                      : keyboardHeight)
+                  : emoteHeight,
+              child: EmotePanel(onChoose: onChooseEmote),
             ),
           ),
           if (toolbarType == 'input' && keyboardHeight == 0.0)
