@@ -218,7 +218,7 @@ class ChatItem extends StatelessWidget {
                     SmartDialog.dismiss<dynamic>().then(
                       (e) => Get.toNamed<dynamic>('/video?bvid=$bvid&cid=$cid',
                           arguments: <String, String?>{
-                            'pic': content['thumb'],
+                            'pic': content['cover'],
                             'heroTag': heroTag,
                           }),
                     );
