@@ -230,8 +230,8 @@ class _ImagePreviewState extends State<ImagePreview>
                       return GestureConfig(
                         inPageView: true,
                         initialScale: 1.0,
-                        maxScale: 5.0,
-                        animationMaxScale: 6.0,
+                        maxScale: 15.0,
+                        animationMaxScale: 16.0,
                         initialAlignment: InitialAlignment.center,
                       );
                     },
