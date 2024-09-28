@@ -696,8 +696,8 @@ class PlPlayerController {
           } else {
             playerStatus.status.value = PlayerStatus.paused;
           }
-          videoPlayerServiceHandler.onStatusChange(
-              playerStatus.status.value, isBuffering.value);
+          // videoPlayerServiceHandler.onStatusChange(
+          //     playerStatus.status.value, isBuffering.value);
 
           /// 触发回调事件
           for (var element in _statusListeners) {
@@ -745,8 +745,8 @@ class PlPlayerController {
         }),
         videoPlayerController!.stream.buffering.listen((bool event) {
           isBuffering.value = event;
-          videoPlayerServiceHandler.onStatusChange(
-              playerStatus.status.value, event);
+          // videoPlayerServiceHandler.onStatusChange(
+          //     playerStatus.status.value, event);
         }),
         // videoPlayerController!.stream.log.listen((event) {
         //   print('videoPlayerController!.stream.log.listen');
@@ -790,14 +790,14 @@ class PlPlayerController {
         // }),
         // 媒体通知监听
         onPlayerStatusChanged.listen((PlayerStatus event) {
-          videoPlayerServiceHandler.onStatusChange(event, isBuffering.value);
+          // videoPlayerServiceHandler.onStatusChange(event, isBuffering.value);
         }),
-        onPositionChanged.listen((Duration event) {
-          EasyThrottle.throttle(
-              'mediaServicePosition',
-              const Duration(seconds: 1),
-              () => videoPlayerServiceHandler.onPositionChange(event));
-        }),
+        // onPositionChanged.listen((Duration event) {
+        //   EasyThrottle.throttle(
+        //       'mediaServicePosition',
+        //       const Duration(seconds: 1),
+        //       () => videoPlayerServiceHandler.onPositionChange(event));
+        // }),
       ],
     );
   }
@@ -1122,7 +1122,7 @@ class PlPlayerController {
   /// 设置后台播放
   Future<void> setBackgroundPlay(bool val) async {
     setting.put(SettingBoxKey.enableBackgroundPlay, val);
-    videoPlayerServiceHandler.revalidateSetting();
+    // videoPlayerServiceHandler.revalidateSetting();
   }
 
   /// 读取亮度
@@ -1326,7 +1326,7 @@ class PlPlayerController {
         _videoPlayerController = null;
       }
       _instance = null;
-      videoPlayerServiceHandler.clear();
+      // videoPlayerServiceHandler.clear();
     } catch (err) {
       print(err);
     }

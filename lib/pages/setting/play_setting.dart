@@ -41,7 +41,7 @@ class _PlaySettingState extends State<PlaySetting> {
     super.dispose();
 
     // 重新验证媒体通知后台播放设置
-    videoPlayerServiceHandler.revalidateSetting();
+    // videoPlayerServiceHandler.revalidateSetting();
   }
 
   @override

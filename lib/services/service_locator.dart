@@ -5,7 +5,7 @@ late VideoPlayerServiceHandler videoPlayerServiceHandler;
 late AudioSessionHandler audioSessionHandler;
 
 Future<void> setupServiceLocator() async {
-  final audio = await initAudioService();
-  videoPlayerServiceHandler = audio;
-  audioSessionHandler = AudioSessionHandler();
+  // final audio = await initAudioService();
+  // videoPlayerServiceHandler = audio;
+  // audioSessionHandler = AudioSessionHandler();
 }
