@@ -391,7 +391,7 @@ class ReplyItemRow extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.only(left: 42, right: 4, top: 0),
       child: Material(
-        color: Theme.of(context).colorScheme.onInverseSurface,
+        color: Theme.of(context).colorScheme.secondary.withOpacity(0.1),
         borderRadius: BorderRadius.circular(6),
         clipBehavior: Clip.hardEdge,
         animationDuration: Duration.zero,
