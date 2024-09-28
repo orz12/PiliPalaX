@@ -62,6 +62,7 @@ class _MediaPageState extends State<MediaPage>
   Widget build(BuildContext context) {
     super.build(context);
     Color primary = Theme.of(context).colorScheme.primary;
+
     return Scaffold(
       backgroundColor: Colors.transparent,
       appBar: AppBar(
@@ -79,48 +80,69 @@ class _MediaPageState extends State<MediaPage>
         child: Column(
           children: [
             ListTile(
-                leading: null,
-                title: Padding(
-                  padding: const EdgeInsets.only(left: 20),
-                  child: Text(
-                    '媒体库',
-                    style: TextStyle(
-                      fontSize:
-                          Theme.of(context).textTheme.titleLarge!.fontSize,
-                      fontWeight: FontWeight.bold,
-                    ),
+              leading: null,
+              title: Padding(
+                padding: const EdgeInsets.only(left: 20),
+                child: Text(
+                  '媒体库',
+                  style: TextStyle(
+                    fontSize: Theme.of(context).textTheme.titleLarge!.fontSize,
+                    fontWeight: FontWeight.bold,
                   ),
-                ),
-                trailing: IconButton(
-                  tooltip: '设置',
-                  onPressed: () {
-                    Get.toNamed('/setting');
-                  },
-                  icon: const Icon(
-                    Icons.settings_outlined,
-                    size: 20,
-                  ),
-                )),
-            for (var i in mediaController.list) ...[
-              ListTile(
-                onTap: () => i['onTap'](),
-                dense: true,
-                leading: Padding(
-                  padding: const EdgeInsets.only(left: 15),
-                  child: Icon(
-                    i['icon'],
-                    color: primary,
-                  ),
-                ),
-                contentPadding:
-                    const EdgeInsets.only(left: 15, top: 2, bottom: 2),
-                minLeadingWidth: 0,
-                title: Text(
-                  i['title'],
-                  style: const TextStyle(fontSize: 15),
                 ),
               ),
-            ],
+              trailing: IconButton(
+                tooltip: '设置',
+                onPressed: () {
+                  Get.toNamed('/setting');
+                },
+                icon: const Icon(
+                  Icons.settings_outlined,
+                  size: 20,
+                ),
+              ),
+            ),
+            // 网格视图替代 for 循环
+            Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 10,
+                vertical: 10,
+              ),
+              child: GridView.builder(
+                physics:
+                    const NeverScrollableScrollPhysics(), // 禁用GridView自己的滚动，防止冲突
+                shrinkWrap: true,
+                gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+                  maxCrossAxisExtent: 200,
+                  crossAxisSpacing: 0, // 网格之间的水平间距
+                  mainAxisSpacing: 10, // 网格之间的垂直间距
+                  childAspectRatio: 4, // 宽高比，1表示正方形网格
+                ),
+                itemCount: mediaController.list.length,
+                itemBuilder: (context, index) {
+                  var item = mediaController.list[index];
+                  return GestureDetector(
+                    onTap: () => item['onTap'](),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          item['icon'],
+                          color: primary,
+                          size: 30, // 图标大小
+                        ),
+                        const SizedBox(width: 8), // 图标和文字之间的间距
+                        Text(
+                          item['title'],
+                          style: const TextStyle(fontSize: 14),
+                          // textAlign: TextAlign.center, // 文字居中
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              ),
+            ),
             Obx(() => mediaController.userLogin.value
                 ? favFolder(mediaController, context)
                 : const SizedBox(height: 0))
