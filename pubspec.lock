@@ -563,10 +563,10 @@ packages:
     dependency: "direct main"
     description:
       name: floating
-      sha256: ddcd7f28247746dbb62997c48c89d1824118676796df47fdc6f864f8d02849bc
+      sha256: "62924c96915823ce955da32b26766e11583ce437990a601032191d6d4b0b0764"
       url: "https://mirrors.tuna.tsinghua.edu.cn/dart-pub/"
     source: hosted
-    version: "3.0.0"
+    version: "4.0.1"
   flutter:
     dependency: "direct main"
     description: flutter

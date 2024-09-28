@@ -329,7 +329,7 @@ class BangumiIntroController extends GetxController {
     int currentIndex =
         episodes.indexWhere((e) => e.cid == videoDetailCtr.cid.value);
     int prevIndex = currentIndex - 1;
-    PlayRepeat platRepeat = videoDetailCtr.plPlayerController.playRepeat;
+    PlayRepeat platRepeat = videoDetailCtr.plPlayerController!.playRepeat;
     if (prevIndex < 0) {
       if (platRepeat == PlayRepeat.listCycle) {
         prevIndex = episodes.length - 1;
@@ -349,7 +349,7 @@ class BangumiIntroController extends GetxController {
     late List episodes;
     VideoDetailController videoDetailCtr =
         Get.find<VideoDetailController>(tag: Get.arguments['heroTag']);
-    PlayRepeat platRepeat = videoDetailCtr.plPlayerController.playRepeat;
+    PlayRepeat platRepeat = videoDetailCtr.plPlayerController!.playRepeat;
 
     if (bangumiDetail.value.episodes != null) {
       episodes = bangumiDetail.value.episodes!;

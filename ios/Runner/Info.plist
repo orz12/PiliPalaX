@@ -102,9 +102,20 @@
 				</array>
 			</dict>
 		</array>
+		<key>NSAppTransportSecurity</key>
+        <dict>
+            <key>NSAllowsArbitraryLoads</key>
+            <true/>
+        </dict>
+        <key>NSBonjourServices</key>
+        <array>
+            <string>_dartobservatory._tcp</string>
+        </array>
 		<key>UIBackgroundModes</key>
 		<array>
 			<string>audio</string>
+            <string>processing</string>
+            <string>remote-notification</string>
 		</array>
 		<key>UIStatusBarHidden</key>
 		<false/>

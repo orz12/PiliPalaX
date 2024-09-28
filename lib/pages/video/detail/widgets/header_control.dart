@@ -86,7 +86,7 @@ class _HeaderControlState extends State<HeaderControl> {
 
   void listenFullScreenStatus() {
     fullScreenStatusListener = widget
-        .videoDetailCtr!.plPlayerController.isFullScreen
+        .videoDetailCtr!.plPlayerController!.isFullScreen
         .listen((bool status) {
       isFullScreen = status;
 
@@ -99,7 +99,7 @@ class _HeaderControlState extends State<HeaderControl> {
 
   @override
   void dispose() {
-    widget.floating?.dispose();
+    // widget.floating?.dispose();
     fullScreenStatusListener.cancel();
     clock.cancel();
     super.dispose();
@@ -1569,109 +1569,109 @@ class _HeaderControlState extends State<HeaderControl> {
                 ),
               ),
             ),
-            if (Platform.isAndroid)
-              SizedBox(
-                width: 42,
-                height: 34,
-                child: IconButton(
-                  tooltip: '画中画',
-                  style: ButtonStyle(
-                    padding: MaterialStateProperty.all(EdgeInsets.zero),
-                  ),
-                  onPressed: () async {
-                    bool canUsePiP = widget.floating != null &&
-                        await widget.floating!.isPipAvailable;
-                    widget.controller!.hiddenControls(false);
-                    if (canUsePiP) {
-                      bool enableBackgroundPlay = setting.get(
-                          SettingBoxKey.enableBackgroundPlay,
-                          defaultValue: true);
-                      if (!enableBackgroundPlay) {
-                        // SmartDialog.showToast('建议开启【后台播放】功能\n避免画中画没有暂停按钮');
-                        // await Future.delayed(const Duration(seconds: 2), () {
-                        // });
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Column(children: <Widget>[
-                              const Row(
-                                children: <Widget>[
-                                  Icon(
-                                    Icons.check,
-                                    color: Colors.green,
-                                  ),
-                                  SizedBox(width: 10),
-                                  Text('画中画',
-                                      style:
-                                          TextStyle(fontSize: 15, height: 1.5))
-                                ],
-                              ),
-                              const SizedBox(height: 10),
-                              const Text(
-                                  '建议开启【后台音频服务】\n'
-                                  '避免画中画没有暂停按钮',
-                                  style:
-                                      TextStyle(fontSize: 12.5, height: 1.5)),
-                              Row(children: [
-                                TextButton(
-                                    style: ButtonStyle(
-                                      foregroundColor:
-                                          MaterialStateProperty.resolveWith(
-                                              (states) {
-                                        return Theme.of(context)
-                                            .snackBarTheme
-                                            .actionTextColor;
-                                      }),
-                                    ),
-                                    onPressed: () async {
-                                      _.setBackgroundPlay(true);
-                                      SmartDialog.showToast("请重新载入本页面刷新");
-                                      // Get.back();
-                                    },
-                                    child: const Text('启用后台音频服务')),
-                                const SizedBox(width: 10),
-                                TextButton(
-                                    style: ButtonStyle(
-                                      foregroundColor:
-                                          MaterialStateProperty.resolveWith(
-                                              (states) {
-                                        return Theme.of(context)
-                                            .snackBarTheme
-                                            .actionTextColor;
-                                      }),
-                                    ),
-                                    onPressed: () {},
-                                    child: const Text('不启用'))
-                              ])
-                            ]),
-                            duration: const Duration(seconds: 2),
-                            showCloseIcon: true,
-                          ),
-                        );
-                        await Future.delayed(const Duration(seconds: 3), () {});
-                      }
-                      final Rational aspectRatio = Rational(
-                        widget.videoDetailCtr!.data.dash!.video!.first.width!,
-                        widget.videoDetailCtr!.data.dash!.video!.first.height!,
-                      );
-                      if (!context.mounted) return;
-                      await widget.floating!.enable(EnableManual(
-                        aspectRatio: aspectRatio,
-                        sourceRectHint: Rectangle<int>(
-                          0,
-                          0,
-                          context.width.toInt(),
-                          context.height.toInt(),
-                        ),
-                      ));
-                    } else {}
-                  },
-                  icon: const Icon(
-                    Icons.picture_in_picture_outlined,
-                    size: 19,
-                    color: Colors.white,
-                  ),
-                ),
-              ),
+            // if (Platform.isAndroid)
+            //   SizedBox(
+            //     width: 42,
+            //     height: 34,
+            //     child: IconButton(
+            //       tooltip: '画中画',
+            //       style: ButtonStyle(
+            //         padding: MaterialStateProperty.all(EdgeInsets.zero),
+            //       ),
+            //       onPressed: () async {
+            //         bool canUsePiP = widget.floating != null &&
+            //             await widget.floating!.isPipAvailable;
+            //         widget.controller!.hiddenControls(false);
+            //         if (canUsePiP) {
+            //           bool enableBackgroundPlay = setting.get(
+            //               SettingBoxKey.enableBackgroundPlay,
+            //               defaultValue: true);
+            //           if (!enableBackgroundPlay) {
+            //             // SmartDialog.showToast('建议开启【后台播放】功能\n避免画中画没有暂停按钮');
+            //             // await Future.delayed(const Duration(seconds: 2), () {
+            //             // });
+            //             ScaffoldMessenger.of(context).showSnackBar(
+            //               SnackBar(
+            //                 content: Column(children: <Widget>[
+            //                   const Row(
+            //                     children: <Widget>[
+            //                       Icon(
+            //                         Icons.check,
+            //                         color: Colors.green,
+            //                       ),
+            //                       SizedBox(width: 10),
+            //                       Text('画中画',
+            //                           style:
+            //                               TextStyle(fontSize: 15, height: 1.5))
+            //                     ],
+            //                   ),
+            //                   const SizedBox(height: 10),
+            //                   const Text(
+            //                       '建议开启【后台音频服务】\n'
+            //                       '避免画中画没有暂停按钮',
+            //                       style:
+            //                           TextStyle(fontSize: 12.5, height: 1.5)),
+            //                   Row(children: [
+            //                     TextButton(
+            //                         style: ButtonStyle(
+            //                           foregroundColor:
+            //                               MaterialStateProperty.resolveWith(
+            //                                   (states) {
+            //                             return Theme.of(context)
+            //                                 .snackBarTheme
+            //                                 .actionTextColor;
+            //                           }),
+            //                         ),
+            //                         onPressed: () async {
+            //                           _.setBackgroundPlay(true);
+            //                           SmartDialog.showToast("请重新载入本页面刷新");
+            //                           // Get.back();
+            //                         },
+            //                         child: const Text('启用后台音频服务')),
+            //                     const SizedBox(width: 10),
+            //                     TextButton(
+            //                         style: ButtonStyle(
+            //                           foregroundColor:
+            //                               MaterialStateProperty.resolveWith(
+            //                                   (states) {
+            //                             return Theme.of(context)
+            //                                 .snackBarTheme
+            //                                 .actionTextColor;
+            //                           }),
+            //                         ),
+            //                         onPressed: () {},
+            //                         child: const Text('不启用'))
+            //                   ])
+            //                 ]),
+            //                 duration: const Duration(seconds: 2),
+            //                 showCloseIcon: true,
+            //               ),
+            //             );
+            //             await Future.delayed(const Duration(seconds: 3), () {});
+            //           }
+            //           final Rational aspectRatio = Rational(
+            //             widget.videoDetailCtr!.data.dash!.video!.first.width!,
+            //             widget.videoDetailCtr!.data.dash!.video!.first.height!,
+            //           );
+            //           if (!context.mounted) return;
+            //           await widget.floating!.enable(ImmediatePiP(
+            //             aspectRatio: aspectRatio,
+            //             sourceRectHint: Rectangle<int>(
+            //               0,
+            //               0,
+            //               context.width.toInt(),
+            //               context.height.toInt(),
+            //             ),
+            //           ));
+            //         } else {}
+            //       },
+            //       icon: const Icon(
+            //         Icons.picture_in_picture_outlined,
+            //         size: 19,
+            //         color: Colors.white,
+            //       ),
+            //     ),
+            //   ),
             SizedBox(
               width: 42,
               height: 34,

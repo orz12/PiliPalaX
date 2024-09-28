@@ -44,7 +44,7 @@ class _LiveRoomPageState extends State<LiveRoomPage> {
 
   @override
   void dispose() {
-    floating?.dispose();
+    // floating?.dispose();
     plPlayerController!.dispose();
     super.dispose();
   }

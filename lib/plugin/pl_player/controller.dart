@@ -32,7 +32,7 @@ Box setting = GStorage.setting;
 Box localCache = GStorage.localCache;
 
 class PlPlayerController {
-  Player? _videoPlayerController;
+  static Player? _videoPlayerController;
   VideoController? _videoController;
 
   // 添加一个私有静态变量来保存实例
@@ -386,7 +386,11 @@ class PlPlayerController {
   }) {
     // 如果实例尚未创建，则创建一个新实例
     _instance ??= PlPlayerController._();
+    // print('getInstance');
+    // print(StackTrace.current);
     _instance!._playerCount.value += 1;
+    print("_playerCount");
+    print(_instance!._playerCount.value);
     _videoType.value = videoType;
     return _instance!;
   }
@@ -887,6 +891,7 @@ class PlPlayerController {
   /// TODO  _duration.value丢失
   Future<void> play({bool repeat = false, bool hideControls = true}) async {
     if (_playerCount.value == 0) return;
+    if (playerStatus.status.value == PlayerStatus.disabled) return;
     // 播放时自动隐藏控制条
     controls = !hideControls;
     // repeat为true，将从头播放
@@ -916,6 +921,11 @@ class PlPlayerController {
     if (!isInterrupt) {
       audioSessionHandler.setActive(false);
     }
+  }
+
+  Future<void> disable() async {
+    playerStatus.status.value = PlayerStatus.disabled;
+    await _videoPlayerController?.stop();
   }
 
   /// 更改播放状态

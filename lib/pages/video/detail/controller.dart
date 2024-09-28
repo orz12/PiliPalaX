@@ -70,7 +70,7 @@ class VideoDetailController extends GetxController
   ReplyItemModel? firstFloor;
   final scaffoldKey = GlobalKey<ScaffoldState>();
   RxString bgCover = ''.obs;
-  PlPlayerController plPlayerController = PlPlayerController.getInstance();
+  PlPlayerController? plPlayerController;
 
   late VideoItem firstVideo;
   late AudioItem firstAudio;
@@ -84,7 +84,7 @@ class VideoDetailController extends GetxController
   var userInfo;
   late bool isFirstTime = true;
   Floating? floating;
-  late PreferredSizeWidget headerControl;
+  PreferredSizeWidget? headerControl;
 
   // late bool enableCDN;
   late int? cacheVideoQa;
@@ -95,7 +95,7 @@ class VideoDetailController extends GetxController
   PersistentBottomSheetController? replyReplyBottomSheetCtr;
 
   @override
-  void onInit() {
+  void onInit() async {
     super.onInit();
     final Map argMap = Get.arguments;
     userInfo = userInfoCache.get('userInfoCache');
@@ -108,7 +108,9 @@ class VideoDetailController extends GetxController
         }
       }
       if (keys.contains('pic')) {
-        videoItem['pic'] = argMap['pic'];
+        if (argMap['pic'] != null && argMap['pic'] != '') {
+          videoItem['pic'] = argMap['pic'];
+        }
       }
     }
     bool defaultShowComment =
@@ -117,7 +119,28 @@ class VideoDetailController extends GetxController
         length: 2, vsync: this, initialIndex: defaultShowComment ? 1 : 0);
     autoPlay.value =
         setting.get(SettingBoxKey.autoPlayEnable, defaultValue: true);
-    if (autoPlay.value) isShowCover.value = false;
+    if (autoPlay.value) {
+      isShowCover.value = false;
+      plPlayerController = PlPlayerController.getInstance();
+      headerControl = HeaderControl(
+        controller: plPlayerController,
+        videoDetailCtr: this,
+        floating: floating,
+        heroTag: heroTag,
+      );
+    }
+    if (videoItem['pic']?.isEmpty != false) {
+      VideoHttp.videoIntro(bvid: bvid).then(
+        (value) {
+          if (value['status']) {
+            videoItem['pic'] = value['data'].pic;
+            isShowCover.refresh();
+          } else {
+            SmartDialog.showToast("视频封面获取失败：${value['msg']}");
+          }
+        },
+      );
+    }
     enableHA.value = setting.get(SettingBoxKey.enableHA, defaultValue: true);
     hwdec.value = setting.get(SettingBoxKey.hardwareDecoding,
         defaultValue: Platform.isAndroid ? 'auto-safe' : 'auto');
@@ -131,12 +154,6 @@ class VideoDetailController extends GetxController
     if (Platform.isAndroid) {
       floating = Floating();
     }
-    headerControl = HeaderControl(
-      controller: plPlayerController,
-      videoDetailCtr: this,
-      floating: floating,
-      heroTag: heroTag,
-    );
     // CDN优化
     // enableCDN = setting.get(SettingBoxKey.enableCDN, defaultValue: true);
 
@@ -150,7 +167,12 @@ class VideoDetailController extends GetxController
         defaultValue: VideoDecodeFormats.values[1].code);
     cacheAudioQa = setting.get(SettingBoxKey.defaultAudioQa,
         defaultValue: AudioQuality.hiRes.code);
-    oid.value = IdUtils.bv2av(Get.parameters['bvid']!);
+    if (Get.parameters['bvid'] != null && Get.parameters['bvid']!.isNotEmpty) {
+      oid.value = IdUtils.bv2av(Get.parameters['bvid']!);
+    } else {
+      SmartDialog.showToast('视频信息获取失败，可能为充电视频等特殊情况');
+      oid.value = 0;
+    }
   }
 
   showReplyReplyPanel() {
@@ -178,11 +200,12 @@ class VideoDetailController extends GetxController
   /// 更新画质、音质
   /// TODO 继续进度播放
   updatePlayer() {
+    if (plPlayerController == null) return;
     isShowCover.value = false;
-    defaultST = plPlayerController.position.value;
-    plPlayerController.removeListeners();
-    plPlayerController.isBuffering.value = false;
-    plPlayerController.buffered.value = Duration.zero;
+    defaultST = plPlayerController!.position.value;
+    plPlayerController!.removeListeners();
+    plPlayerController!.isBuffering.value = false;
+    plPlayerController!.buffered.value = Duration.zero;
 
     /// 根据currentVideoQa和currentDecodeFormats 重新设置videoUrl
     List<VideoItem> videoList =
@@ -266,11 +289,15 @@ class VideoDetailController extends GetxController
     /// 设置/恢复 屏幕亮度
     if (brightness != null) {
       ScreenBrightness().setScreenBrightness(brightness!);
-    } else if (setting.get(SettingBoxKey.enableAutoBrightness,
-        defaultValue: false) as bool) {
-      ScreenBrightness().resetScreenBrightness();
     }
-    await plPlayerController.setDataSource(
+    plPlayerController ??= PlPlayerController.getInstance();
+    headerControl ??= HeaderControl(
+      controller: plPlayerController,
+      videoDetailCtr: this,
+      floating: floating,
+      heroTag: heroTag,
+    );
+    await plPlayerController!.setDataSource(
       DataSource(
         videoSource: video ?? videoUrl,
         audioSource: audio ?? audioUrl,
@@ -301,7 +328,7 @@ class VideoDetailController extends GetxController
     );
 
     /// 开启自动全屏时，在player初始化完成后立即传入headerControl
-    plPlayerController.headerControl = headerControl;
+    plPlayerController!.headerControl = headerControl;
   }
 
   // 视频链接
@@ -310,9 +337,10 @@ class VideoDetailController extends GetxController
     if (result['status']) {
       data = result['data'];
       if (data.acceptDesc!.isNotEmpty && data.acceptDesc!.contains('试看')) {
-        SmartDialog.showToast(
-          '该视频为专属视频，仅提供试看',
+        SmartDialog.showNotify(
+          msg: '该视频为专属视频，仅提供试看',
           displayTime: const Duration(seconds: 3),
+          notifyType: NotifyType.warning,
         );
       }
       if (data.dash == null && data.durl != null) {
@@ -334,7 +362,11 @@ class VideoDetailController extends GetxController
         return result;
       }
       if (data.dash == null) {
-        SmartDialog.showToast('视频资源不存在');
+        SmartDialog.showNotify(
+          msg: '视频资源不存在',
+          displayTime: const Duration(seconds: 3),
+          notifyType: NotifyType.error,
+        );
         isShowCover.value = false;
         return result;
       }
@@ -438,12 +470,20 @@ class VideoDetailController extends GetxController
     } else {
       if (result['code'] == -404) {
         isShowCover.value = false;
-        SmartDialog.showToast('视频不存在或已被删除');
+        SmartDialog.showNotify(
+          msg: '视频不存在或已被删除',
+          displayTime: const Duration(seconds: 3),
+          notifyType: NotifyType.error,
+        );
       }
       if (result['code'] == 87008) {
         SmartDialog.showToast("当前视频可能是专属视频，可能需包月充电观看(${result['msg']})");
       } else {
-        SmartDialog.showToast("错误（${result['code']}）：${result['msg']}");
+        SmartDialog.showNotify(
+          msg: '错误（${result['code']}）：${result['msg']}',
+          displayTime: const Duration(seconds: 3),
+          notifyType: NotifyType.warning,
+        );
       }
     }
     return result;

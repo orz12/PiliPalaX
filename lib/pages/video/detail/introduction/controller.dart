@@ -525,7 +525,7 @@ class VideoIntroController extends GetxController {
     int prevIndex = currentIndex - 1;
     final VideoDetailController videoDetailCtr =
         Get.find<VideoDetailController>(tag: heroTag);
-    final PlayRepeat platRepeat = videoDetailCtr.plPlayerController.playRepeat;
+    final PlayRepeat platRepeat = videoDetailCtr.plPlayerController!.playRepeat;
 
     // 列表循环
     if (prevIndex < 0) {
@@ -558,12 +558,17 @@ class VideoIntroController extends GetxController {
       final List<Part> pages = videoDetail.value.pages!;
       episodes.addAll(pages);
     }
-    final VideoDetailController videoDetailCtr =
-        Get.find<VideoDetailController>(tag: heroTag);
-    final PlayRepeat platRepeat = videoDetailCtr.plPlayerController.playRepeat;
+    late VideoDetailController videoDetailCtr;
+    PlayRepeat playRepeat = PlayRepeat.listCycle;
+    try {
+      videoDetailCtr = Get.find<VideoDetailController>(tag: heroTag);
+      playRepeat = videoDetailCtr.plPlayerController!.playRepeat;
+    } catch (_) {
+      return false;
+    }
 
     if (episodes.isEmpty) {
-      if (platRepeat == PlayRepeat.autoPlayRelated) {
+      if (playRepeat == PlayRepeat.autoPlayRelated) {
         return playRelated();
       }
       return false;
@@ -575,9 +580,9 @@ class VideoIntroController extends GetxController {
 
     // 列表循环
     if (nextIndex >= episodes.length) {
-      if (platRepeat == PlayRepeat.listCycle) {
+      if (playRepeat == PlayRepeat.listCycle) {
         nextIndex = 0;
-      } else if (platRepeat == PlayRepeat.autoPlayRelated) {
+      } else if (playRepeat == PlayRepeat.autoPlayRelated) {
         return playRelated();
       } else {
         return false;

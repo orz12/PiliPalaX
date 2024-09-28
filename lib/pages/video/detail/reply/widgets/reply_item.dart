@@ -673,7 +673,7 @@ InlineSpan buildContent(
                     SmartDialog.showToast('跳转至：$matchStr');
                     Get.find<VideoDetailController>(
                             tag: Get.arguments['heroTag'])
-                        .plPlayerController
+                        .plPlayerController!
                         .seekTo(Duration(seconds: Utils.duration(matchStr)),
                             type: 'slider');
                   } catch (e) {
