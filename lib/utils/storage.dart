@@ -109,7 +109,6 @@ class SettingBoxKey {
       videoSync = 'videoSync',
       enableVerticalExpand = 'enableVerticalExpand',
       enableOnlineTotal = 'enableOnlineTotal',
-      enableAutoBrightness = 'enableAutoBrightness',
       enableAutoEnter = 'enableAutoEnter',
       enableAutoExit = 'enableAutoExit',
       enableLongShowControl = 'enableLongShowControl',
