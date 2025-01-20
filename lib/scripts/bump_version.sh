@@ -6,7 +6,7 @@ last_version_name=$(echo $last_tag | cut -d '+' -f 1)
 last_version_code=$(echo $last_tag | cut -d '+' -f 2)
 
 printf "当前分支为: $branch\n"
-if $(git status -z); then
+if [[ -n $(git status -z) ]]; then
     echo "存在未跟踪或未提交的文件！"
     exit
 fi
