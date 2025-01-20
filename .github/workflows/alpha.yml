@@ -49,6 +49,7 @@ jobs:
         run: |
           # TODO: 获取上一个workflow run运行状态以等待其artifact
           # TODO: 包括上次失败workflow run中的提交
+          # TODO: 强制推送时日志为空
           workflow_runs=$(curl -s -H "Authorization: token $GITHUB_TOKEN" \
             "https://api.github.com/repos/${{ github.repository }}/actions/workflows/build-alpha.yml/runs?status=completed&per_page=2")
           previous_run_id=$(echo $workflow_runs | jq -r '.workflow_runs[0].id')
@@ -131,7 +132,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: 构建Java环境
+      - name: 安装Java环境
         if: startsWith(matrix.target_platform, 'android')
         uses: actions/setup-java@v3
         with:
@@ -147,14 +148,14 @@ jobs:
 
       - name: 修复Flutter 3.24中文字重异常
         if: startsWith(matrix.target_platform, 'android')
+        working-directory: ${{ env.FLUTTER_ROOT }}
         run: |
-          cd $FLUTTER_ROOT
-          git config --global user.name "orz12"
-          git config --global user.email "orz12@test.com"
-          git cherry-pick d4124bd --strategy-option theirs
+          git config user.name "orz12"
+          git config user.email "orz12@test.com"
+          curl https://gist.githubusercontent.com/VillagerTom/077315c7101182af8bf443bb506007d0/raw/6c2c735a761f5e819672680bbefe473b748aa211/flutter-3.24.4-fix.diff | git apply
+          git commit -am "fix font weight issue"
           # Flutter precache
           flutter --version
-          cd -
 
       - name: 下载项目依赖
         run: flutter pub get
