@@ -28,7 +28,6 @@ elif [[ $branch != "dev" ]]; then
     echo "请勿在其他分支更改版本号！"
     exit
 fi
-
 printf "请输入要递增的版本号部分: (x, y, z)\n"
 read -N1
 case $REPLY in
@@ -42,7 +41,7 @@ case $REPLY in
         ;;
     z)
         z=$((${last_version_name##*.} + 1))
-        version_name="${last_version_name%.*}.$z"
+        version_name="$(echo $last_version_name | cut -d '.' -f 1,2).$z"
         if [[ $branch == "main" ]]; then
           printf "是否为beta版？(y/n)\n"
           read -N1
