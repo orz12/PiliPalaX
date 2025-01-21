@@ -19,7 +19,7 @@ if [[ $branch == "main" ]]; then
         read -N1
         if [[ $REPLY == "y" ]]; then
             git tag $current_version
-            printf "使用`git push --follow-tags`触发Release流程\n"
+            printf "使用\`git push --follow-tags\`触发Release流程\n"
         fi
         exit
     fi
@@ -30,6 +30,7 @@ elif [[ $branch != "dev" ]]; then
 fi
 printf "请输入要递增的版本号部分: (x, y, z)\n"
 read -N1
+printf "\n"
 case $REPLY in
     x) 
         x=$((${last_version_name%%.*} + 1))
@@ -45,6 +46,7 @@ case $REPLY in
         if [[ $branch == "main" ]]; then
           printf "是否为beta版？(y/n)\n"
           read -N1
+          printf "\n"
           if [[ $REPLY == "y" ]]; then
               version_name="$version_name(beta)"
           fi
@@ -56,17 +58,18 @@ case $REPLY in
         ;;
 esac
 
-if [[ $branch != "main" ]]; then
+if [[ $branch == "main" ]]; then
     version_code=$((last_version_code + 1))
     printf "新版本号为: $version_name+$version_code\n"
     sed -i "s/version: .*/version: $version_name\+$version_code/g" pubspec.yaml
     printf "是否提交更改并新增tag？(y/n)\n"
     read -N1
+    printf "\n"
     if [[ $REPLY == "y" ]]; then
         git add .
         git commit -em "chore: bump version to $version_name"
         git tag "$version_name+$version_code"
-        printf "使用`git push --follow-tags`触发Release流程\n"
+        printf "使用\`git push --follow-tags\`触发Release流程\n"
     fi
 else
     printf "当前处于dev分支，不会新增tag\n"
@@ -75,9 +78,11 @@ else
     sed -i "s/version: .*/version: $version_name\+$version_code/g" pubspec.yaml
     printf "是否提交更改？(y/n)\n"
     read -N1
+    printf "\n"
     if [[ $REPLY == "y" ]]; then
         git add .
         git commit -em "chore: bump version to $version_name"
+        printf "使用\`git push\`触发build-alpha流程\n"
     fi
 fi
 
