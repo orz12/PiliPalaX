@@ -11,7 +11,36 @@ if [[ -n $(git status -z) ]]; then
     exit
 fi
 
-git pull --rebase
+git fetch
+commits_behind=$(git rev-list --count HEAD..origin/$branch)
+commits_ahead=$(git rev-list --count origin/$branch..HEAD)
+if ((commits_behind > 0)); then
+    if ((commits_ahead > 0)); then
+        printf "存在拉取冲突，合并/变基/忽略/中止？(m/r/i/Ctrl+C)\n"
+        read -N1
+        printf "\n"
+        case $REPLY in
+            m)
+                git pull --rebase=false
+                ;;
+            r)
+                git pull --rebase=true
+                ;;
+            i)
+                printf "\n"
+                ;;
+        esac
+    else
+        printf "本地比远程落后${commits_behind}个提交，是否拉取？(y/n)"
+        read -N1
+        printf "\n"
+        if [[ $REPLY == "y" ]]; then
+            git pull -ff
+        fi
+    fi
+fi
+#git pull --rebase
+
 if [[ $branch == "main" ]]; then
     current_version=$(yq -r .version pubspec.yaml)
     if [[ $current_version != $last_tag ]]; then
