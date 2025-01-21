@@ -18,7 +18,7 @@ if [[ $branch == "main" ]]; then
         printf "当前版本号($current_version)与最新tag不一致, 是否新增tag? (y/n)\n"
         read -N1
         if [[ $REPLY == "y" ]]; then
-            git tag $current_version
+            git tag -a $current_version -m "new version: $current_version"
             printf "使用\`git push --follow-tags\`触发Release流程\n"
         fi
         exit
@@ -68,7 +68,7 @@ if [[ $branch == "main" ]]; then
     if [[ $REPLY == "y" ]]; then
         git add .
         git commit -em "chore: bump version to $version_name"
-        git tag "$version_name+$version_code"
+        git tag -a "$version_name+$version_code" -m "new version: $version_name+$version_code"
         printf "使用\`git push --follow-tags\`触发Release流程\n"
     fi
 else
