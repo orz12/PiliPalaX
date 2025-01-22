@@ -6,7 +6,7 @@ last_version_name=$(echo $last_tag | cut -d '+' -f 1)
 last_version_code=$(echo $last_tag | cut -d '+' -f 2)
 
 printf "当前分支为: $branch\n"
-if [[ -n $(git status -z) ]]; then
+if [[ -n $(git status --porcelain) ]]; then
     echo "存在未跟踪或未提交的文件！"
     exit
 fi
@@ -46,6 +46,7 @@ if [[ $branch == "main" ]]; then
     if [[ $current_version != $last_tag ]]; then
         printf "当前版本号($current_version)与最新tag不一致, 是否新增tag? (y/n)\n"
         read -N1
+        printf "\n"
         if [[ $REPLY == "y" ]]; then
             git tag -a $current_version -m "new version: $current_version"
             printf "使用\`git push --follow-tags\`触发Release流程\n"
