@@ -77,7 +77,7 @@ case $REPLY in
           read -N1
           printf "\n"
           if [[ $REPLY == "y" ]]; then
-              version_name="$version_name(beta)"
+              version_name="$version_name-beta"
           fi
         fi
         ;;
