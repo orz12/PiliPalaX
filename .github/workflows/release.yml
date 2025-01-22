@@ -128,6 +128,6 @@ jobs:
         uses: ncipollo/release-action@v1
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          artifacts: PiliPalaX-Release/*
+          artifacts: PiliPalaX-Release/PiliPalaX*/*
           prerelease: ${{ contains(github.ref, 'beta') }}
           allowUpdates: true
