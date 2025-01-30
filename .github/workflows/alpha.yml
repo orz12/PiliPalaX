@@ -34,6 +34,7 @@ jobs:
         with:
           fetch-depth: 0
 
+      # TODO: 强制推送时日志为空
       - name: 解析push事件信息
         id: analyze_push_event
         run: |
@@ -49,7 +50,6 @@ jobs:
         run: |
           # TODO: 获取上一个workflow run运行状态以等待其artifact
           # TODO: 包括上次失败workflow run中的提交
-          # TODO: 强制推送时日志为空
           workflow_runs=$(curl -s -H "Authorization: token $GITHUB_TOKEN" \
             "https://api.github.com/repos/${{ github.repository }}/actions/workflows/build-alpha.yml/runs?status=completed&per_page=2")
           previous_run_id=$(echo $workflow_runs | jq -r '.workflow_runs[0].id')

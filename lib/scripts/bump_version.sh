@@ -2,82 +2,85 @@
 
 branch=$(git rev-parse --abbrev-ref HEAD)
 last_tag=$(git describe --tags --abbrev=0)
-last_version_name=$(echo $last_tag | cut -d '+' -f 1)
-last_version_code=$(echo $last_tag | cut -d '+' -f 2)
+last_version_name=$(echo "$last_tag" | cut -d '+' -f 1)
+last_version_code=$(echo "$last_tag" | cut -d '+' -f 2)
 
-printf "当前分支为: $branch\n"
+echo "当前分支为: $branch"
 if [[ -n $(git status --porcelain) ]]; then
     echo "存在未跟踪或未提交的文件！"
     exit
 fi
 
 git fetch
-commits_behind=$(git rev-list --count HEAD..origin/$branch)
-commits_ahead=$(git rev-list --count origin/$branch..HEAD)
+commits_behind=$(git rev-list --count HEAD..origin/"$branch")
+commits_ahead=$(git rev-list --count origin/"$branch"..HEAD)
 if ((commits_behind > 0)); then
     if ((commits_ahead > 0)); then
-        printf "存在拉取冲突，合并/变基/忽略/中止？(m/r/i/Ctrl+C)\n"
-        read -N1
+        read -n1 -p "存在拉取冲突，合并/变基/忽略/中止？(m/r/i/Enter) "
         printf "\n"
-        case $REPLY in
-            m)
+        case "$REPLY" in
+            "m")
                 git pull --rebase=false
                 ;;
-            r)
+            "r")
                 git pull --rebase=true
                 ;;
-            i)
-                printf "\n"
+            "i")
+                printf "\b"
+                ;;
+            "")
+                exit
                 ;;
         esac
     else
-        printf "本地比远程落后${commits_behind}个提交，是否拉取？(y/n)"
-        read -N1
+        read -n1 -p "本地比远程落后${commits_behind}个提交，是否拉取？(y/n) "
         printf "\n"
-        if [[ $REPLY == "y" ]]; then
+        if [[ -z "$REPLY" || "$REPLY" == "y" ]]; then
             git pull -ff
         fi
     fi
 fi
 #git pull --rebase
 
-if [[ $branch == "main" ]]; then
+if [[ "$branch" == "main" ]]; then
     current_version=$(yq -r .version pubspec.yaml)
-    if [[ $current_version != $last_tag ]]; then
-        printf "当前版本号($current_version)与最新tag不一致, 是否新增tag? (y/n)\n"
-        read -N1
+    if [[ "$current_version" != "$last_tag" ]]; then
+        read -n1 -p "当前版本号($current_version)与最新tag不一致, 是否新增tag? (y/n) "
         printf "\n"
-        if [[ $REPLY == "y" ]]; then
-            git tag -a $current_version -m "new version: $current_version"
+        if [[ -z "$REPLY" || "$REPLY" == "y" ]]; then
+            git tag -a "$current_version" -m "new version: $current_version"
             printf "使用\`git push --follow-tags\`触发Release流程\n"
         fi
-        exit
+        read -n1 -p "继续修改版本号？(y/n) "
+        printf "\n"
+        if [[ -n "$REPLY" && "$REPLY" != "y" ]]; then
+            exit
+        fi
+
     fi
     unset current_version
-elif [[ $branch != "dev" ]]; then
+elif [[ "$branch" != "dev" ]]; then
     echo "请勿在其他分支更改版本号！"
     exit
 fi
-printf "请输入要递增的版本号部分: (x, y, z)\n"
-read -N1
+read -n1 -p "请输入要递增的版本号部分: (x/y/z) "
 printf "\n"
-case $REPLY in
+case "$REPLY" in
     x) 
         x=$((${last_version_name%%.*} + 1))
         version_name="$x.0.0"
         ;;
     y)
-        y=$(($(echo $last_version_name | cut -d '.' -f 2) + 1))
+        y=$(($(echo "$last_version_name" | cut -d '.' -f 2) + 1))
         version_name="${last_version_name%%.*}.$y.0"
         ;;
     z)
         z=$((${last_version_name##*.} + 1))
-        version_name="$(echo $last_version_name | cut -d '.' -f 1,2).$z"
-        if [[ $branch == "main" ]]; then
-          printf "是否为beta版？(y/n)\n"
-          read -N1
+        version_name="$(echo "$last_version_name" | cut -d '.' -f 1,2).$z"
+        if [[ "$branch" == "main" ]]; then
+          read -n1 -p "是否为beta版？(y/n) "
           printf "\n"
-          if [[ $REPLY == "y" ]]; then
+          if [[ -z "$REPLY" || "$REPLY" == "y" ]]; then
               version_name="$version_name-beta"
           fi
         fi
@@ -88,31 +91,28 @@ case $REPLY in
         ;;
 esac
 
-if [[ $branch == "main" ]]; then
+if [[ "$branch" == "main" ]]; then
     version_code=$((last_version_code + 1))
-    printf "新版本号为: $version_name+$version_code\n"
+    echo "新版本号为: $version_name+$version_code"
     sed -i "s/version: .*/version: $version_name\+$version_code/g" pubspec.yaml
-    printf "是否提交更改并新增tag？(y/n)\n"
-    read -N1
+    read -n1 -p "是否提交更改并新增tag？(y/n) "
     printf "\n"
-    if [[ $REPLY == "y" ]]; then
+    if [[ -z "$REPLY" || "$REPLY" == "y" ]]; then
         git add .
         git commit -em "chore: bump version to $version_name"
         git tag -a "$version_name+$version_code" -m "new version: $version_name+$version_code"
-        printf "使用\`git push --follow-tags\`触发Release流程\n"
+        echo "使用\`git push --follow-tags\`触发Release流程"
     fi
 else
     printf "当前处于dev分支，不会新增tag\n"
     version_code=$last_version_code
-    printf "新版本号为: $version_name+$version_code\n"
+    echo "新版本号为: $version_name+$version_code"
     sed -i "s/version: .*/version: $version_name\+$version_code/g" pubspec.yaml
-    printf "是否提交更改？(y/n)\n"
-    read -N1
+    read -n1 -p "是否提交更改？(y/n) "
     printf "\n"
-    if [[ $REPLY == "y" ]]; then
+    if [[ -z "$REPLY" || "$REPLY" == "y" ]]; then
         git add .
         git commit -em "chore: bump version to $version_name"
-        printf "使用\`git push\`触发build-alpha流程\n"
+        echo "使用\`git push\`触发build-alpha流程"
     fi
 fi
-
