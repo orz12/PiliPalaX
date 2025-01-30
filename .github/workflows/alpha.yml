@@ -96,7 +96,7 @@ jobs:
             let build_num=$(yq -r .build_num build_info.yml)+${{ steps.get_previous_run.outputs.previous_run_success }}
           fi
 
-          echo "new_version=${version_name}-${alpha_or_pre}.${build_num}+${version_code}" >> $GITHUB_OUTPUT
+          echo "new_version=${version_name%-beta}-${alpha_or_pre}.${build_num}+${version_code}" >> $GITHUB_OUTPUT
           echo "new_build_num=$build_num" >> $GITHUB_OUTPUT                                      
 
       - name: 生成新build_info.yml
