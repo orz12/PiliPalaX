@@ -16,7 +16,7 @@ on:
       - '**.txt'
       - '.github/**'
       - '.idea/**'
-      - '!.github/workflows/build-alpha.yml'
+      - '!.github/workflows/alpha.yml'
 
 jobs:
   prepare_publish_info:
@@ -34,6 +34,7 @@ jobs:
         with:
           fetch-depth: 0
 
+      # TODO: 强制推送时日志为空
       - name: 解析push事件信息
         id: analyze_push_event
         run: |
@@ -82,9 +83,11 @@ jobs:
           fi
           
           # pubspec.yaml中版本号比tag新，则发布pre版，否则发布pre版
-          alpha_or_pre=pre
-          if (echo $last_tag | grep $version_name); then
-            alpha_or_pre=alpha
+          alpha_or_pre=alpha
+          if [[ "$version_name" > "$last_tag" ]]; then
+            alpha_or_pre=pre
+          else
+            version_name=$(echo $last_tag | egrep -o "^[0-9]+\.[0-9]+\.[0-9]+")
           fi
 
           # 如果上次workflow run失败，且与当前版本号一致，不递增build_num。
@@ -96,12 +99,13 @@ jobs:
           fi
 
           echo "new_version=${version_name}-${alpha_or_pre}.${build_num}+${version_code}" >> $GITHUB_OUTPUT
-          echo "new_build_num=$build_num" >> $GITHUB_OUTPUT                                      
+          echo "version_name=$version_name" >> $GITHUB_OUTPUT
+          echo "build_num=$build_num" >> $GITHUB_OUTPUT                                      
 
       - name: 生成新build_info.yml
         run: |
-          version=$(yq -er .version pubspec.yaml | cut -d "+" -f 1)
-          build_num=${{ steps.update_version.outputs.new_build_num}}
+          version=${{ steps.update_version.outputs.version_name }}
+          build_num=${{ steps.update_version.outputs.build_num}}
           
           rm -f build_info.yml
           cat << EOF > build_info.yml
@@ -131,7 +135,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: 构建Java环境
+      - name: 安装Java环境
         if: startsWith(matrix.target_platform, 'android')
         uses: actions/setup-java@v3
         with:
@@ -147,14 +151,14 @@ jobs:
 
       - name: 修复Flutter 3.24中文字重异常
         if: startsWith(matrix.target_platform, 'android')
+        working-directory: ${{ env.FLUTTER_ROOT }}
         run: |
-          cd $FLUTTER_ROOT
-          git config --global user.name "orz12"
-          git config --global user.email "orz12@test.com"
-          git cherry-pick d4124bd --strategy-option theirs
+          git config user.name "orz12"
+          git config user.email "orz12@test.com"
+          curl https://gist.githubusercontent.com/VillagerTom/077315c7101182af8bf443bb506007d0/raw/6c2c735a761f5e819672680bbefe473b748aa211/flutter-3.24.4-fix.diff | git apply
+          git commit -am "fix font weight issue"
           # Flutter precache
           flutter --version
-          cd -
 
       - name: 下载项目依赖
         run: flutter pub get
