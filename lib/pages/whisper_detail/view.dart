@@ -59,11 +59,11 @@ class _WhisperDetailPageState extends State<WhisperDetailPage>
     if (!mounted) return;
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
-      // 键盘高度
-      final viewInsets = EdgeInsets.fromViewPadding(
-          View.of(context).viewInsets, View.of(context).devicePixelRatio);
       _debouncer.run(() {
         if (!mounted) return;
+        // 键盘高度
+        final viewInsets = EdgeInsets.fromViewPadding(
+            View.of(context).viewInsets, View.of(context).devicePixelRatio);
         if (keyboardHeight == 0) {
           emoteHeight = keyboardHeight =
               keyboardHeight == 0.0 ? viewInsets.bottom : keyboardHeight;

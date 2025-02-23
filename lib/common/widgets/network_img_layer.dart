@@ -49,37 +49,45 @@ class NetworkImgLayer extends StatelessWidget {
       memCacheWidth = width.cacheSize(context);
       // memCacheHeight = height.cacheSize(context);
     }
-    Widget res = src != null && src != ''
-        ? ClipRRect(
-            clipBehavior: Clip.antiAlias,
-            borderRadius: BorderRadius.circular(
-              type == 'avatar'
-                  ? 50
-                  : type == 'emote'
-                      ? 0
-                      : StyleString.imgRadius.x,
-            ),
-            child: CachedNetworkImage(
-              imageUrl:
-                  '${src!.startsWith('//') ? 'https:${src!}' : src!}@${quality ?? defaultImgQuality}q.webp',
-              width: width,
-              height:
-                  ignoreHeight == null || ignoreHeight == false ? height : null,
-              memCacheWidth: memCacheWidth,
-              memCacheHeight: memCacheHeight,
-              fit: BoxFit.cover,
-              fadeOutDuration:
-                  fadeOutDuration ?? const Duration(milliseconds: 120),
-              fadeInDuration:
-                  fadeInDuration ?? const Duration(milliseconds: 120),
-              filterQuality: FilterQuality.low,
-              errorWidget: (BuildContext context, String url, Object error) =>
-                  placeholder(context),
-              placeholder: (BuildContext context, String url) =>
-                  placeholder(context),
-            ),
-          )
-        : placeholder(context);
+    late Widget res;
+    if (src?.isEmpty != false) {
+      res = placeholder(context);
+    } else {
+      String srcUrl = src!;
+      if (srcUrl.startsWith('http://')) {
+        srcUrl = srcUrl.substring(5);
+      }
+      if (srcUrl.startsWith('//')) {
+        srcUrl = 'https:$srcUrl';
+      }
+      print(srcUrl);
+      res = ClipRRect(
+        clipBehavior: Clip.antiAlias,
+        borderRadius: BorderRadius.circular(
+          type == 'avatar'
+              ? 50
+              : type == 'emote'
+                  ? 0
+                  : StyleString.imgRadius.x,
+        ),
+        child: CachedNetworkImage(
+          imageUrl:
+              '$srcUrl@${quality ?? defaultImgQuality}q.webp',
+          width: width,
+          height: ignoreHeight == null || ignoreHeight == false ? height : null,
+          memCacheWidth: memCacheWidth,
+          memCacheHeight: memCacheHeight,
+          fit: BoxFit.cover,
+          fadeOutDuration: fadeOutDuration ?? const Duration(milliseconds: 120),
+          fadeInDuration: fadeInDuration ?? const Duration(milliseconds: 120),
+          filterQuality: FilterQuality.low,
+          errorWidget: (BuildContext context, String url, Object error) =>
+              placeholder(context),
+          placeholder: (BuildContext context, String url) =>
+              placeholder(context),
+        ),
+      );
+    }
     if (semanticsLabel != null) {
       return Semantics(
         label: semanticsLabel,

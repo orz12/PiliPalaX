@@ -77,6 +77,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
   final GlobalKey relatedVideoPanelKey = GlobalKey();
   final GlobalKey videoPlayerFutureKey = GlobalKey();
   final GlobalKey videoReplyPanelKey = GlobalKey();
+  final GlobalKey scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
   void initState() {
@@ -204,6 +205,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
 
   // 播放器状态监听
   void playerListener(PlayerStatus? status) async {
+    print("playerListener $status");
     playerStatus = status!;
     switch (status) {
       case PlayerStatus.playing:
@@ -683,7 +685,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
         right: false, //isFullScreen != true,
         child: Scaffold(
           resizeToAvoidBottomInset: false,
-          key: videoDetailController.scaffoldKey,
+          key: scaffoldKey,
           // backgroundColor: Colors.black,
           appBar: removeSafeArea
               ? null
@@ -947,7 +949,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
       });
   Widget get childWhenDisabledLandscape => Scaffold(
         resizeToAvoidBottomInset: false,
-        key: videoDetailController.scaffoldKey,
+        key: scaffoldKey,
         // backgroundColor: Colors.black,
         appBar: removeSafeArea
             ? null
@@ -976,7 +978,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
       );
   Widget get childWhenDisabledAlmostSquare => Scaffold(
         resizeToAvoidBottomInset: false,
-        key: videoDetailController.scaffoldKey,
+        key: scaffoldKey,
         // backgroundColor: Colors.black,
         appBar: removeSafeArea
             ? null

@@ -422,18 +422,18 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
             String bvid = widget.controller.bvid;
             final List episodes = [];
             late Function changeFucCall;
-            if (isSeason) {
+            if (isPage) {
+              final List<Part> pages =
+              videoIntroController!.videoDetail.value.pages!;
+              episodes.addAll(pages);
+              changeFucCall = videoIntroController!.changeSeasonOrbangu;
+            } else if (isSeason) {
               final List<SectionItem> sections =
                   videoIntroController!.videoDetail.value.ugcSeason!.sections!;
               for (int i = 0; i < sections.length; i++) {
                 final List<EpisodeItem> episodesList = sections[i].episodes!;
                 episodes.addAll(episodesList);
               }
-              changeFucCall = videoIntroController!.changeSeasonOrbangu;
-            } else if (isPage) {
-              final List<Part> pages =
-                  videoIntroController!.videoDetail.value.pages!;
-              episodes.addAll(pages);
               changeFucCall = videoIntroController!.changeSeasonOrbangu;
             } else if (isBangumi) {
               episodes.addAll(
@@ -1360,17 +1360,24 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
                     if (_.isBuffering.value)
                       Obx(() {
                         if (_.buffered.value == Duration.zero) {
-                          return const Text(
-                            'Buffering...',
-                            style: TextStyle(color: Colors.white, fontSize: 12),
-                            semanticsLabel: '',
+                          return SizedBox(
+                            width: 180,
+                            child: Text(
+                              _.playerLog.value,
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
+                              textAlign: TextAlign.center,
+                              style: const TextStyle(
+                                  color: Colors.white, fontSize: 10),
+                              semanticsLabel: '',
+                            ),
                           );
                         }
                         String bufferStr = _.buffered.toString();
                         return Text(
                           bufferStr.substring(0, bufferStr.length - 3),
                           style: const TextStyle(
-                              color: Colors.white, fontSize: 12),
+                              color: Colors.white, fontSize: 10),
                           semanticsLabel: '',
                         );
                       }),

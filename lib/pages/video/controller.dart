@@ -69,7 +69,7 @@ class VideoDetailController extends GetxController
   // int fRpid = 0;
 
   // ReplyItemModel? firstFloor;
-  final scaffoldKey = GlobalKey<ScaffoldState>();
+  // final scaffoldKey = GlobalKey<ScaffoldState>();
   RxString bgCover = ''.obs;
   PlPlayerController? plPlayerController;
 

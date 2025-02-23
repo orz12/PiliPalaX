@@ -1,4 +1,5 @@
 import 'dart:developer';
+import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:hive/hive.dart';
@@ -345,10 +346,12 @@ class VideoHttp {
     var res = await Request().post(
       Api.oneThree,
       queryParameters: {
-        'bvid': bvid,
-        'csrf': await Request.getCsrf(),
+        'aid': IdUtils.bv2av(bvid),
+        'access_key': GStorage.localCache
+            .get(LocalCacheKey.accessKey, defaultValue: {})['value'],
       },
     );
+    print(res);
     if (res.data['code'] == 0) {
       return {'status': true, 'data': res.data['data']};
     } else {

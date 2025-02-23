@@ -578,17 +578,18 @@ class VideoIntroController extends GetxController {
   bool prevPlay() {
     final List episodes = [];
     bool isPages = false;
-    if (videoDetail.value.ugcSeason != null) {
+    if (videoDetail.value.pages != null &&
+        videoDetail.value.pages!.length > 1) {
+      isPages = true;
+      final List<Part> pages = videoDetail.value.pages!;
+      episodes.addAll(pages);
+    } else if (videoDetail.value.ugcSeason != null) {
       final UgcSeason ugcSeason = videoDetail.value.ugcSeason!;
       final List<SectionItem> sections = ugcSeason.sections!;
       for (int i = 0; i < sections.length; i++) {
         final List<EpisodeItem> episodesList = sections[i].episodes!;
         episodes.addAll(episodesList);
       }
-    } else if (videoDetail.value.pages != null) {
-      isPages = true;
-      final List<Part> pages = videoDetail.value.pages!;
-      episodes.addAll(pages);
     }
 
     final int currentIndex =
@@ -613,16 +614,17 @@ class VideoIntroController extends GetxController {
   // 是否有下一集（必须存在分p、分集）
   bool hasNextEpisode() {
     final List episodes = [];
-    if (videoDetail.value.ugcSeason != null) {
+    if (videoDetail.value.pages != null &&
+        videoDetail.value.pages!.length > 1) {
+      final List<Part> pages = videoDetail.value.pages!;
+      episodes.addAll(pages);
+    } else if (videoDetail.value.ugcSeason != null) {
       final UgcSeason ugcSeason = videoDetail.value.ugcSeason!;
       final List<SectionItem> sections = ugcSeason.sections!;
       for (int i = 0; i < sections.length; i++) {
         final List<EpisodeItem> episodesList = sections[i].episodes!;
         episodes.addAll(episodesList);
       }
-    } else if (videoDetail.value.pages != null) {
-      final List<Part> pages = videoDetail.value.pages!;
-      episodes.addAll(pages);
     }
     if (episodes.isEmpty) {
       return false;
@@ -638,19 +640,21 @@ class VideoIntroController extends GetxController {
 
   /// 列表循环或者顺序播放时，自动播放下一个
   bool nextPlay() {
+    print("entering nextPlay");
     final List episodes = [];
     bool isPages = false;
-    if (videoDetail.value.ugcSeason != null) {
+    if (videoDetail.value.pages != null &&
+        videoDetail.value.pages!.length > 1) {
+      isPages = true;
+      final List<Part> pages = videoDetail.value.pages!;
+      episodes.addAll(pages);
+    } else if (videoDetail.value.ugcSeason != null) {
       final UgcSeason ugcSeason = videoDetail.value.ugcSeason!;
       final List<SectionItem> sections = ugcSeason.sections!;
       for (int i = 0; i < sections.length; i++) {
         final List<EpisodeItem> episodesList = sections[i].episodes!;
         episodes.addAll(episodesList);
       }
-    } else if (videoDetail.value.pages != null) {
-      isPages = true;
-      final List<Part> pages = videoDetail.value.pages!;
-      episodes.addAll(pages);
     }
     PlayRepeat playRepeat = PlPlayerController.getInstance().playRepeat;
     if (episodes.isEmpty) {

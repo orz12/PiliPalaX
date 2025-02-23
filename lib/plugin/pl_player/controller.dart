@@ -602,9 +602,9 @@ class PlPlayerController {
     Player player = _videoPlayerController ??
         Player(
           configuration: PlayerConfiguration(
-            // 默认缓冲 4M 大小
-            bufferSize: bufferSize,
-          ),
+              // 默认缓冲 4M 大小
+              bufferSize: bufferSize,
+              logLevel: MPVLogLevel.v),
         );
     var pp = player.platform as NativePlayer;
     // 解除倍速限制
@@ -620,6 +620,12 @@ class PlPlayerController {
     // video-sync=display-resample
     await pp.setProperty("video-sync",
         setting.get(SettingBoxKey.videoSync, defaultValue: 'display-resample'));
+    // await pp.setProperty('vf', 'rotate=90');
+    await pp.setProperty('force-seekable', 'yes');
+    // await pp.setProperty("video-rotate", "no");
+    // await pp.setProperty("video-zoom","0");
+    // await pp.setProperty("vf", "tblend=c0_mode=difference,eq=contrast=2");
+    // await pp.setProperty("vf", "scale")
     // // vo=gpu-next & gpu-context=android & gpu-api=opengl
     // await pp.setProperty("vo", "gpu-next");
     // await pp.setProperty("gpu-context", "android");
@@ -798,6 +804,7 @@ class PlPlayerController {
         }),
         videoPlayerController!.stream.completed.listen((event) {
           if (event) {
+            print("stream completed");
             playerStatus.status.value = PlayerStatus.completed;
 
             /// 触发回调事件
@@ -835,11 +842,16 @@ class PlPlayerController {
           videoPlayerServiceHandler.onStatusChange(
               playerStatus.status.value, event);
         }),
-        // videoPlayerController!.stream.log.listen((event) {
-        //   print('videoPlayerController!.stream.log.listen');
-        //   print(event);
-        //   SmartDialog.showToast('视频加载日志： $event');
-        // }),
+        videoPlayerController!.stream.log.listen((event) {
+          // print('videoPlayerController!.stream.log.listen');
+          // print('[pp] $event');
+          // if (event.level == "v") {
+          if (isBuffering.value) {
+            _playerLog.value = "[${event.prefix}]${event.text}";
+          }
+          // }
+          // SmartDialog.showToast('视频加载日志： $event');
+        }),
         videoPlayerController!.stream.error.listen((String event) {
           // 直播的错误提示没有参考价值，均不予显示
           if (videoType.value == 'live') return;
