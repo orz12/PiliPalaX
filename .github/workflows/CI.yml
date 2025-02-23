@@ -157,7 +157,7 @@ jobs:
           done
 
       - name: 上传
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: Pilipala-CI
           path: |
@@ -200,7 +200,7 @@ jobs:
           done
 
       - name: 上传
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           if-no-files-found: error
           name: Pilipala-CI
@@ -216,7 +216,7 @@ jobs:
       - iOS
     steps:
 
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         with:
           name: Pilipala-CI
           path: ./Pilipala-CI

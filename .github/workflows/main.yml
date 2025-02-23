@@ -95,7 +95,7 @@ jobs:
           done
 
       - name: 上传
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: Pilipala-Release
           path: |
@@ -137,7 +137,7 @@ jobs:
           done
 
       - name: 上传
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           if-no-files-found: error
           name: Pilipala-Release
@@ -151,7 +151,7 @@ jobs:
       - android
       - iOS
     steps:
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         with:
           name: Pilipala-Release
           path: ./Pilipala-Release
