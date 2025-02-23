@@ -159,7 +159,7 @@ jobs:
       - name: 上传
         uses: actions/upload-artifact@v4
         with:
-          name: Pilipala-CI
+          name: Pilipala-CI-${{ strategy.job-index }}
           path: |
             build/app/outputs/flutter-apk/Pili-*.apk
 
@@ -203,7 +203,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           if-no-files-found: error
-          name: Pilipala-CI
+          name: Pilipala-CI-iOS
           path: |
             build/Pili-*.ipa
 
@@ -218,7 +218,8 @@ jobs:
 
       - uses: actions/download-artifact@v4
         with:
-          name: Pilipala-CI
+          pattern: Pilipala-CI-*
+          merge-multiple: true
           path: ./Pilipala-CI
           
       - name: Upload Pre-release

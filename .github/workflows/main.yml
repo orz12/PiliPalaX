@@ -97,7 +97,7 @@ jobs:
       - name: 上传
         uses: actions/upload-artifact@v4
         with:
-          name: Pilipala-Release
+          name: Pilipala-Release-${{ strategy.job-index }}
           path: |
             build/app/outputs/flutter-apk/Pili-*.apk
 
@@ -140,7 +140,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           if-no-files-found: error
-          name: Pilipala-Release
+          name: Pilipala-Release-iOS
           path: |
             build/Pili-*.ipa
 
@@ -153,7 +153,8 @@ jobs:
     steps:
       - uses: actions/download-artifact@v4
         with:
-          name: Pilipala-Release
+          pattern: Pilipala-Release-*
+          merge-multiple: true
           path: ./Pilipala-Release
 
       - name: Install dependencies
